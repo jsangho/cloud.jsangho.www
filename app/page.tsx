@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, KeyboardEvent, FormEvent } from "react";
-import { Send, RefreshCw, Loader2, Database, MessageCircle } from "lucide-react";
+import { Send, RefreshCw, Loader2, Database, MessageCircle, LogIn } from "lucide-react";
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
@@ -21,8 +21,33 @@ interface SampleDataItem {
 export default function TitanicQaApp() {
   const [currentView, setCurrentView] = useState<"qa" | "data">("qa");
 
+  const handleLogin = () => {
+    // 로그인 로직 구현 예정
+    console.log("로그인 버튼 클릭");
+  };
+
   return (
     <main className="min-h-screen bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+      {/* Navigation Bar */}
+      <nav className="sticky top-0 z-50 w-full border-b border-zinc-200 dark:border-zinc-700 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MessageCircle size={20} className="text-zinc-700 dark:text-zinc-300" />
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+              Titanic QA
+            </span>
+          </div>
+          <button
+            onClick={handleLogin}
+            aria-label="로그인"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          >
+            <LogIn size={16} />
+            로그인
+          </button>
+        </div>
+      </nav>
+
       <div className="max-w-lg mx-auto px-4 py-6">
         {/* Header */}
         <header className="text-center mb-6">
