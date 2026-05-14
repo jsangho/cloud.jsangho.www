@@ -1,6 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect, KeyboardEvent, FormEvent } from "react";
+import {
+  Suspense,
+  useState,
+  useRef,
+  useEffect,
+  KeyboardEvent,
+  FormEvent,
+} from "react";
+import { useSearchParams } from "next/navigation";
 import { Send, RefreshCw, Loader2, Database, MessageCircle } from "lucide-react";
 
 const apiBaseUrl =
@@ -18,54 +26,31 @@ interface SampleDataItem {
   [key: string]: string | number | boolean | null;
 }
 
-export default function TitanicQaApp() {
-  const [currentView, setCurrentView] = useState<"qa" | "data">("qa");
+function TitanicQaAppContent() {
+  const searchParams = useSearchParams();
+  const currentView =
+    searchParams.get("view") === "data" ? "data" : "qa";
 
   return (
-    <main className="min-h-screen bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-      <div className="max-w-lg mx-auto px-4 py-6">
-        {/* Header */}
-        <header className="text-center mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Titanic QA Assistant
-          </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            타이타닉 데이터 기반 질의응답
-          </p>
-        </header>
-
-        {/* Navigation */}
-        <nav className="flex gap-2 mb-6 justify-center">
-          <button
-            onClick={() => setCurrentView("qa")}
-            aria-label="QA 채팅 보기"
-            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
-              currentView === "qa"
-                ? "border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
-                : "border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500"
-            }`}
-          >
-            <MessageCircle size={16} />
-            QA 채팅
-          </button>
-          <button
-            onClick={() => setCurrentView("data")}
-            aria-label="샘플 데이터 보기"
-            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
-              currentView === "data"
-                ? "border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
-                : "border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-500"
-            }`}
-          >
-            <Database size={16} />
-            샘플 데이터
-          </button>
-        </nav>
-
-        {/* Views */}
+    <main className="min-h-screen bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+      <div className="mx-auto max-w-lg px-4 py-6">
         {currentView === "qa" ? <TitanicQAPage /> : <TitanicSampleDataPage />}
       </div>
     </main>
+  );
+}
+
+export default function TitanicQaApp() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-white dark:bg-zinc-900">
+          <div className="mx-auto max-w-lg px-4 py-6" />
+        </main>
+      }
+    >
+      <TitanicQaAppContent />
+    </Suspense>
   );
 }
 
@@ -161,7 +146,7 @@ function TitanicQAPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-220px)] min-h-[400px]">
+    <div className="flex min-h-[400px] flex-col h-[calc(100vh-14rem)]">
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto space-y-4 pb-4">
         {messages.length === 0 && (

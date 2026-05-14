@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from '@/components/navbar'
@@ -38,7 +39,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased bg-background">
-        <Navbar />
+        <Suspense
+          fallback={
+            <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur h-[72px]" />
+          }
+        >
+          <Navbar />
+        </Suspense>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
