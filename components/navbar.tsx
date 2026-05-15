@@ -1,89 +1,69 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Database, MessageCircle } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { WeatherWidget } from "@/components/weather-widget";
 import { cn } from "@/lib/utils";
 
-function NavTabLink({
-  href,
-  active,
-  children,
-  icon,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-  icon: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors",
-        active
-          ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-          : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-500"
-      )}
-    >
-      {icon}
-      {children}
-    </Link>
+function navLinkClass(active: boolean) {
+  return cn(
+    "border-stone-600/70 bg-stone-800/45 text-stone-200 shadow-none hover:bg-stone-700/65 hover:text-stone-50 hover:border-stone-500 focus-visible:ring-stone-500/40",
+    active &&
+      "border-stone-400 bg-stone-600 text-stone-50 hover:bg-stone-600 hover:border-stone-400 hover:text-stone-50"
   );
 }
 
 export function Navbar() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const view = searchParams.get("view");
-  const onHome = pathname === "/";
-  const isQa = onHome && view !== "data";
-  const isData = onHome && view === "data";
-  const isKayfabe = pathname === "/kayfabe";
+  const isPle = pathname === "/ple";
+  const isResults = pathname === "/results";
+  const isRankings = pathname === "/rankings";
   const isTitanicHome = pathname === "/titanic-home";
 
+  const loginBtnClass =
+    "border-stone-600/70 bg-stone-800/45 text-stone-200 shadow-none hover:bg-stone-700/65 hover:text-stone-50 hover:border-stone-500 focus-visible:ring-stone-500/40";
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+    <header className="sticky top-0 z-50 w-full border-b border-stone-700/45 bg-stone-900/82 backdrop-blur-md supports-[backdrop-filter]:bg-stone-900/68">
+      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-y-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center sm:gap-y-0">
         <div className="text-center sm:text-left">
-          <Link href="/">
-            <h1 className="text-xl font-bold tracking-tight text-foreground">
-              Titanic QA Assistant
+          <Link href="/" className="block transition-colors hover:opacity-90">
+            <h1 className="text-xl font-bold tracking-tight text-stone-50">
+              KayFabe
             </h1>
           </Link>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            타이타닉 데이터 기반 질의응답
+          <p className="mt-1 text-sm text-stone-400 tracking-wide">
+            WWE PLE 예측 게임
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
-          <NavTabLink href="/?view=qa" active={isQa} icon={<MessageCircle size={16} />}>
-            QA 채팅
-          </NavTabLink>
-          <NavTabLink href="/?view=data" active={isData} icon={<Database size={16} />}>
-            샘플 데이터
-          </NavTabLink>
-
-          <Button variant="outline" size="sm" asChild>
-            <Link
-              href="/kayfabe"
-              className="font-medium"
-              aria-current={isKayfabe ? "page" : undefined}
-            >
-              [케이페이브]
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-center">
+          <Button variant="outline" size="sm" asChild className={navLinkClass(isPle)}>
+            <Link href="/ple" aria-current={isPle ? "page" : undefined}>
+              PLE
             </Link>
           </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link
-              href="/titanic-home"
-              className="font-medium"
-              aria-current={isTitanicHome ? "page" : undefined}
-            >
+          <Button variant="outline" size="sm" asChild className={navLinkClass(isResults)}>
+            <Link href="/results" aria-current={isResults ? "page" : undefined}>
+              결과
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild className={navLinkClass(isRankings)}>
+            <Link href="/rankings" aria-current={isRankings ? "page" : undefined}>
+              순위표
+            </Link>
+          </Button>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
+          <WeatherWidget />
+          <Button variant="outline" size="sm" asChild className={navLinkClass(isTitanicHome)}>
+            <Link href="/titanic-home" aria-current={isTitanicHome ? "page" : undefined}>
               [타이타닉]
             </Link>
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className={loginBtnClass}>
             로그인
           </Button>
         </div>

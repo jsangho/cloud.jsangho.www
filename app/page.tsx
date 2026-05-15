@@ -1,29 +1,49 @@
 "use client";
 
-import {
-  Suspense,
-  useState,
-  useRef,
-  useEffect,
-  KeyboardEvent,
-  FormEvent,
-} from "react";
+import { Suspense, useState, useEffect } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Send, RefreshCw, Loader2, Database, MessageCircle } from "lucide-react";
+import { Loader2, Database, RefreshCw } from "lucide-react";
+import { GeminiChatPanel } from "@/components/gemini-chat-panel";
+import { WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
-interface Message {
-  role: "user" | "assistant";
-  text: string;
-  ts: string;
-  confidence?: number;
-  sources?: string[];
-}
-
 interface SampleDataItem {
   [key: string]: string | number | boolean | null;
+}
+
+/** Soft warm “arena dim” — low contrast, easy on the eyes. */
+function WweArenaShell({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="relative min-h-screen overflow-x-hidden bg-stone-900 text-stone-100">
+      {/* Gentle overhead wash */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_85%_at_50%_-35%,rgba(168,162,158,0.2),transparent_62%)]"
+      />
+      {/* Warm corner depth (muted, no saturated red/gold) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_0%_100%,rgba(120,113,108,0.14),transparent_58%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_50%_at_100%_0%,rgba(87,83,78,0.12),transparent_52%)]"
+      />
+      {/* Barely-there grain (avoids harsh stripes) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.025] bg-[repeating-linear-gradient(118deg,#fafaf9_0px,#fafaf9_1px,transparent_1px,transparent_24px)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-stone-950/25 via-transparent to-stone-950/75"
+      />
+      <div className="relative z-10">{children}</div>
+    </main>
+  );
 }
 
 function TitanicQaAppContent() {
@@ -32,11 +52,52 @@ function TitanicQaAppContent() {
     searchParams.get("view") === "data" ? "data" : "qa";
 
   return (
-    <main className="min-h-screen bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
-      <div className="mx-auto max-w-lg px-4 py-6">
-        {currentView === "qa" ? <TitanicQAPage /> : <TitanicSampleDataPage />}
-      </div>
-    </main>
+    <WweArenaShell>
+      {currentView === "qa" ? (
+        <div className="flex min-h-[calc(100dvh-5.5rem)] flex-col">
+          <section className="shrink-0 px-4 py-8 text-center">
+            <div className="mx-auto max-w-3xl">
+              <h2 className="text-balance text-3xl font-bold tracking-tight text-stone-50 sm:text-4xl md:text-5xl">
+                <span className="block">WWE PLE를</span>
+                <span className="block">색 다르게 즐기는 방법</span>
+              </h2>
+              <p className="mt-4 text-balance text-lg font-medium text-stone-400 sm:text-xl">
+                결과를 예측해서 Head of Table이 되어보자!
+              </p>
+            </div>
+          </section>
+          <div className="mx-auto w-full max-w-4xl shrink-0 px-4 pb-4">
+            <p className="mb-2 text-center text-xs font-medium uppercase tracking-wider text-stone-500">
+              월별 PLE
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {WWE_PLE_MONTHLY_ORDER.map((ple) => (
+                <Link
+                  key={ple.month}
+                  href={`/ple/${ple.slug}`}
+                  className="rounded-lg border border-stone-600/80 bg-stone-800/55 px-2.5 py-1.5 text-left text-xs text-stone-200 shadow-sm transition-colors hover:border-stone-500 hover:bg-stone-700/70 hover:text-stone-50 sm:px-3 sm:text-sm"
+                >
+                  <span className="block text-[10px] font-normal text-stone-500 sm:text-xs">
+                    {ple.month}월
+                  </span>
+                  <span className="block font-medium leading-snug">
+                    {ple.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="min-h-0 flex-1" aria-hidden />
+          <div className="mx-auto mt-auto w-full max-w-2xl shrink-0 px-4 pb-6 pt-2">
+            <GeminiChatPanel className="min-h-[280px] h-[min(46dvh,560px)] max-h-[52dvh]" />
+          </div>
+        </div>
+      ) : (
+        <div className="mx-auto max-w-2xl px-4 py-6">
+          <TitanicSampleDataPage />
+        </div>
+      )}
+    </WweArenaShell>
   );
 }
 
@@ -44,226 +105,13 @@ export default function TitanicQaApp() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-white dark:bg-zinc-900">
-          <div className="mx-auto max-w-lg px-4 py-6" />
-        </main>
+        <WweArenaShell>
+          <div className="mx-auto max-w-2xl px-4 py-6" />
+        </WweArenaShell>
       }
     >
       <TitanicQaAppContent />
     </Suspense>
-  );
-}
-
-function TitanicQAPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [lastQuestion, setLastQuestion] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const sendQuestion = async (question: string) => {
-    if (!question.trim()) return;
-
-    const userMessage: Message = {
-      role: "user",
-      text: question.trim(),
-      ts: new Date().toISOString(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-    setErrorMessage(null);
-    setLastQuestion(question.trim());
-
-    try {
-      const response = await fetch(`${apiBaseUrl}/titanic/qa`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: question.trim() }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`서버 오류: ${response.status}`);
-      }
-
-      const data: { answer: string; confidence: number; sources: string[] } =
-        await response.json();
-
-      const assistantMessage: Message = {
-        role: "assistant",
-        text: data.answer,
-        ts: new Date().toISOString(),
-        confidence: data.confidence,
-        sources: data.sources,
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-      setLastQuestion(null);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    sendQuestion(input);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendQuestion(input);
-    }
-  };
-
-  const handleRetry = () => {
-    if (lastQuestion) {
-      setErrorMessage(null);
-      sendQuestion(lastQuestion);
-    }
-  };
-
-  const formatTime = (ts: string) => {
-    return new Date(ts).toLocaleTimeString("ko-KR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  return (
-    <div className="flex min-h-[400px] flex-col h-[calc(100vh-14rem)]">
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto space-y-4 pb-4">
-        {messages.length === 0 && (
-          <div className="text-center text-zinc-400 dark:text-zinc-500 py-12">
-            <MessageCircle size={48} className="mx-auto mb-3 opacity-50" />
-            <p>질문을 입력하여 대화를 시작하세요</p>
-          </div>
-        )}
-
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 ${
-                msg.role === "user"
-                  ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
-                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-              }`}
-            >
-              <p className="whitespace-pre-wrap break-words">{msg.text}</p>
-
-              {msg.role === "assistant" && msg.confidence !== undefined && (
-                <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700 text-xs text-zinc-500 dark:text-zinc-400">
-                  <p>
-                    신뢰도:{" "}
-                    <span className="font-medium">
-                      {(msg.confidence * 100).toFixed(1)}%
-                    </span>
-                  </p>
-                  {msg.sources && msg.sources.length > 0 && (
-                    <p className="mt-1">
-                      출처: {msg.sources.join(", ")}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              <p
-                className={`text-xs mt-1 ${
-                  msg.role === "user"
-                    ? "text-zinc-300 dark:text-zinc-600"
-                    : "text-zinc-400 dark:text-zinc-500"
-                }`}
-              >
-                {formatTime(msg.ts)}
-              </p>
-            </div>
-          </div>
-        ))}
-
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl px-4 py-3">
-              <Loader2 size={20} className="animate-spin text-zinc-500" />
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Error Message */}
-      {errorMessage && (
-        <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-sm text-red-700 dark:text-red-400 mb-2">
-            {errorMessage}
-          </p>
-          <button
-            onClick={handleRetry}
-            aria-label="재시도"
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-red-300 dark:border-red-700 bg-white dark:bg-zinc-900 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
-          >
-            <RefreshCw size={14} />
-            재시도
-          </button>
-        </div>
-      )}
-
-      {/* Input Area */}
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <div className="flex-1">
-          <label htmlFor="question-input" className="sr-only">
-            질문 입력
-          </label>
-          <textarea
-            ref={textareaRef}
-            id="question-input"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="예: 25세 남성 3등석 생존 가능성은?"
-            maxLength={500}
-            rows={2}
-            disabled={isLoading}
-            className="w-full px-4 py-3 text-sm bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-500 focus:border-transparent disabled:opacity-50 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={isLoading || !input.trim()}
-          aria-label="질문 전송"
-          className="self-end h-[52px] w-[52px] flex items-center justify-center border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 rounded-xl hover:border-zinc-400 dark:hover:border-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {isLoading ? (
-            <Loader2 size={20} className="animate-spin" />
-          ) : (
-            <Send size={20} />
-          )}
-        </button>
-      </form>
-
-      <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 text-center">
-        Enter로 전송, Shift+Enter로 줄바꿈
-      </p>
-    </div>
   );
 }
 
@@ -324,14 +172,12 @@ function TitanicSampleDataPage() {
 
   return (
     <div>
-      {/* Loading */}
       {isLoading && (
         <div className="flex justify-center py-12">
           <Loader2 size={32} className="animate-spin text-zinc-400" />
         </div>
       )}
 
-      {/* Error */}
       {errorMessage && (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-sm text-red-700 dark:text-red-400 mb-3">
@@ -348,7 +194,6 @@ function TitanicSampleDataPage() {
         </div>
       )}
 
-      {/* Data Cards */}
       {!isLoading && !errorMessage && data.length === 0 && (
         <div className="text-center text-zinc-400 dark:text-zinc-500 py-12">
           <Database size={48} className="mx-auto mb-3 opacity-50" />
