@@ -20,9 +20,7 @@ export function Navbar() {
   const isResults = pathname === "/results";
   const isRankings = pathname === "/rankings";
   const isTitanicHome = pathname === "/titanic-home";
-
-  const loginBtnClass =
-    "border-stone-600/70 bg-stone-800/45 text-stone-200 shadow-none hover:bg-stone-700/65 hover:text-stone-50 hover:border-stone-500 focus-visible:ring-stone-500/40";
+  const isLogin = pathname === "/login";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-stone-700/45 bg-stone-900/82 backdrop-blur-md supports-[backdrop-filter]:bg-stone-900/68">
@@ -63,8 +61,10 @@ export function Navbar() {
               [타이타닉]
             </Link>
           </Button>
-          <Button variant="outline" size="sm" className={loginBtnClass}>
-            로그인
+          <Button variant="outline" size="sm" asChild className={navLinkClass(isLogin)}>
+            <Link href="/login" aria-current={isLogin ? "page" : undefined}>
+              로그인
+            </Link>
           </Button>
         </div>
       </div>
