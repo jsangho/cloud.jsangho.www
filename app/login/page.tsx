@@ -3,14 +3,86 @@
 import { FormEvent, useState } from "react";
 import { LockKeyhole, Mail, UserRound } from "lucide-react";
 
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const requestTimeoutMs = 5000;
+
 type AuthMode = "login" | "signup";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<AuthMode>("login");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isSignup = mode === "signup";
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+
+    if (isSignup) {
+      const nickname = String(formData.get("nickname") ?? "").trim();
+      const email = String(formData.get("email") ?? "").trim();
+      const password = String(formData.get("password") ?? "");
+      const passwordConfirm = String(formData.get("passwordConfirm") ?? "");
+
+      if (!nickname || !email || !password || !passwordConfirm) {
+        alert("회원가입 입력란을 모두 작성해 주세요.");
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        return;
+      }
+
+      const signupMessage = `회원가입 입력값\n\n닉네임: ${nickname}\n이메일: ${email}\n비밀번호: ${password}\n비밀번호 확인: ${passwordConfirm}`;
+
+      setIsSubmitting(true);
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => {
+        controller.abort();
+      }, requestTimeoutMs);
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/signup`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            nickname,
+            email,
+            password,
+            passwordConfirm,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`서버 오류: ${response.status}`);
+        }
+
+        alert(signupMessage);
+      } catch (error) {
+        alert(
+          error instanceof DOMException && error.name === "AbortError"
+            ? `${signupMessage}\n\n서버 응답이 ${requestTimeoutMs / 1000}초 이상 걸려 요청을 중단했습니다. 백엔드가 켜져 있는지 확인해 주세요.`
+            : error instanceof Error
+            ? `${signupMessage}\n\n서버 전송 실패: ${error.message}`
+            : `${signupMessage}\n\n서버 전송에 실패했습니다.`
+        );
+      } finally {
+        window.clearTimeout(timeoutId);
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    alert("로그인 입력이 완료되었습니다.");
   }
 
   return (
@@ -52,7 +124,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-4">
             {isSignup && (
               <label className="block">
                 <span className="mb-2 block text-sm font-medium text-stone-300">
@@ -123,9 +195,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className="mt-2 h-12 w-full rounded-2xl border border-stone-500/40 bg-stone-200 text-sm font-bold text-stone-950 shadow-lg shadow-black/20 transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-950"
             >
-              {isSignup ? "회원가입" : "로그인"}
+              {isSubmitting ? "전송 중..." : isSignup ? "회원가입" : "로그인"}
             </button>
           </form>
 
