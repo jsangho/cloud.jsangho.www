@@ -1,8 +1,19 @@
+import { PleEventGrid } from "@/components/ple-event-grid";
+
 export default function PlePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-zinc-100 via-zinc-200/70 to-zinc-300/50 px-4 py-16 text-center text-zinc-700 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-800 dark:text-zinc-300">
-      <p className="text-lg font-medium">PLE</p>
-      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">페이지 준비 중입니다.</p>
+    <main className="min-h-[calc(100dvh-5.5rem)] bg-stone-900 px-4 py-10 text-stone-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="mb-8 text-center">
+          <h1 className="text-2xl font-bold tracking-tight text-stone-50 sm:text-3xl">
+            월별 PLE
+          </h1>
+          <p className="mt-2 text-sm text-stone-400 sm:text-base">
+            예측할 이벤트를 선택하세요
+          </p>
+        </header>
+        <PleEventGrid variant="large" />
+      </div>
     </main>
   );
 }

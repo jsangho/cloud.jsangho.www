@@ -1,15 +1,16 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { LockKeyhole, Mail, UserRound } from "lucide-react";
-
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-const requestTimeoutMs = 5000;
+import { useRouter } from "next/navigation";
+import { IdCard, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
+import { apiBaseUrl, parseApiError, requestTimeoutMs } from "@/lib/api";
 
 type AuthMode = "login" | "signup";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login: saveAuthUser } = useAuth();
   const [mode, setMode] = useState<AuthMode>("login");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSignup = mode === "signup";
@@ -21,15 +22,17 @@ export default function LoginPage() {
       return;
     }
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const userId = String(formData.get("userId") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
 
     if (isSignup) {
       const nickname = String(formData.get("nickname") ?? "").trim();
-      const email = String(formData.get("email") ?? "").trim();
-      const password = String(formData.get("password") ?? "");
       const passwordConfirm = String(formData.get("passwordConfirm") ?? "");
 
-      if (!nickname || !email || !password || !passwordConfirm) {
+      if (!userId || !nickname || !email || !password || !passwordConfirm) {
         alert("회원가입 입력란을 모두 작성해 주세요.");
         return;
       }
@@ -38,8 +41,6 @@ export default function LoginPage() {
         alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         return;
       }
-
-      const signupMessage = `회원가입 입력값\n\n닉네임: ${nickname}\n이메일: ${email}\n비밀번호: ${password}\n비밀번호 확인: ${passwordConfirm}`;
 
       setIsSubmitting(true);
       const controller = new AbortController();
@@ -55,6 +56,7 @@ export default function LoginPage() {
           },
           signal: controller.signal,
           body: JSON.stringify({
+            userId,
             nickname,
             email,
             password,
@@ -62,18 +64,28 @@ export default function LoginPage() {
           }),
         });
 
+        const data = (await response.json().catch(() => null)) as {
+          detail?: string | { msg?: string }[];
+          message?: string;
+        } | null;
+
         if (!response.ok) {
-          throw new Error(`서버 오류: ${response.status}`);
+          throw new Error(parseApiError(data, response.status));
         }
 
-        alert(signupMessage);
+        alert(
+          data?.message ??
+            `회원가입이 완료되었습니다.\n\n닉네임: ${nickname}\n이메일: ${email}`
+        );
+        form.reset();
+        setMode("login");
       } catch (error) {
         alert(
           error instanceof DOMException && error.name === "AbortError"
-            ? `${signupMessage}\n\n서버 응답이 ${requestTimeoutMs / 1000}초 이상 걸려 요청을 중단했습니다. 백엔드가 켜져 있는지 확인해 주세요.`
+            ? `서버 응답이 ${requestTimeoutMs / 1000}초 이상 걸려 요청을 중단했습니다. 백엔드가 켜져 있는지 확인해 주세요.`
             : error instanceof Error
-            ? `${signupMessage}\n\n서버 전송 실패: ${error.message}`
-            : `${signupMessage}\n\n서버 전송에 실패했습니다.`
+            ? error.message
+            : "회원가입에 실패했습니다."
         );
       } finally {
         window.clearTimeout(timeoutId);
@@ -82,7 +94,61 @@ export default function LoginPage() {
       return;
     }
 
-    alert("로그인 입력이 완료되었습니다.");
+    if (!userId || !password) {
+      alert("ID와 비밀번호를 입력해 주세요.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => {
+      controller.abort();
+    }, requestTimeoutMs);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+        body: JSON.stringify({ userId, password }),
+      });
+
+      const data = (await response.json().catch(() => null)) as {
+        detail?: string | { msg?: string }[];
+        message?: string;
+        nickname?: string;
+        email?: string;
+        role?: string;
+      } | null;
+
+      if (!response.ok) {
+        throw new Error(parseApiError(data, response.status));
+      }
+
+      if (!data?.nickname || !data.email || !data.role) {
+        throw new Error("로그인 응답 형식이 올바르지 않습니다.");
+      }
+
+      saveAuthUser({
+        nickname: data.nickname,
+        email: data.email,
+        role: data.role,
+      });
+      router.push("/");
+    } catch (error) {
+      alert(
+        error instanceof DOMException && error.name === "AbortError"
+          ? `서버 응답이 ${requestTimeoutMs / 1000}초 이상 걸려 요청을 중단했습니다. 백엔드가 켜져 있는지 확인해 주세요.`
+          : error instanceof Error
+          ? error.message
+          : "로그인에 실패했습니다."
+      );
+    } finally {
+      window.clearTimeout(timeoutId);
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -107,7 +173,6 @@ export default function LoginPage() {
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-gradient-to-b from-stone-950/30 via-stone-900/40 to-stone-950/85"
       />
-
       <section className="relative z-10 flex min-h-[calc(100dvh-5.5rem)] items-center justify-center px-4 py-10">
         <div className="w-full max-w-[460px] rounded-3xl border border-stone-700/70 bg-stone-950/58 p-6 shadow-2xl shadow-black/35 backdrop-blur-xl sm:p-8">
           <div className="text-center">
@@ -145,19 +210,37 @@ export default function LoginPage() {
 
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-stone-300">
-                이메일
+                ID
               </span>
               <span className="flex items-center gap-3 rounded-2xl border border-stone-700/80 bg-stone-900/70 px-4 py-3 text-stone-300 transition-colors focus-within:border-stone-400 focus-within:bg-stone-900">
-                <Mail className="size-5 text-stone-500" />
+                <IdCard className="size-5 text-stone-500" />
                 <input
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
+                  type="text"
+                  name="userId"
+                  autoComplete={isSignup ? "username" : "username"}
+                  placeholder="로그인 ID"
                   className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-600 outline-none"
                 />
               </span>
             </label>
+
+            {isSignup && (
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-stone-300">
+                  이메일
+                </span>
+                <span className="flex items-center gap-3 rounded-2xl border border-stone-700/80 bg-stone-900/70 px-4 py-3 text-stone-300 transition-colors focus-within:border-stone-400 focus-within:bg-stone-900">
+                  <Mail className="size-5 text-stone-500" />
+                  <input
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-600 outline-none"
+                  />
+                </span>
+              </label>
+            )}
 
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-stone-300">

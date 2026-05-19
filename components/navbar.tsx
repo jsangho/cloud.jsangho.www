@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { PlePickerDialog } from "@/components/ple-picker-dialog";
 import { WeatherWidget } from "@/components/weather-widget";
+import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 
 function navLinkClass(active: boolean) {
@@ -15,12 +17,20 @@ function navLinkClass(active: boolean) {
 }
 
 export function Navbar() {
+  const router = useRouter();
+  const { user, logout, isReady } = useAuth();
   const pathname = usePathname();
-  const isPle = pathname === "/ple";
+  const isPle = pathname === "/ple" || pathname.startsWith("/ple/");
   const isResults = pathname === "/results";
   const isRankings = pathname === "/rankings";
   const isTitanicHome = pathname === "/titanic-home";
   const isLogin = pathname === "/login";
+  const isMyInfo = pathname === "/my-info";
+
+  function handleLogout() {
+    logout();
+    router.push("/");
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-stone-700/45 bg-stone-900/82 backdrop-blur-md supports-[backdrop-filter]:bg-stone-900/68">
@@ -37,11 +47,7 @@ export function Navbar() {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-center">
-          <Button variant="outline" size="sm" asChild className={navLinkClass(isPle)}>
-            <Link href="/ple" aria-current={isPle ? "page" : undefined}>
-              PLE
-            </Link>
-          </Button>
+          <PlePickerDialog triggerClassName={navLinkClass(isPle)} />
           <Button variant="outline" size="sm" asChild className={navLinkClass(isResults)}>
             <Link href="/results" aria-current={isResults ? "page" : undefined}>
               결과
@@ -61,11 +67,43 @@ export function Navbar() {
               [타이타닉]
             </Link>
           </Button>
-          <Button variant="outline" size="sm" asChild className={navLinkClass(isLogin)}>
-            <Link href="/login" aria-current={isLogin ? "page" : undefined}>
-              로그인
-            </Link>
-          </Button>
+          {!isReady ? (
+            <div
+              className="h-8 w-[7.5rem] animate-pulse rounded-md border border-stone-700/50 bg-stone-800/60"
+              aria-hidden
+            />
+          ) : user ? (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className={navLinkClass(isMyInfo)}
+              >
+                <Link href="/my-info" aria-current={isMyInfo ? "page" : undefined}>
+                  내 정보
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className={navLinkClass(false)}
+                onClick={handleLogout}
+              >
+                로그아웃
+              </Button>
+              <span className="px-1 text-sm font-semibold text-stone-100">
+                {user.nickname}
+              </span>
+            </>
+          ) : (
+            <Button variant="outline" size="sm" asChild className={navLinkClass(isLogin)}>
+              <Link href="/login" aria-current={isLogin ? "page" : undefined}>
+                로그인
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>

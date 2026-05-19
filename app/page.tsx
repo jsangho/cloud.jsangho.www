@@ -1,11 +1,10 @@
 "use client";
 
 import { Suspense, useState, useEffect } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Loader2, Database, RefreshCw } from "lucide-react";
 import { GeminiChatPanel } from "@/components/gemini-chat-panel";
-import { WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
+import { PleEventGrid } from "@/components/ple-event-grid";
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
@@ -70,22 +69,7 @@ function TitanicQaAppContent() {
             <p className="mb-2 text-center text-xs font-medium uppercase tracking-wider text-stone-500">
               월별 PLE
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              {WWE_PLE_MONTHLY_ORDER.map((ple) => (
-                <Link
-                  key={ple.month}
-                  href={`/ple/${ple.slug}`}
-                  className="rounded-lg border border-stone-600/80 bg-stone-800/55 px-2.5 py-1.5 text-left text-xs text-stone-200 shadow-sm transition-colors hover:border-stone-500 hover:bg-stone-700/70 hover:text-stone-50 sm:px-3 sm:text-sm"
-                >
-                  <span className="block text-[10px] font-normal text-stone-500 sm:text-xs">
-                    {ple.month}월
-                  </span>
-                  <span className="block font-medium leading-snug">
-                    {ple.label}
-                  </span>
-                </Link>
-              ))}
-            </div>
+            <PleEventGrid variant="compact" />
           </div>
           <div className="min-h-0 flex-1" aria-hidden />
           <div className="mx-auto mt-auto w-full max-w-2xl shrink-0 px-4 pb-6 pt-2">

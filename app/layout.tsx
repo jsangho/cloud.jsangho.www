@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from '@/components/navbar'
+import { AuthProvider } from '@/context/auth-context'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -38,14 +39,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased bg-background">
-        <Suspense
-          fallback={
-            <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur h-[72px]" />
-          }
-        >
-          <Navbar />
-        </Suspense>
-        {children}
+        <AuthProvider>
+          <Suspense
+            fallback={
+              <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur h-[72px]" />
+            }
+          >
+            <Navbar />
+          </Suspense>
+          {children}
+        </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
