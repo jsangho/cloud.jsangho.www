@@ -1,4 +1,4 @@
-import { apiBaseUrl } from "@/lib/api";
+import { apiBaseUrl, requestTimeoutMs } from "@/lib/api";
 import type { PleMatchCard } from "@/lib/wwe-ple-matches";
 import type { PleSlug } from "@/lib/wwe-ple";
 import { getPleBySlug } from "@/lib/wwe-ple";
@@ -94,7 +94,11 @@ export async function fetchPleBoard(
   clientId?: string
 ): Promise<PleBoard | null> {
   const q = clientId ? `?client_id=${encodeURIComponent(clientId)}` : "";
-  const res = await fetch(`${apiBaseUrl}/ple/${slug}${q}`);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
+  const res = await fetch(`${apiBaseUrl}/ple/${slug}${q}`, {
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timer));
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(res.statusText);
   return res.json();
@@ -110,6 +114,23 @@ export async function submitPlePrediction(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ pick, clientId }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? res.statusText);
+  }
+  return res.json();
+}
+
+export async function setPleMatchResult(
+  slug: PleSlug,
+  matchKey: string,
+  payload: PleMatchResult
+): Promise<PleBoard> {
+  const res = await fetch(`${apiBaseUrl}/ple/${slug}/matches/${matchKey}/result`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

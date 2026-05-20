@@ -131,20 +131,34 @@ type PleMatchBracketProps = {
   className?: string;
 };
 
+type BracketUiState = {
+  board: PleBoard | null;
+  useApi: boolean;
+  offline: boolean;
+};
+
+const initialBracketUiState: BracketUiState = {
+  board: null,
+  useApi: false,
+  offline: false,
+};
+
 export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
   const staticMatches = getPleMatches(slug);
   const bracketTheme = getBracketTheme(slug);
   const clientId = useMemo(() => getPleClientId(), []);
 
-  const [board, setBoard] = useState<PleBoard | null>(null);
-  const [useApi, setUseApi] = useState(false);
-  const [syncError, setSyncError] = useState<string | null>(null);
+  const [ui, setUi] = useState<BracketUiState>(initialBracketUiState);
   const [state, setState] = useState<StoredBracketState>(() =>
     buildInitialState(staticMatches)
   );
 
-  const matches: PleBoardMatch[] = useApi && board ? board.matches : staticMatches;
-  const showResults = useApi && board?.status === "finished";
+  const patchUi = (patch: Partial<BracketUiState>) =>
+    setUi((prev) => ({ ...prev, ...patch }));
+
+  const matches: PleBoardMatch[] =
+    ui.useApi && ui.board ? ui.board.matches : staticMatches;
+  const showResults = ui.useApi && ui.board?.status === "finished";
 
   useEffect(() => {
     let cancelled = false;
@@ -153,19 +167,16 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
     async function bootstrap() {
       try {
         let data = await fetchPleBoard(slug, clientId);
-        if (!data) {
+        if (!data || data.matches.length === 0) {
           data = await syncPleFromClient(slug, staticCards);
         }
         if (cancelled) return;
-        setBoard(data);
-        setUseApi(true);
+        patchUi({ board: data, useApi: true, offline: false });
         setState(stateFromBoard(data));
-        setSyncError(null);
-      } catch (e) {
+      } catch {
         if (cancelled) return;
-        setUseApi(false);
+        patchUi({ board: null, useApi: false, offline: true });
         setState(buildInitialState(staticCards));
-        setSyncError(e instanceof Error ? e.message : "API unavailable");
         try {
           const raw = localStorage.getItem(storageKey(slug));
           if (raw) {
@@ -193,39 +204,70 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
   }, [slug, clientId]);
 
   useEffect(() => {
-    if (!useApi) return;
+    if (!ui.offline) return;
+
+    let cancelled = false;
+    const staticCards = getPleMatches(slug);
+
+    async function retryConnect() {
+      try {
+        let data = await fetchPleBoard(slug, clientId);
+        if (!data || data.matches.length === 0) {
+          data = await syncPleFromClient(slug, staticCards);
+        }
+        if (cancelled) return;
+        patchUi({ board: data, useApi: true, offline: false });
+        setState(stateFromBoard(data));
+      } catch {
+        // keep offline until next retry
+      }
+    }
+
+    const timer = setInterval(() => {
+      void retryConnect();
+    }, 4000);
+
+    void retryConnect();
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [slug, clientId, ui.offline]);
+
+  useEffect(() => {
+    if (!ui.useApi) return;
     return subscribePleLive(
       slug,
       clientId,
       (live) => {
-        setBoard(live);
+        patchUi({ board: live });
         setState(stateFromBoard(live));
       },
       () => {
         /* SSE 실패 시 폴링 없이 마지막 스냅샷 유지 */
       }
     );
-  }, [slug, clientId, useApi]);
+  }, [slug, clientId, ui.useApi]);
 
   const persistLocal = useCallback(
     (next: StoredBracketState) => {
-      if (useApi) return;
+      if (ui.useApi) return;
       try {
         localStorage.setItem(storageKey(slug), JSON.stringify(next));
       } catch {
         /* quota */
       }
     },
-    [slug, useApi]
+    [slug, ui.useApi]
   );
 
   const handleSelect = useCallback(
     async (match: PleMatchCard, pick: Side | number) => {
-      if (useApi && board) {
+      if (ui.useApi && ui.board) {
         const pickStr = typeof pick === "number" ? String(pick) : pick;
         try {
           const updated = await submitPlePrediction(slug, match.id, pickStr, clientId);
-          setBoard(updated);
+          patchUi({ board: updated });
           setState(stateFromBoard(updated));
         } catch {
           /* ignore */
@@ -263,7 +305,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
         return prev;
       });
     },
-    [useApi, board, slug, clientId, persistLocal]
+    [ui.useApi, ui.board, slug, clientId, persistLocal]
   );
 
   if (matches.length === 0) return null;
@@ -274,13 +316,13 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
         <h2 className="text-lg font-bold text-stone-50">전체 경기 · 예측</h2>
         <p className="mt-1 text-xs text-stone-500">
           한 번 선택하면 변경할 수 없습니다 · 사이트 투표와 북메이커 승률은 별도 표시
-          {useApi && board?.status === "finished" && (
+          {ui.useApi && ui.board?.status === "finished" && (
             <span className="ml-1 text-emerald-400">· {BRACKET_LABELS.liveResults}</span>
           )}
         </p>
-        {syncError && (
+        {ui.offline && (
           <p className="mt-1 text-xs text-amber-500/90">
-            서버 연결 없음 — 로컬 예측만 저장됩니다 ({syncError})
+            서버 연결 없음 — 로컬 예측만 저장됩니다
           </p>
         )}
       </div>

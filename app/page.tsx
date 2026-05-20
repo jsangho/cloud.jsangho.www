@@ -99,30 +99,41 @@ export default function TitanicQaApp() {
   );
 }
 
+type SampleDataPageState = {
+  data: SampleDataItem[];
+  isLoading: boolean;
+  errorMessage: string | null;
+};
+
+const initialSampleDataState: SampleDataPageState = {
+  data: [],
+  isLoading: false,
+  errorMessage: null,
+};
+
 function TitanicSampleDataPage() {
-  const [data, setData] = useState<SampleDataItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [state, setState] = useState<SampleDataPageState>(initialSampleDataState);
+
+  const patchState = (patch: Partial<SampleDataPageState>) =>
+    setState((prev) => ({ ...prev, ...patch }));
 
   const fetchData = async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
+    patchState({ isLoading: true, errorMessage: null });
 
     try {
       const response = await fetch(`${apiBaseUrl}/titanic/data`);
 
       if (!response.ok) {
-        throw new Error(`서버 오류: ${response.status}`);
+        patchState({ errorMessage: "데이터를 불러오지 못했습니다." });
+        return;
       }
 
       const result: SampleDataItem[] = await response.json();
-      setData(result);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다."
-      );
+      patchState({ data: result, errorMessage: null });
+    } catch {
+      patchState({ errorMessage: "데이터를 불러오지 못했습니다." });
     } finally {
-      setIsLoading(false);
+      patchState({ isLoading: false });
     }
   };
 
@@ -156,16 +167,16 @@ function TitanicSampleDataPage() {
 
   return (
     <div>
-      {isLoading && (
+      {state.isLoading && (
         <div className="flex justify-center py-12">
           <Loader2 size={32} className="animate-spin text-zinc-400" />
         </div>
       )}
 
-      {errorMessage && (
+      {state.errorMessage && (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-sm text-red-700 dark:text-red-400 mb-3">
-            {errorMessage}
+            {state.errorMessage}
           </p>
           <button
             onClick={fetchData}
@@ -178,20 +189,20 @@ function TitanicSampleDataPage() {
         </div>
       )}
 
-      {!isLoading && !errorMessage && data.length === 0 && (
+      {!state.isLoading && !state.errorMessage && state.data.length === 0 && (
         <div className="text-center text-zinc-400 dark:text-zinc-500 py-12">
           <Database size={48} className="mx-auto mb-3 opacity-50" />
           <p>데이터가 없습니다</p>
         </div>
       )}
 
-      {!isLoading && data.length > 0 && (
+      {!state.isLoading && state.data.length > 0 && (
         <div className="space-y-4">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            총 {data.length}개의 레코드
+            총 {state.data.length}개의 레코드
           </p>
 
-          {data.map((item, idx) => (
+          {state.data.map((item, idx) => (
             <div
               key={idx}
               className="p-4 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl"

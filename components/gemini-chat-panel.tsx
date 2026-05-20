@@ -6,6 +6,7 @@ import {
   useEffect,
   KeyboardEvent,
   FormEvent,
+  useCallback,
 } from "react";
 import {
   Loader2,
@@ -31,18 +32,32 @@ interface ChatMessage {
   ts: string;
 }
 
+type GeminiChatPanelState = {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  errorMessage: string | null;
+  lastPayload: { messages: ChatMessage[]; model: string } | null;
+};
+
+const initialChatPanelState: GeminiChatPanelState = {
+  messages: [],
+  isLoading: false,
+  errorMessage: null,
+  lastPayload: null,
+};
+
+const CHAT_REQUEST_FAILED = "메시지를 전송하지 못했습니다.";
+
 export function GeminiChatPanel({ className }: { className?: string }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [model, setModel] = useState<string>(MODEL_OPTIONS[0].value);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [lastPayload, setLastPayload] = useState<{
-    messages: ChatMessage[];
-    model: string;
-  } | null>(null);
+  const [state, setState] = useState<GeminiChatPanelState>(initialChatPanelState);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const patchState = useCallback(
+    (patch: Partial<GeminiChatPanelState>) =>
+      setState((prev) => ({ ...prev, ...patch })),
+    []
+  );
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -50,7 +65,7 @@ export function GeminiChatPanel({ className }: { className?: string }) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [state.messages]);
 
   /** 백엔드 `/chat`은 `{ message: string }` 단일 필드만 받음 */
   function historyToMessage(history: ChatMessage[]): string {
@@ -71,11 +86,10 @@ export function GeminiChatPanel({ className }: { className?: string }) {
     const last = history[history.length - 1];
     if (!last || last.role !== "user" || !last.text.trim()) return;
 
-    setIsLoading(true);
-    setErrorMessage(null);
-    setLastPayload({
-      messages: history,
-      model: modelId,
+    patchState({
+      isLoading: true,
+      errorMessage: null,
+      lastPayload: { messages: history, model: modelId },
     });
 
     try {
@@ -87,39 +101,19 @@ export function GeminiChatPanel({ className }: { className?: string }) {
         }),
       });
 
-      const raw = await response.text();
-      let data: { reply?: string; detail?: string | unknown } = {};
-      try {
-        data = JSON.parse(raw) as typeof data;
-      } catch {
-        /* ignore */
-      }
+      const data = (await response.json().catch(() => null)) as {
+        reply?: string;
+      } | null;
 
       if (!response.ok) {
-        const detail = data.detail;
-        let detailStr: string;
-        if (typeof detail === "string") {
-          detailStr = detail;
-        } else if (Array.isArray(detail)) {
-          detailStr = detail
-            .map((item) =>
-              typeof item === "object" &&
-              item !== null &&
-              "msg" in item &&
-              typeof (item as { msg: unknown }).msg === "string"
-                ? (item as { msg: string }).msg
-                : JSON.stringify(item)
-            )
-            .join("; ");
-        } else {
-          detailStr = raw || `서버 오류: ${response.status}`;
-        }
-        throw new Error(detailStr);
+        patchState({ errorMessage: CHAT_REQUEST_FAILED });
+        return;
       }
 
-      const reply = data.reply?.trim();
+      const reply = data?.reply?.trim();
       if (!reply) {
-        throw new Error("빈 응답을 받았습니다.");
+        patchState({ errorMessage: CHAT_REQUEST_FAILED });
+        return;
       }
 
       const assistantMessage: ChatMessage = {
@@ -128,21 +122,26 @@ export function GeminiChatPanel({ className }: { className?: string }) {
         ts: new Date().toISOString(),
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
-      setLastPayload(null);
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다."
-      );
+      patchState({
+        messages: [...history, assistantMessage],
+        lastPayload: null,
+      });
+    } catch {
+      patchState({ errorMessage: CHAT_REQUEST_FAILED });
     } finally {
-      setIsLoading(false);
+      patchState({ isLoading: false });
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const text = input.trim();
-    if (!text || isLoading) return;
+    if (state.isLoading) return;
+
+    const form = e.currentTarget;
+    const formProps = Object.fromEntries(new FormData(form).entries());
+    const text = String(formProps.message ?? "").trim();
+    const modelId = String(formProps.model ?? MODEL_OPTIONS[0].value);
+    if (!text) return;
 
     const userMessage: ChatMessage = {
       role: "user",
@@ -150,10 +149,10 @@ export function GeminiChatPanel({ className }: { className?: string }) {
       ts: new Date().toISOString(),
     };
 
-    const next = [...messages, userMessage];
-    setMessages(next);
-    setInput("");
-    void sendWithHistory(next, model);
+    const next = [...state.messages, userMessage];
+    patchState({ messages: next });
+    form.reset();
+    void sendWithHistory(next, modelId);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -165,9 +164,9 @@ export function GeminiChatPanel({ className }: { className?: string }) {
   };
 
   const handleRetry = () => {
-    if (!lastPayload) return;
-    setErrorMessage(null);
-    void sendWithHistory(lastPayload.messages, lastPayload.model);
+    if (!state.lastPayload) return;
+    patchState({ errorMessage: null });
+    void sendWithHistory(state.lastPayload.messages, state.lastPayload.model);
   };
 
   const formatTime = (ts: string) => {
@@ -199,7 +198,9 @@ export function GeminiChatPanel({ className }: { className?: string }) {
     };
     const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
     if (!SR) {
-      setErrorMessage("이 브라우저에서는 음성 입력을 지원하지 않습니다.");
+      patchState({
+        errorMessage: "이 브라우저에서는 음성 입력을 지원하지 않습니다.",
+      });
       return;
     }
     const recognition = new SR();
@@ -211,13 +212,14 @@ export function GeminiChatPanel({ className }: { className?: string }) {
         results: { 0: { 0: { transcript: string } } };
       };
       const transcript = res.results[0]?.[0]?.transcript;
-      if (transcript) {
-        setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
-        textareaRef.current?.focus();
+      if (transcript && textareaRef.current) {
+        const el = textareaRef.current;
+        el.value = el.value ? `${el.value} ${transcript}` : transcript;
+        el.focus();
       }
     };
     recognition.onerror = () => {
-      setErrorMessage("음성 인식 중 오류가 발생했습니다.");
+      patchState({ errorMessage: "음성 인식 중 오류가 발생했습니다." });
     };
     recognition.start();
   };
@@ -231,7 +233,7 @@ export function GeminiChatPanel({ className }: { className?: string }) {
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         <div className="flex min-h-full flex-col justify-end gap-4 pb-4">
-          {messages.map((msg, idx) => (
+          {state.messages.map((msg, idx) => (
             <div
               key={`${msg.ts}-${idx}`}
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
@@ -257,7 +259,7 @@ export function GeminiChatPanel({ className }: { className?: string }) {
             </div>
           ))}
 
-          {isLoading && (
+          {state.isLoading && (
             <div className="flex justify-start">
               <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl px-4 py-3">
                 <Loader2 size={20} className="animate-spin text-zinc-500" />
@@ -269,12 +271,12 @@ export function GeminiChatPanel({ className }: { className?: string }) {
         </div>
       </div>
 
-      {errorMessage && (
+      {state.errorMessage && (
         <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-sm text-red-700 dark:text-red-400 mb-2">
-            {errorMessage}
+            {state.errorMessage}
           </p>
-          {lastPayload && (
+          {state.lastPayload && (
             <button
               type="button"
               onClick={handleRetry}
@@ -296,13 +298,12 @@ export function GeminiChatPanel({ className }: { className?: string }) {
           <textarea
             ref={textareaRef}
             id="gemini-input"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
+            name="message"
             onKeyDown={handleKeyDown}
             placeholder="Gemini에게 물어보기"
             maxLength={8000}
             rows={2}
-            disabled={isLoading}
+            disabled={state.isLoading}
             className="w-full resize-none border-0 bg-transparent px-1 py-1 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 disabled:opacity-50 dark:text-zinc-100 dark:placeholder:text-zinc-500"
           />
 
@@ -330,9 +331,9 @@ export function GeminiChatPanel({ className }: { className?: string }) {
             <div className="flex items-center gap-1">
               <div className="relative">
                 <select
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                  disabled={isLoading}
+                  name="model"
+                  defaultValue={MODEL_OPTIONS[0].value}
+                  disabled={state.isLoading}
                   aria-label="모델 선택"
                   className="h-9 appearance-none rounded-full border border-zinc-200 bg-zinc-50 py-0 pl-3 pr-8 text-xs font-medium text-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-300 disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:focus:ring-zinc-600"
                 >
@@ -349,11 +350,11 @@ export function GeminiChatPanel({ className }: { className?: string }) {
 
               <button
                 type="submit"
-                disabled={isLoading || !input.trim()}
+                disabled={state.isLoading}
                 aria-label="전송"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-100 disabled:opacity-40 dark:text-zinc-300 dark:hover:bg-zinc-700"
               >
-                {isLoading ? (
+                {state.isLoading ? (
                   <Loader2 size={18} className="animate-spin" />
                 ) : (
                   <Send size={18} strokeWidth={1.75} />
@@ -363,7 +364,7 @@ export function GeminiChatPanel({ className }: { className?: string }) {
               <button
                 type="button"
                 onClick={startVoiceInput}
-                disabled={isLoading}
+                disabled={state.isLoading}
                 aria-label="음성 입력"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-100 disabled:opacity-40 dark:text-zinc-300 dark:hover:bg-zinc-700"
               >

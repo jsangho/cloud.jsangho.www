@@ -22,3 +22,12 @@ export function parseApiError(
   }
   return data?.message ?? `서버 오류: ${status}`;
 }
+
+/** REACT_RULES §4: 사용자 UI에는 API 원문·입력 echo를 노출하지 않음 */
+export function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
+export function getRequestTimeoutMessage(): string {
+  return `서버 응답이 ${requestTimeoutMs / 1000}초 이상 걸려 요청을 중단했습니다. 백엔드가 켜져 있는지 확인해 주세요.`;
+}

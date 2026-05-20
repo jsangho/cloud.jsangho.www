@@ -4,7 +4,12 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IdCard, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
-import { apiBaseUrl, parseApiError, requestTimeoutMs } from "@/lib/api";
+import {
+  apiBaseUrl,
+  getRequestTimeoutMessage,
+  isAbortError,
+  requestTimeoutMs,
+} from "@/lib/api";
 
 type AuthMode = "login" | "signup";
 
@@ -17,6 +22,14 @@ const initialState: LoginPageState = {
   mode: "login",
   isSubmitting: false,
 };
+
+function authFailureAlert(isSignup: boolean, error: unknown) {
+  if (isAbortError(error)) {
+    alert(getRequestTimeoutMessage());
+    return;
+  }
+  alert(isSignup ? "회원가입에 실패했습니다." : "로그인에 실패했습니다.");
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -77,29 +90,16 @@ export default function LoginPage() {
           }),
         });
 
-        const data = (await response.json().catch(() => null)) as {
-          detail?: string | { msg?: string }[];
-          message?: string;
-        } | null;
-
         if (!response.ok) {
-          throw new Error(parseApiError(data, response.status));
+          authFailureAlert(true, null);
+          return;
         }
 
-        alert(
-          data?.message ??
-            `회원가입이 완료되었습니다.\n\n닉네임: ${nickname}\n이메일: ${email}`
-        );
+        alert("회원가입이 완료되었습니다.");
         form.reset();
         patchState({ mode: "login" });
       } catch (error) {
-        alert(
-          error instanceof DOMException && error.name === "AbortError"
-            ? `서버 응답이 ${requestTimeoutMs / 1000}초 이상 걸려 요청을 중단했습니다. 백엔드가 켜져 있는지 확인해 주세요.`
-            : error instanceof Error
-            ? error.message
-            : "회원가입에 실패했습니다."
-        );
+        authFailureAlert(true, error);
       } finally {
         window.clearTimeout(timeoutId);
         patchState({ isSubmitting: false });
@@ -129,19 +129,19 @@ export default function LoginPage() {
       });
 
       const data = (await response.json().catch(() => null)) as {
-        detail?: string | { msg?: string }[];
-        message?: string;
         nickname?: string;
         email?: string;
         role?: string;
       } | null;
 
       if (!response.ok) {
-        throw new Error(parseApiError(data, response.status));
+        authFailureAlert(false, null);
+        return;
       }
 
       if (!data?.nickname || !data.email || !data.role) {
-        throw new Error("로그인 응답 형식이 올바르지 않습니다.");
+        authFailureAlert(false, null);
+        return;
       }
 
       saveAuthUser({
@@ -151,13 +151,7 @@ export default function LoginPage() {
       });
       router.push("/");
     } catch (error) {
-      alert(
-        error instanceof DOMException && error.name === "AbortError"
-          ? `서버 응답이 ${requestTimeoutMs / 1000}초 이상 걸려 요청을 중단했습니다. 백엔드가 켜져 있는지 확인해 주세요.`
-          : error instanceof Error
-          ? error.message
-          : "로그인에 실패했습니다."
-      );
+      authFailureAlert(false, error);
     } finally {
       window.clearTimeout(timeoutId);
       patchState({ isSubmitting: false });
@@ -166,26 +160,7 @@ export default function LoginPage() {
 
   return (
     <main className="relative min-h-[calc(100dvh-5.5rem)] overflow-hidden bg-stone-900 text-stone-100">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_85%_at_50%_-35%,rgba(168,162,158,0.2),transparent_62%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_0%_100%,rgba(120,113,108,0.14),transparent_58%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_50%_at_100%_0%,rgba(87,83,78,0.12),transparent_52%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.025] bg-[repeating-linear-gradient(118deg,#fafaf9_0px,#fafaf9_1px,transparent_1px,transparent_24px)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-stone-950/30 via-stone-900/40 to-stone-950/85"
-      />
+      <LoginBackdrop />
       <section className="relative z-10 flex min-h-[calc(100dvh-5.5rem)] items-center justify-center px-4 py-10">
         <div className="w-full max-w-[460px] rounded-3xl border border-stone-700/70 bg-stone-950/58 p-6 shadow-2xl shadow-black/35 backdrop-blur-xl sm:p-8">
           <div className="text-center">
@@ -230,7 +205,7 @@ export default function LoginPage() {
                 <input
                   type="text"
                   name="userId"
-                  autoComplete={isSignup ? "username" : "username"}
+                  autoComplete="username"
                   placeholder="로그인 ID"
                   className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-600 outline-none"
                 />
@@ -316,5 +291,32 @@ export default function LoginPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function LoginBackdrop() {
+  return (
+    <>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_85%_at_50%_-35%,rgba(168,162,158,0.2),transparent_62%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_0%_100%,rgba(120,113,108,0.14),transparent_58%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_50%_at_100%_0%,rgba(87,83,78,0.12),transparent_52%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.025] bg-[repeating-linear-gradient(118deg,#fafaf9_0px,#fafaf9_1px,transparent_1px,transparent_24px)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-stone-950/30 via-stone-900/40 to-stone-950/85"
+      />
+    </>
   );
 }
