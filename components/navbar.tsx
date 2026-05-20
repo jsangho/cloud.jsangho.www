@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState, type ReactNode } from "react";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { PlePickerDialog } from "@/components/ple-picker-dialog";
 import { WeatherWidget } from "@/components/weather-widget";
 import { useAuth } from "@/context/auth-context";
@@ -16,16 +17,46 @@ function navLinkClass(active: boolean) {
   );
 }
 
+function NavLink({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        buttonVariants({ variant: "outline", size: "sm" }),
+        navLinkClass(active)
+      )}
+      {...(active ? { "aria-current": "page" as const } : {})}
+    >
+      {children}
+    </Link>
+  );
+}
+
 export function Navbar() {
   const router = useRouter();
   const { user, logout, isReady } = useAuth();
   const pathname = usePathname();
-  const isPle = pathname === "/ple" || pathname.startsWith("/ple/");
-  const isResults = pathname === "/results";
-  const isRankings = pathname === "/rankings";
-  const isTitanicHome = pathname === "/titanic-home";
-  const isLogin = pathname === "/login";
-  const isMyInfo = pathname === "/my-info";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isPle = mounted && (pathname === "/ple" || pathname.startsWith("/ple/"));
+  const isResults = mounted && pathname === "/results";
+  const isRankings = mounted && pathname === "/rankings";
+  const isTitanicHome = mounted && pathname === "/titanic-home";
+  const isLogin = mounted && pathname === "/login";
+  const isMyInfo = mounted && pathname === "/my-info";
+  const showAuth = mounted && isReady;
 
   function handleLogout() {
     logout();
@@ -48,42 +79,29 @@ export function Navbar() {
 
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-center">
           <PlePickerDialog triggerClassName={navLinkClass(isPle)} />
-          <Button variant="outline" size="sm" asChild className={navLinkClass(isResults)}>
-            <Link href="/results" aria-current={isResults ? "page" : undefined}>
-              결과
-            </Link>
-          </Button>
-          <Button variant="outline" size="sm" asChild className={navLinkClass(isRankings)}>
-            <Link href="/rankings" aria-current={isRankings ? "page" : undefined}>
-              순위표
-            </Link>
-          </Button>
+          <NavLink href="/results" active={isResults}>
+            결과
+          </NavLink>
+          <NavLink href="/rankings" active={isRankings}>
+            순위표
+          </NavLink>
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
           <WeatherWidget />
-          <Button variant="outline" size="sm" asChild className={navLinkClass(isTitanicHome)}>
-            <Link href="/titanic-home" aria-current={isTitanicHome ? "page" : undefined}>
-              [타이타닉]
-            </Link>
-          </Button>
-          {!isReady ? (
+          <NavLink href="/titanic-home" active={isTitanicHome}>
+            [타이타닉]
+          </NavLink>
+          {!showAuth ? (
             <div
               className="h-8 w-[7.5rem] animate-pulse rounded-md border border-stone-700/50 bg-stone-800/60"
               aria-hidden
             />
           ) : user ? (
             <>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className={navLinkClass(isMyInfo)}
-              >
-                <Link href="/my-info" aria-current={isMyInfo ? "page" : undefined}>
-                  내 정보
-                </Link>
-              </Button>
+              <NavLink href="/my-info" active={isMyInfo}>
+                내 정보
+              </NavLink>
               <Button
                 type="button"
                 variant="outline"
@@ -98,11 +116,9 @@ export function Navbar() {
               </span>
             </>
           ) : (
-            <Button variant="outline" size="sm" asChild className={navLinkClass(isLogin)}>
-              <Link href="/login" aria-current={isLogin ? "page" : undefined}>
-                로그인
-              </Link>
-            </Button>
+            <NavLink href="/login" active={isLogin}>
+              로그인
+            </NavLink>
           )}
         </div>
       </div>

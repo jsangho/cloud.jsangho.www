@@ -8,29 +8,42 @@ import { apiBaseUrl, parseApiError, requestTimeoutMs } from "@/lib/api";
 
 type AuthMode = "login" | "signup";
 
+type LoginPageState = {
+  mode: AuthMode;
+  isSubmitting: boolean;
+};
+
+const initialState: LoginPageState = {
+  mode: "login",
+  isSubmitting: false,
+};
+
 export default function LoginPage() {
   const router = useRouter();
   const { login: saveAuthUser } = useAuth();
-  const [mode, setMode] = useState<AuthMode>("login");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const isSignup = mode === "signup";
+  const [state, setState] = useState<LoginPageState>(initialState);
+  const isSignup = state.mode === "signup";
+
+  const patchState = (patch: Partial<LoginPageState>) =>
+    setState((prev) => ({ ...prev, ...patch }));
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (isSubmitting) {
+    if (state.isSubmitting) {
       return;
     }
 
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const userId = String(formData.get("userId") ?? "").trim();
-    const email = String(formData.get("email") ?? "").trim();
-    const password = String(formData.get("password") ?? "");
+    const formProps = Object.fromEntries(formData.entries());
+    const userId = String(formProps.userId ?? "").trim();
+    const password = String(formProps.password ?? "");
 
     if (isSignup) {
-      const nickname = String(formData.get("nickname") ?? "").trim();
-      const passwordConfirm = String(formData.get("passwordConfirm") ?? "");
+      const nickname = String(formProps.nickname ?? "").trim();
+      const email = String(formProps.email ?? "").trim();
+      const passwordConfirm = String(formProps.passwordConfirm ?? "");
 
       if (!userId || !nickname || !email || !password || !passwordConfirm) {
         alert("회원가입 입력란을 모두 작성해 주세요.");
@@ -42,7 +55,7 @@ export default function LoginPage() {
         return;
       }
 
-      setIsSubmitting(true);
+      patchState({ isSubmitting: true });
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => {
         controller.abort();
@@ -78,7 +91,7 @@ export default function LoginPage() {
             `회원가입이 완료되었습니다.\n\n닉네임: ${nickname}\n이메일: ${email}`
         );
         form.reset();
-        setMode("login");
+        patchState({ mode: "login" });
       } catch (error) {
         alert(
           error instanceof DOMException && error.name === "AbortError"
@@ -89,7 +102,7 @@ export default function LoginPage() {
         );
       } finally {
         window.clearTimeout(timeoutId);
-        setIsSubmitting(false);
+        patchState({ isSubmitting: false });
       }
       return;
     }
@@ -99,7 +112,7 @@ export default function LoginPage() {
       return;
     }
 
-    setIsSubmitting(true);
+    patchState({ isSubmitting: true });
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => {
       controller.abort();
@@ -147,7 +160,7 @@ export default function LoginPage() {
       );
     } finally {
       window.clearTimeout(timeoutId);
-      setIsSubmitting(false);
+      patchState({ isSubmitting: false });
     }
   }
 
@@ -278,17 +291,23 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={state.isSubmitting}
               className="mt-2 h-12 w-full rounded-2xl border border-stone-500/40 bg-stone-200 text-sm font-bold text-stone-950 shadow-lg shadow-black/20 transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-950"
             >
-              {isSubmitting ? "전송 중..." : isSignup ? "회원가입" : "로그인"}
+              {state.isSubmitting
+                ? "전송 중..."
+                : isSignup
+                  ? "회원가입"
+                  : "로그인"}
             </button>
           </form>
 
           <div className="mt-5 text-center">
             <button
               type="button"
-              onClick={() => setMode(isSignup ? "login" : "signup")}
+              onClick={() =>
+                patchState({ mode: isSignup ? "login" : "signup" })
+              }
               className="rounded-full border border-stone-700/80 bg-stone-900/55 px-3 py-1.5 text-xs font-medium text-stone-400 transition-colors hover:border-stone-500 hover:bg-stone-800/80 hover:text-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500/60"
             >
               {isSignup ? "로그인으로 돌아가기" : "회원가입"}
