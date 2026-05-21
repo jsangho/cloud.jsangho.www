@@ -100,6 +100,38 @@ export async function fetchPleBoard(
   return res.json();
 }
 
+export type MatchResultPayload = {
+  winnerSide?: "left" | "right";
+  winnerIndex?: number;
+  winnerName?: string;
+  status?: "scheduled" | "live" | "finished";
+};
+
+export async function submitPleMatchResult(
+  slug: PleSlug,
+  matchKey: string,
+  body: MatchResultPayload
+): Promise<PleBoard> {
+  const res = await fetch(
+    `${apiBaseUrl}/ple/${slug}/matches/${matchKey}/result`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        winnerSide: body.winnerSide,
+        winnerIndex: body.winnerIndex,
+        winnerName: body.winnerName,
+        status: body.status ?? "finished",
+      }),
+    }
+  );
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { detail?: string }).detail ?? res.statusText);
+  }
+  return res.json();
+}
+
 export async function submitPlePrediction(
   slug: PleSlug,
   matchKey: string,

@@ -165,7 +165,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative min-h-[calc(100dvh-5.5rem)] overflow-hidden bg-stone-900 text-stone-100">
+    <main className="relative min-h-[calc(100dvh-5.5rem)] w-full min-w-0 overflow-x-hidden bg-stone-900 text-stone-100">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_85%_at_50%_-35%,rgba(168,162,158,0.2),transparent_62%)]"

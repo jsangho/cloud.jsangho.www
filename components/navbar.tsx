@@ -53,7 +53,9 @@ export function Navbar() {
   const isPle = mounted && (pathname === "/ple" || pathname.startsWith("/ple/"));
   const isResults = mounted && pathname === "/results";
   const isRankings = mounted && pathname === "/rankings";
-  const isTitanicHome = mounted && pathname === "/titanic-home";
+  const isTitanicHome =
+    mounted &&
+    (pathname === "/titanic-home" || pathname.startsWith("/titanic-home/"));
   const isLogin = mounted && pathname === "/login";
   const isMyInfo = mounted && pathname === "/my-info";
   const showAuth = mounted && isReady;
@@ -64,8 +66,8 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-stone-700/45 bg-stone-900/82 backdrop-blur-md supports-[backdrop-filter]:bg-stone-900/68">
-      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-y-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center sm:gap-y-0">
+    <header className="sticky top-0 z-50 w-full min-w-0 border-b border-stone-700/45 bg-stone-900/82 backdrop-blur-md supports-[backdrop-filter]:bg-stone-900/68">
+      <div className="mx-auto grid w-full max-w-5xl min-w-0 grid-cols-1 gap-y-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center sm:gap-y-0">
         <div className="text-center sm:text-left">
           <Link href="/" className="block transition-colors hover:opacity-90">
             <h1 className="text-xl font-bold tracking-tight text-stone-50">

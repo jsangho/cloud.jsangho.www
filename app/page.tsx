@@ -16,7 +16,7 @@ interface SampleDataItem {
 /** Soft warm “arena dim” — low contrast, easy on the eyes. */
 function WweArenaShell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-stone-900 text-stone-100">
+    <main className="relative min-h-screen w-full min-w-0 overflow-x-hidden bg-stone-900 text-stone-100">
       {/* Gentle overhead wash */}
       <div
         aria-hidden
@@ -65,7 +65,7 @@ function TitanicQaAppContent() {
               </p>
             </div>
           </section>
-          <div className="mx-auto w-full max-w-4xl shrink-0 px-4 pb-4">
+          <div className="mx-auto w-full max-w-5xl shrink-0 px-4 pb-4">
             <p className="mb-2 text-center text-xs font-medium uppercase tracking-wider text-stone-500">
               월별 PLE
             </p>
