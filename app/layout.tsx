@@ -36,8 +36,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="font-sans antialiased bg-background">
+    <html lang="ko" className="h-full">
+      <body className="min-h-full w-full overflow-x-hidden font-sans antialiased bg-stone-950 text-stone-100">
         <AuthProvider>
           <Navbar />
           {children}

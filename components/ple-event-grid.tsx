@@ -6,35 +6,38 @@ type PleEventGridProps = {
   variant?: "compact" | "large";
   className?: string;
   onNavigate?: () => void;
+  /** 링크 접두사 (기본 `/ple`, 결과 페이지는 `/results`) */
+  hrefPrefix?: string;
 };
 
 export function PleEventGrid({
   variant = "large",
   className,
   onNavigate,
+  hrefPrefix = "/ple",
 }: PleEventGridProps) {
   const isLarge = variant === "large";
 
   return (
     <ul
       className={cn(
-        "list-none p-0 m-0",
+        "list-none m-0 w-full p-0",
         isLarge
           ? "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-          : "flex flex-wrap items-center justify-center gap-2",
+          : "grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6",
         className
       )}
     >
       {WWE_PLE_MONTHLY_ORDER.map((ple) => (
-        <li key={ple.slug}>
+        <li key={ple.slug} className="min-w-0">
           <Link
-            href={`/ple/${ple.slug}`}
+            href={`${hrefPrefix}/${ple.slug}`}
             onClick={onNavigate}
             className={cn(
-              "block rounded-xl border text-left shadow-sm transition-colors",
+              "block h-full w-full min-w-0 rounded-xl border text-left shadow-sm transition-colors",
               isLarge
                 ? "border-stone-600/80 bg-stone-800/55 px-5 py-4 hover:border-stone-500 hover:bg-stone-700/70"
-                : "border-stone-600/80 bg-stone-800/55 px-2.5 py-1.5 text-xs text-stone-200 hover:border-stone-500 hover:bg-stone-700/70 hover:text-stone-50 sm:px-3 sm:text-sm"
+                : "border-stone-600/80 bg-stone-800/55 px-2.5 py-2 text-xs text-stone-200 hover:border-stone-500 hover:bg-stone-700/70 hover:text-stone-50 sm:px-3 sm:text-sm"
             )}
           >
             <span
