@@ -22,7 +22,37 @@ type MatchBracketCardProps = {
   onSelect: (pick: Side | number) => void;
   result?: PleMatchResult | PleMatchResultHint | null;
   showResults?: boolean;
+  aiPickName?: string | null;
+  aiCorrect?: boolean | null;
 };
+
+function AiPickBanner({
+  aiPickName,
+  aiCorrect,
+  showResults,
+}: {
+  aiPickName?: string | null;
+  aiCorrect?: boolean | null;
+  showResults?: boolean;
+}) {
+  if (!aiPickName) return null;
+  return (
+    <p
+      className={cn(
+        "border-t border-stone-200/80 bg-stone-50 px-3 py-1.5 text-center text-[10px] sm:text-xs",
+        showResults && aiCorrect === true && "bg-emerald-50/90 text-emerald-800",
+        showResults && aiCorrect === false && "bg-red-50/80 text-red-800"
+      )}
+    >
+      <span className="font-semibold text-violet-700">AI 예측</span>
+      <span className="mx-1 text-stone-400">·</span>
+      <span className="font-medium text-stone-700">{aiPickName}</span>
+      {showResults && aiCorrect != null && (
+        <span className="ml-2 font-bold">{aiCorrect ? "✓ 적중" : "✗ 실패"}</span>
+      )}
+    </p>
+  );
+}
 
 function pickOutcome(
   result: PleMatchResult | PleMatchResultHint | null | undefined,
@@ -87,6 +117,7 @@ function CompetitorPick({
         outcome === "win" && "bg-emerald-100 ring-2 ring-inset ring-emerald-500",
         outcome === "loss" && "bg-stone-200/90 opacity-75",
         outcome == null && isSelected && nameStyle.selectedBg,
+        outcome != null && isSelected && "ring-2 ring-inset ring-violet-400",
         outcome == null && !isSelected && !isOtherSelected && !locked && "bg-white hover:bg-stone-50",
         outcome == null && !isSelected && isOtherSelected && "bg-stone-100/80",
         outcome == null && !isSelected && locked && "bg-stone-50",
@@ -106,6 +137,16 @@ function CompetitorPick({
           {competitor.name}
         </span>
       </div>
+      {isSelected && (
+        <span
+          className={cn(
+            "mt-0.5 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white",
+            outcome == null ? nameStyle.headerBg : "bg-violet-600"
+          )}
+        >
+          {BRACKET_LABELS.myPick}
+        </span>
+      )}
       {outcome === "win" && (
         <span className="mt-0.5 rounded bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
           {BRACKET_LABELS.win}
@@ -114,16 +155,6 @@ function CompetitorPick({
       {outcome === "loss" && (
         <span className="mt-0.5 rounded bg-stone-400 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
           {BRACKET_LABELS.loss}
-        </span>
-      )}
-      {outcome == null && isSelected && (
-        <span
-          className={cn(
-            "mt-0.5 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white",
-            nameStyle.headerBg
-          )}
-        >
-          {BRACKET_LABELS.myPick}
         </span>
       )}
     </button>
@@ -294,6 +325,8 @@ export function MatchBracketCard({
   onSelect,
   result,
   showResults = false,
+  aiPickName,
+  aiCorrect,
 }: MatchBracketCardProps) {
   const cardStyle = bracketTheme[match.cardVariant];
   const leftStyle = bracketTheme.sideA;
@@ -318,6 +351,11 @@ export function MatchBracketCard({
           >
             {match.title}
           </div>
+          <AiPickBanner
+            aiPickName={aiPickName}
+            aiCorrect={aiCorrect}
+            showResults={displayResults}
+          />
 
           <div className={cn("border-2 border-t-0 bg-white p-2", cardStyle.border)}>
             <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-wide text-stone-400">
@@ -383,6 +421,11 @@ export function MatchBracketCard({
         >
           {match.title}
         </div>
+        <AiPickBanner
+          aiPickName={aiPickName}
+          aiCorrect={aiCorrect}
+          showResults={displayResults}
+        />
 
         <div className={cn("flex border-2 border-t-0 bg-white", cardStyle.border)}>
           <CompetitorPick

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PleResultsBoard } from "@/components/results/ple-results-board";
-import { getPleBySlug, WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
+import { formatPleMonth, getPleBySlug, WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
 import type { PleSlug } from "@/lib/wwe-ple";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -15,8 +15,12 @@ export default async function ResultsEventPage({ params }: Props) {
   const ple = getPleBySlug(slug);
   if (!ple) notFound();
 
-  const prev = WWE_PLE_MONTHLY_ORDER.find((e) => e.month === ple.month - 1);
-  const next = WWE_PLE_MONTHLY_ORDER.find((e) => e.month === ple.month + 1);
+  const idx = WWE_PLE_MONTHLY_ORDER.findIndex((e) => e.slug === slug);
+  const prev = idx > 0 ? WWE_PLE_MONTHLY_ORDER[idx - 1] : undefined;
+  const next =
+    idx >= 0 && idx < WWE_PLE_MONTHLY_ORDER.length - 1
+      ? WWE_PLE_MONTHLY_ORDER[idx + 1]
+      : undefined;
 
   return (
     <main className="min-h-[calc(100dvh-5.5rem)] w-full min-w-0 bg-stone-900 px-4 py-10 text-stone-100">
@@ -34,7 +38,7 @@ export default async function ResultsEventPage({ params }: Props) {
                 href={`/results/${prev.slug}`}
                 className="rounded-lg border border-stone-700/60 px-3 py-1 text-stone-400 hover:border-stone-500 hover:text-stone-200"
               >
-                {prev.month}월
+                {formatPleMonth(prev.month)}
               </Link>
             )}
             {next && (
@@ -42,19 +46,22 @@ export default async function ResultsEventPage({ params }: Props) {
                 href={`/results/${next.slug}`}
                 className="rounded-lg border border-stone-700/60 px-3 py-1 text-stone-400 hover:border-stone-500 hover:text-stone-200"
               >
-                {next.month}월
+                {formatPleMonth(next.month)}
               </Link>
             )}
           </div>
         </nav>
 
         <header className="mb-8 rounded-2xl border border-stone-600/70 bg-stone-800/50 p-6">
-          <span className="text-sm font-medium text-stone-500">{ple.month}월 PLE</span>
+          <span className="text-sm font-medium text-stone-500">
+            {formatPleMonth(ple.month)} PLE
+          </span>
           <h1 className="mt-1 text-3xl font-bold tracking-tight text-stone-50">
             {ple.label}
           </h1>
           <p className="mt-2 text-sm text-stone-400">
-            승자를 선택하고 「결과 등록」을 누르면 서버에 저장됩니다.
+            등록된 승자는 누구나 확인할 수 있습니다. 등록·수정은 관리자 인증 후에만
+            가능합니다.
           </p>
         </header>
 

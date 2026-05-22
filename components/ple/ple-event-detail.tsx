@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { PleEventDetail } from "@/lib/wwe-ple-detail";
 import type { PleSlug } from "@/lib/wwe-ple";
-import { WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
+import { formatPleMonth, WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
 import { PleMatchBracket } from "@/components/ple/ple-match-bracket";
 
 type PleBase = (typeof WWE_PLE_MONTHLY_ORDER)[number];
@@ -14,8 +14,12 @@ type PleEventDetailViewProps = {
 
 export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
   const { theme } = detail;
-  const prev = WWE_PLE_MONTHLY_ORDER.find((e) => e.month === ple.month - 1);
-  const next = WWE_PLE_MONTHLY_ORDER.find((e) => e.month === ple.month + 1);
+  const idx = WWE_PLE_MONTHLY_ORDER.findIndex((e) => e.slug === ple.slug);
+  const prev = idx > 0 ? WWE_PLE_MONTHLY_ORDER[idx - 1] : undefined;
+  const next =
+    idx >= 0 && idx < WWE_PLE_MONTHLY_ORDER.length - 1
+      ? WWE_PLE_MONTHLY_ORDER[idx + 1]
+      : undefined;
 
   return (
     <main className={cn("relative min-h-[calc(100dvh-5.5rem)] overflow-hidden", theme.pageBg)}>
@@ -40,7 +44,7 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
                 href={`/ple/${prev.slug}`}
                 className="rounded-lg border border-stone-700/60 px-3 py-1 text-stone-400 hover:border-stone-500 hover:text-stone-200"
               >
-                {prev.month}월
+                {formatPleMonth(prev.month)}
               </Link>
             )}
             {next && (
@@ -48,7 +52,7 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
                 href={`/ple/${next.slug}`}
                 className="rounded-lg border border-stone-700/60 px-3 py-1 text-stone-400 hover:border-stone-500 hover:text-stone-200"
               >
-                {next.month}월
+                {formatPleMonth(next.month)}
               </Link>
             )}
           </div>
@@ -68,7 +72,7 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
               theme.badge
             )}
           >
-            {ple.month}월 · {detail.signatureLabel}
+            {formatPleMonth(ple.month)} · {detail.signatureLabel}
           </span>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-stone-50 sm:text-4xl">
             {ple.label}
@@ -81,9 +85,9 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
           </p>
         </header>
 
-        <PleHighlightsSection detail={detail} />
-
         <PleMatchBracket slug={ple.slug as PleSlug} className="mt-8" />
+
+        <PleHighlightsSection detail={detail} />
 
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link

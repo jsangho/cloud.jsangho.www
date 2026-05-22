@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
+import { formatPleMonth, WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
 
 type PleEventGridProps = {
   variant?: "compact" | "large";
@@ -24,12 +24,15 @@ export function PleEventGrid({
         "list-none m-0 w-full p-0",
         isLarge
           ? "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-          : "grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6",
+          : "mx-auto flex max-w-5xl flex-wrap justify-center gap-2 sm:gap-2.5",
         className
       )}
     >
       {WWE_PLE_MONTHLY_ORDER.map((ple) => (
-        <li key={ple.slug} className="min-w-0">
+        <li
+          key={ple.slug}
+          className={cn("min-w-0", !isLarge && "w-[calc(50%-0.25rem)] sm:w-[9.5rem]")}
+        >
           <Link
             href={`${hrefPrefix}/${ple.slug}`}
             onClick={onNavigate}
@@ -46,7 +49,7 @@ export function PleEventGrid({
                 isLarge ? "text-sm" : "block text-[10px] font-normal sm:text-xs"
               )}
             >
-              {ple.month}월
+              {formatPleMonth(ple.month)}
             </span>
             <span
               className={cn(

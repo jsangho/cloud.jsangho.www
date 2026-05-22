@@ -11,6 +11,8 @@ import {
 } from "react";
 
 export type AuthUser = {
+  /** 로그인 API userId — 예측·순위 집계에 필요 */
+  id: number;
   nickname: string;
   email: string;
   role: string;
@@ -35,7 +37,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const raw = localStorage.getItem(AUTH_STORAGE_KEY);
       if (raw) {
-        setUser(JSON.parse(raw) as AuthUser);
+        const parsed = JSON.parse(raw) as Partial<AuthUser>;
+        if (typeof parsed.id === "number" && parsed.nickname && parsed.email && parsed.role) {
+          setUser(parsed as AuthUser);
+        } else {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+        }
       }
     } catch {
       localStorage.removeItem(AUTH_STORAGE_KEY);

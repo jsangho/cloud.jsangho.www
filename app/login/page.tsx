@@ -129,6 +129,7 @@ export default function LoginPage() {
       });
 
       const data = (await response.json().catch(() => null)) as {
+        userId?: number;
         nickname?: string;
         email?: string;
         role?: string;
@@ -139,12 +140,18 @@ export default function LoginPage() {
         return;
       }
 
-      if (!data?.nickname || !data.email || !data.role) {
+      if (
+        data?.userId == null ||
+        !data.nickname ||
+        !data.email ||
+        !data.role
+      ) {
         authFailureAlert(false, null);
         return;
       }
 
       saveAuthUser({
+        id: data.userId,
         nickname: data.nickname,
         email: data.email,
         role: data.role,

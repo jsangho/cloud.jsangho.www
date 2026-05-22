@@ -1,74 +1,98 @@
-/** 1월→11월 순 WWE PLE (slug는 `/ple/[slug]` 경로용) */
+/** 2026 WWE PLE. month가 null이면 일정 미확정(「미정」). */
+export const WWE_PLE_YEAR = 2026 as const;
+
 export const WWE_PLE_MONTHLY_ORDER = [
   {
     month: 1,
+    year: WWE_PLE_YEAR,
     slug: "royal-rumble",
     label: "Royal Rumble",
-    description: "30인 룰렛 매치로 WrestleMania 출전권을 가르는 시즌 오프닝",
+    description: "1.31 리야드 — WrestleMania 42 출전권",
   },
   {
     month: 2,
+    year: WWE_PLE_YEAR,
     slug: "elimination-chamber",
     label: "Elimination Chamber",
-    description: "철장 안 6인 엘리미네이션 챔버로 챔피언을 결정",
-  },
-  {
-    month: 3,
-    slug: "stand-and-deliver",
-    label: "Stand & Deliver",
-    description: "NXT의 플래그십 PLE, 차세대 스타들의 무대",
+    description: "2.28 시카고 — 챔버 우승자의 Mania 각",
   },
   {
     month: 4,
+    year: WWE_PLE_YEAR,
+    slug: "stand-and-deliver",
+    label: "Stand & Deliver",
+    description: "4.4 — NXT 플래그십 PLE",
+  },
+  {
+    month: 4,
+    year: WWE_PLE_YEAR,
     slug: "wrestlemania",
-    label: "WrestleMania",
-    description: "WWE 최대의 쇼, 한 해의 클라이맥스",
+    label: "WrestleMania 42",
+    description: "4.18–19 라스베이거스 — 시즌 최대 이벤트",
   },
   {
     month: 5,
+    year: WWE_PLE_YEAR,
     slug: "backlash",
     label: "Backlash",
-    description: "WrestleMania 직후 스토리가 이어지는 첫 메이저 PPV",
+    description: "5.9 탬파 — WrestleMania 42 여파",
+  },
+  {
+    month: 5,
+    year: WWE_PLE_YEAR,
+    slug: "clash-in-italy",
+    label: "Clash in Italy",
+    description: "5.31 토리노 — 국제 PLE",
   },
   {
     month: 6,
-    slug: "money-in-the-bank",
-    label: "Money in the Bank",
-    description: "서류가방 래더 매치로 언제든 타이틀 도전권 획득",
-  },
-  {
-    month: 7,
-    slug: "king-queen-of-the-ring",
-    label: "King & Queen of the Ring",
-    description: "싱글 토너먼트로 왕·여왕을 가리는 중세 테마 PLE",
+    year: WWE_PLE_YEAR,
+    slug: "night-of-champions",
+    label: "Night of Champions",
+    description: "6.27 리야드 — 챔피언십 중심 PLE",
   },
   {
     month: 8,
+    year: WWE_PLE_YEAR,
     slug: "summerslam",
     label: "SummerSlam",
-    description: "여름 최대 PLE, 빅 매치와 라이벌의 절정",
+    description: "8.1–2 미니애폴리스 — 2 Nights",
   },
   {
     month: 9,
-    slug: "bash-in-berlin",
-    label: "Bash in Berlin",
-    description: "독일 베를린에서 열리는 국제 스펙터클 이벤트",
+    year: WWE_PLE_YEAR,
+    slug: "money-in-the-bank",
+    label: "Money in the Bank",
+    description: "9.6 뉴올리언스 — MITB 래더",
   },
   {
-    month: 10,
+    month: null,
+    year: WWE_PLE_YEAR,
+    slug: "king-queen-of-the-ring",
+    label: "King & Queen of the Ring",
+    description: "일정 미확정 — 토너먼트 PLE",
+  },
+  {
+    month: null,
+    year: WWE_PLE_YEAR,
     slug: "bad-blood",
     label: "Bad Blood",
-    description: "헬 인 어 셀 중심의 격렬한 페우드 클리맥스",
+    description: "일정 미확정 — Hell in a Cell 중심",
   },
   {
-    month: 11,
+    month: null,
+    year: WWE_PLE_YEAR,
     slug: "survivor-series",
     label: "Survivor Series",
-    description: "브랜드·팀 대항 서바이버 시리즈로 시즌을 마무리",
+    description: "일정 미확정 — 팀 대항 시즌 피날레",
   },
 ] as const;
 
 export type PleSlug = (typeof WWE_PLE_MONTHLY_ORDER)[number]["slug"];
+
+export function formatPleMonth(month: number | null): string {
+  return month === null ? "미정" : `${month}월`;
+}
 
 export function getPleBySlug(slug: string) {
   return WWE_PLE_MONTHLY_ORDER.find((e) => e.slug === slug);

@@ -24,7 +24,13 @@ export type PleBoardMatch = {
   siteVotes: { left: number; right: number; multi: number[] };
   locked: boolean;
   myPick?: string | null;
+  aiPick?: string | null;
+  aiPickName?: string | null;
+  aiCorrect?: boolean | null;
 };
+
+export type { PleAiRecord, PleAiStats } from "@/lib/ple-ai-stats";
+export { fetchPleAiStats } from "@/lib/ple-ai-stats";
 
 export type PleBoard = {
   slug: string;
@@ -104,6 +110,23 @@ export async function fetchPleBoard(
   return res.json();
 }
 
+function parseApiErrorDetail(err: unknown, fallback: string): string {
+  if (err && typeof err === "object" && "detail" in err) {
+    const detail = (err as { detail?: unknown }).detail;
+    if (typeof detail === "string") return detail;
+    if (Array.isArray(detail)) {
+      return detail
+        .map((d) =>
+          typeof d === "object" && d && "msg" in d
+            ? String((d as { msg: string }).msg)
+            : String(d)
+        )
+        .join(", ");
+    }
+  }
+  return fallback;
+}
+
 export type MatchResultPayload = {
   winnerSide?: "left" | "right";
   winnerIndex?: number;
@@ -131,7 +154,72 @@ export async function submitPleMatchResult(
   );
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error((err as { detail?: string }).detail ?? res.statusText);
+    throw new Error(parseApiErrorDetail(err, res.statusText));
+  }
+  return res.json();
+}
+
+export async function linkPlePredictions(
+  clientId: string,
+  userId: number
+): Promise<number | null> {
+  const res = await fetch(`${apiBaseUrl}/ple/link-predictions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ clientId, userId }),
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as { linked?: number };
+  return typeof data.linked === "number" ? data.linked : null;
+}
+
+export type BatchPredictionItem = {
+  matchKey: string;
+  pick: string;
+};
+
+export async function submitPlePredictionsBatch(
+  slug: PleSlug,
+  clientId: string,
+  predictions: BatchPredictionItem[],
+  userId?: number
+): Promise<PleBoard> {
+  const res = await fetch(`${apiBaseUrl}/ple/${slug}/predictions/batch`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      clientId,
+      predictions,
+      ...(userId != null ? { userId } : {}),
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(parseApiErrorDetail(err, res.statusText));
+  }
+  return res.json();
+}
+
+export type BatchResultItem = {
+  matchKey: string;
+  winnerSide?: "left" | "right";
+  winnerIndex?: number;
+  winnerName?: string;
+  status?: "scheduled" | "live" | "finished";
+};
+
+export async function submitPleResultsBatch(
+  slug: PleSlug,
+  results: BatchResultItem[]
+): Promise<PleBoard> {
+  const res = await fetch(`${apiBaseUrl}/ple/${slug}/results/batch`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ results }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(parseApiErrorDetail(err, res.statusText));
   }
   return res.json();
 }
@@ -140,12 +228,17 @@ export async function submitPlePrediction(
   slug: PleSlug,
   matchKey: string,
   pick: string,
-  clientId: string
+  clientId: string,
+  userId?: number
 ): Promise<PleBoard> {
   const res = await fetch(`${apiBaseUrl}/ple/${slug}/matches/${matchKey}/predict`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pick, clientId }),
+    body: JSON.stringify({
+      pick,
+      clientId,
+      ...(userId != null ? { userId } : {}),
+    }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

@@ -460,7 +460,7 @@ export const PLE_MATCH_CARDS: Record<PleSlug, PleMatchCard[]> = {
     ),
   ],
 
-  "king-queen-of-the-ring": [
+  "night-of-champions": [
     m2(
       "noc26-sami-kross",
       "Single Match",
@@ -486,6 +486,17 @@ export const PLE_MATCH_CARDS: Record<PleSlug, PleMatchCard[]> = {
       { left: 1.55, right: 2.45 }
     ),
     m2(
+      "noc26-undisputed",
+      "Undisputed WWE Championship",
+      "sideB",
+      { name: "John Cena", isChampion: true },
+      { name: "CM Punk" },
+      { left: 1.65, right: 2.25 }
+    ),
+  ],
+
+  "king-queen-of-the-ring": [
+    m2(
       "kotr26-final",
       "Single Match",
       "sideB",
@@ -500,14 +511,6 @@ export const PLE_MATCH_CARDS: Record<PleSlug, PleMatchCard[]> = {
       { name: "Jade Cargill" },
       { name: "Asuka" },
       { left: 1.55, right: 2.45 }
-    ),
-    m2(
-      "noc26-undisputed",
-      "Undisputed WWE Championship",
-      "sideB",
-      { name: "John Cena", isChampion: true },
-      { name: "CM Punk" },
-      { left: 1.65, right: 2.25 }
     ),
   ],
 
@@ -627,46 +630,31 @@ export const PLE_MATCH_CARDS: Record<PleSlug, PleMatchCard[]> = {
     ),
   ],
 
-  "bash-in-berlin": [
+  /** WWE Clash in Italy 2026.5.31 토리노 — 공식 발표 카드 (2026-05-18 기준) */
+  "clash-in-italy": [
     m2(
-      "berlin26-undisputed",
+      "italy26-undisputed",
       "Undisputed WWE Championship",
       "sideA",
       { name: "Cody Rhodes", isChampion: true },
-      { name: "Kevin Owens" },
-      { left: 1.6, right: 2.3 }
+      { name: "Gunther" },
+      { left: 1.55, right: 2.35 }
     ),
     m2(
-      "berlin26-women-tag",
-      "WWE Women's Tag Team Championship",
+      "italy26-whc-tribal",
+      "World Heavyweight Championship — Tribal Combat",
       "sideB",
-      { name: "Bianca Belair & Jade Cargill" },
-      { name: "The Unholy Union", isChampion: true },
-      { left: 1.55, right: 2.45 }
+      { name: "Roman Reigns", isChampion: true },
+      { name: "Jacob Fatu" },
+      { left: 1.65, right: 2.2 }
     ),
     m2(
-      "berlin26-strap",
-      "Strap Match",
+      "italy26-lesnar-femi",
+      "Single Match",
       "sideA",
-      { name: "CM Punk" },
-      { name: "Drew McIntyre" },
-      { left: 1.85, right: 1.95 }
-    ),
-    m2(
-      "berlin26-mixed",
-      "Mixed Tag Match",
-      "sideB",
-      { name: "Damian Priest & Rhea Ripley" },
-      { name: "Dom Mysterio & Liv Morgan" },
-      { left: 1.9, right: 1.92 }
-    ),
-    m2(
-      "berlin26-whc",
-      "World Heavyweight Championship",
-      "sideA",
-      { name: "Gunther", isChampion: true },
-      { name: "Randy Orton" },
-      { left: 1.45, right: 2.75 }
+      { name: "Brock Lesnar" },
+      { name: "Oba Femi" },
+      { left: 1.72, right: 2.05 }
     ),
   ],
 

@@ -105,6 +105,24 @@ export const PLE_BRACKET_THEMES: Record<PleSlug, PleBracketTheme> = {
       voteBar: "bg-orange-500",
     },
   },
+  "night-of-champions": {
+    sideA: {
+      headerBg: "bg-amber-600",
+      headerText: "text-white",
+      border: "border-amber-600",
+      nameText: "text-amber-800",
+      selectedBg: "bg-amber-50",
+      voteBar: "bg-amber-500",
+    },
+    sideB: {
+      headerBg: "bg-yellow-700",
+      headerText: "text-white",
+      border: "border-yellow-700",
+      nameText: "text-yellow-900",
+      selectedBg: "bg-yellow-50",
+      voteBar: "bg-yellow-600",
+    },
+  },
   "money-in-the-bank": {
     sideA: {
       headerBg: "bg-emerald-600",
@@ -159,7 +177,7 @@ export const PLE_BRACKET_THEMES: Record<PleSlug, PleBracketTheme> = {
       voteBar: "bg-red-500",
     },
   },
-  "bash-in-berlin": {
+  "clash-in-italy": {
     sideA: {
       headerBg: "bg-sky-600",
       headerText: "text-white",

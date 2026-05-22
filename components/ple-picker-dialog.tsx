@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -42,9 +43,9 @@ export function PlePickerDialog({ triggerClassName }: PlePickerDialogProps) {
           <DialogTitle className="text-center text-xl text-stone-50">
             월별 PLE
           </DialogTitle>
-          <p className="text-center text-sm text-stone-400">
+          <DialogDescription className="text-center text-sm text-stone-400">
             예측할 이벤트를 선택하세요
-          </p>
+          </DialogDescription>
         </DialogHeader>
         <PleEventGrid variant="large" onNavigate={() => setOpen(false)} />
       </DialogContent>

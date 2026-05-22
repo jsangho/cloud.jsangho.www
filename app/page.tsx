@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Loader2, Database, RefreshCw } from "lucide-react";
 import { GeminiChatPanel } from "@/components/gemini-chat-panel";
+import { PleAiScoreboard } from "@/components/ple-ai-scoreboard";
 import { PleEventGrid } from "@/components/ple-event-grid";
 
 const apiBaseUrl =
@@ -65,12 +66,13 @@ function TitanicQaAppContent() {
               </p>
             </div>
           </section>
-          <div className="mx-auto w-full max-w-5xl shrink-0 px-4 pb-4">
+          <div className="mx-auto flex w-full max-w-5xl shrink-0 flex-col items-center px-4 pb-4">
             <p className="mb-2 text-center text-xs font-medium uppercase tracking-wider text-stone-500">
-              월별 PLE
+              2026 월별 PLE
             </p>
             <PleEventGrid variant="compact" />
           </div>
+          <PleAiScoreboard />
           <div className="min-h-0 flex-1" aria-hidden />
           <div className="mx-auto mt-auto w-full max-w-2xl shrink-0 px-4 pb-6 pt-2">
             <GeminiChatPanel className="min-h-[280px] h-[min(46dvh,560px)] max-h-[52dvh]" />
