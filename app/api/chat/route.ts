@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const DEFAULT_MODEL = "gemini-2.0-flash";
-const MODEL_FALLBACKS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"] as const;
+const DEFAULT_MODEL = "gemini-2.5-flash";
+const MODEL_FALLBACKS = ["gemini-2.5-flash", "gemini-2.0-flash"] as const;
 
 function resolveApiKey(): string | undefined {
   return (
@@ -45,15 +45,20 @@ function toClientError(error: unknown): { message: string; status: number } {
   if (
     msg.includes("429") ||
     lower.includes("quota") ||
-    lower.includes("resource exhausted")
+    lower.includes("resource exhausted") ||
+    lower.includes("limit: 0")
   ) {
     return {
       message:
-        "Gemini API 할당량을 초과했습니다. 1~2분 후 다시 시도하거나 API 키·빌링을 확인해 주세요.",
+        "Gemini API 무료 할당량이 없거나 초과했습니다. Google AI Studio에서 키·빌링을 확인한 뒤 1~2분 후 다시 시도해 주세요.",
       status: 429,
     };
   }
-  if (msg.includes("404") || lower.includes("not found") || lower.includes("model")) {
+  if (
+    msg.includes("404") ||
+    lower.includes("is not found") ||
+    lower.includes("not supported for generatecontent")
+  ) {
     return {
       message: "선택한 모델을 사용할 수 없습니다. 다른 모델을 선택해 주세요.",
       status: 502,

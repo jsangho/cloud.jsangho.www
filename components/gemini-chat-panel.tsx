@@ -20,9 +20,8 @@ import { cn } from "@/lib/utils";
 import { getChatEndpoint } from "@/lib/api";
 
 const MODEL_OPTIONS = [
-  { value: "gemini-2.0-flash", label: "빠른 모델" },
-  { value: "gemini-1.5-flash", label: "표준 모델" },
-  { value: "gemini-1.5-pro", label: "고성능 모델" },
+  { value: "gemini-2.5-flash", label: "빠른 모델" },
+  { value: "gemini-2.0-flash", label: "표준 모델" },
 ] as const;
 
 interface ChatMessage {
