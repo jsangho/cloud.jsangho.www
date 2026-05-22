@@ -50,7 +50,7 @@ const CHAT_REQUEST_FAILED = "메시지를 전송하지 못했습니다.";
 
 export function GeminiChatPanel({ className }: { className?: string }) {
   const [state, setState] = useState<GeminiChatPanelState>(initialChatPanelState);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const patchState = useCallback(
@@ -60,10 +60,13 @@ export function GeminiChatPanel({ className }: { className?: string }) {
   );
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
   };
 
   useEffect(() => {
+    if (state.messages.length === 0) return;
     scrollToBottom();
   }, [state.messages]);
 
@@ -231,7 +234,10 @@ export function GeminiChatPanel({ className }: { className?: string }) {
         className
       )}
     >
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <div
+        ref={scrollContainerRef}
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+      >
         <div className="flex min-h-full flex-col justify-end gap-4 pb-4">
           {state.messages.map((msg, idx) => (
             <div
@@ -267,7 +273,7 @@ export function GeminiChatPanel({ className }: { className?: string }) {
             </div>
           )}
 
-          <div ref={messagesEndRef} />
+          <div aria-hidden className="h-px shrink-0" />
         </div>
       </div>
 

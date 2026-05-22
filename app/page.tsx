@@ -51,31 +51,49 @@ function TitanicQaAppContent() {
   const currentView =
     searchParams.get("view") === "data" ? "data" : "qa";
 
+  useEffect(() => {
+    if (currentView !== "qa") return;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [currentView]);
+
   return (
     <WweArenaShell>
       {currentView === "qa" ? (
         <div className="flex min-h-[calc(100dvh-5.5rem)] flex-col">
-          <section className="shrink-0 px-4 py-8 text-center">
-            <div className="mx-auto max-w-3xl">
-              <h2 className="text-balance text-3xl font-bold tracking-tight text-stone-50 sm:text-4xl md:text-5xl">
+          <section className="shrink-0 px-4 pt-6 pb-4 text-center sm:pt-8">
+            <div className="mx-auto max-w-4xl">
+              <h2 className="text-balance text-[1.75rem] font-extrabold leading-[1.06] tracking-tight text-stone-50 sm:text-4xl sm:leading-[1.05] md:text-[2.75rem]">
                 <span className="block">WWE PLE를</span>
                 <span className="block">색 다르게 즐기는 방법</span>
               </h2>
-              <p className="mt-4 text-balance text-lg font-medium text-stone-400 sm:text-xl">
+              <p className="mx-auto mt-2.5 max-w-xl text-balance text-base font-semibold leading-snug text-stone-300 sm:mt-3 sm:text-lg">
                 결과를 예측해서 Head of Table이 되어보자!
               </p>
             </div>
           </section>
-          <div className="mx-auto flex w-full max-w-5xl shrink-0 flex-col items-center px-4 pb-4">
-            <p className="mb-2 text-center text-xs font-medium uppercase tracking-wider text-stone-500">
-              2026 월별 PLE
-            </p>
-            <PleEventGrid variant="compact" />
+
+          <section className="mx-auto flex w-full max-w-5xl min-h-0 flex-1 flex-col justify-center px-4 py-3 sm:py-5">
+            <div className="w-full rounded-2xl border border-stone-700/70 bg-stone-950/55 p-4 shadow-lg shadow-black/25 backdrop-blur-sm sm:rounded-3xl sm:p-6">
+              <div className="mb-3 text-center sm:mb-4">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-stone-400">
+                  2026 월별 PLE
+                </p>
+                <p className="mt-1 text-sm text-stone-500">
+                  이벤트를 골라 승부 예측에 참여하세요
+                </p>
+              </div>
+              <PleEventGrid
+                variant="large"
+                className="grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4"
+              />
+            </div>
+          </section>
+
+          <div className="shrink-0 px-4">
+            <PleAiScoreboard />
           </div>
-          <PleAiScoreboard />
-          <div className="min-h-0 flex-1" aria-hidden />
-          <div className="mx-auto mt-auto w-full max-w-2xl shrink-0 px-4 pb-6 pt-2">
-            <GeminiChatPanel className="min-h-[280px] h-[min(46dvh,560px)] max-h-[52dvh]" />
+          <div className="mx-auto w-full max-w-2xl shrink-0 px-4 pb-6 pt-3 sm:pt-4">
+            <GeminiChatPanel className="min-h-[240px] h-[min(40dvh,480px)] max-h-[46dvh] sm:min-h-[280px] sm:h-[min(46dvh,560px)] sm:max-h-[52dvh]" />
           </div>
         </div>
       ) : (

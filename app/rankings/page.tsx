@@ -26,6 +26,54 @@ const initialState: RankingsPageState = {
   myRank: null,
 };
 
+function rankRowClass(rank: number, isMe: boolean) {
+  const base = "border-b border-stone-800/60";
+  const meRing = isMe ? "ring-1 ring-inset ring-amber-500/40" : "";
+
+  if (rank === 1) {
+    return cn(
+      base,
+      meRing,
+      "bg-gradient-to-r from-amber-400/22 via-amber-500/12 to-amber-950/5"
+    );
+  }
+  if (rank === 2) {
+    return cn(
+      base,
+      meRing,
+      "bg-gradient-to-r from-stone-300/18 via-stone-400/10 to-stone-950/5"
+    );
+  }
+  if (rank === 3) {
+    return cn(
+      base,
+      meRing,
+      "bg-gradient-to-r from-orange-700/22 via-amber-800/14 to-stone-950/5"
+    );
+  }
+  if (rank >= 4 && rank <= 10) {
+    return cn(base, meRing, "bg-stone-800/45");
+  }
+  return cn(base, isMe && "bg-amber-500/10");
+}
+
+function rankNumberClass(rank: number) {
+  const base = "text-sm font-bold tabular-nums";
+  if (rank === 1) return cn(base, "text-amber-200");
+  if (rank === 2) return cn(base, "text-stone-200");
+  if (rank === 3) return cn(base, "text-orange-300/95");
+  if (rank >= 4 && rank <= 10) return cn(base, "text-stone-300");
+  return cn(base, "text-stone-400 font-semibold");
+}
+
+function rankTextClass(rank: number) {
+  if (rank === 1) return "text-amber-50";
+  if (rank === 2) return "text-stone-100";
+  if (rank === 3) return "text-orange-50/95";
+  if (rank >= 4 && rank <= 10) return "text-stone-200";
+  return "text-stone-100";
+}
+
 function TableRow({
   row,
   isMe,
@@ -33,17 +81,14 @@ function TableRow({
   row: RankingRow;
   isMe: boolean;
 }) {
+  const text = rankTextClass(row.rank);
+
   return (
-    <tr
-      className={cn(
-        "border-b border-stone-800/60",
-        isMe && "bg-amber-500/10"
-      )}
-    >
-      <td className="py-3 pr-3 text-right text-sm font-semibold text-stone-200 tabular-nums">
+    <tr className={rankRowClass(row.rank, isMe)}>
+      <td className={cn("py-3 pr-3 text-right", rankNumberClass(row.rank))}>
         {row.rank}
       </td>
-      <td className="py-3 pr-3 text-sm font-semibold text-stone-100">
+      <td className={cn("py-3 pr-3 text-sm font-semibold", text)}>
         {row.nickname}
         {isMe && (
           <span className="ml-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-200">
@@ -51,10 +96,20 @@ function TableRow({
           </span>
         )}
       </td>
-      <td className="py-3 pr-3 text-right text-sm font-semibold text-stone-100 tabular-nums">
+      <td
+        className={cn(
+          "py-3 pr-3 text-right text-sm font-semibold tabular-nums",
+          text
+        )}
+      >
         {row.score}
       </td>
-      <td className="py-3 text-right text-sm font-semibold text-stone-100 tabular-nums">
+      <td
+        className={cn(
+          "py-3 text-right text-sm font-semibold tabular-nums",
+          text
+        )}
+      >
         {formatAccuracy(row.accuracy)}
       </td>
     </tr>

@@ -39,7 +39,7 @@ export function PleEventGrid({
             className={cn(
               "block h-full w-full min-w-0 rounded-xl border text-left shadow-sm transition-colors",
               isLarge
-                ? "border-stone-600/80 bg-stone-800/55 px-5 py-4 hover:border-stone-500 hover:bg-stone-700/70"
+                ? "border-stone-600/80 bg-stone-800/55 px-3.5 py-3 hover:border-stone-500 hover:bg-stone-700/70 sm:px-4 sm:py-3.5"
                 : "border-stone-600/80 bg-stone-800/55 px-2.5 py-2 text-xs text-stone-200 hover:border-stone-500 hover:bg-stone-700/70 hover:text-stone-50 sm:px-3 sm:text-sm"
             )}
           >
@@ -55,14 +55,14 @@ export function PleEventGrid({
               className={cn(
                 "block font-semibold text-stone-50",
                 isLarge
-                  ? "mt-1 text-xl leading-tight sm:text-2xl"
+                  ? "mt-0.5 text-base leading-tight sm:text-lg"
                   : "font-medium leading-snug"
               )}
             >
               {ple.label}
             </span>
             {isLarge && (
-              <span className="mt-2 block text-sm leading-snug text-stone-400">
+              <span className="mt-1.5 block text-xs leading-snug text-stone-400 sm:text-sm">
                 {ple.description}
               </span>
             )}
