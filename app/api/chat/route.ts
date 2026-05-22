@@ -1,10 +1,108 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+const DEFAULT_MODEL = "gemini-2.0-flash";
+const MODEL_FALLBACKS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"] as const;
+
+function resolveApiKey(): string | undefined {
+  return (
+    process.env.GEMINI_API_KEY?.trim() ||
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim()
+  );
+}
+
+function extractReplyText(
+  result: Awaited<
+    ReturnType<ReturnType<GoogleGenerativeAI["getGenerativeModel"]>["generateContent"]>
+  >
+): string {
+  try {
+    return (result.response.text() || "").trim();
+  } catch {
+    const feedback = result.response.promptFeedback;
+    throw new Error(
+      feedback
+        ? "응답이 차단되었거나 비어 있습니다."
+        : "응답 텍스트를 읽을 수 없습니다."
+    );
+  }
+}
+
+function toClientError(error: unknown): { message: string; status: number } {
+  const msg = error instanceof Error ? error.message : String(error);
+  const lower = msg.toLowerCase();
+
+  if (lower.includes("api key") || lower.includes("api_key")) {
+    return {
+      message:
+        "Gemini API 키가 없거나 유효하지 않습니다. Vercel에 GEMINI_API_KEY를 설정했는지 확인해 주세요.",
+      status: 500,
+    };
+  }
+  if (
+    msg.includes("429") ||
+    lower.includes("quota") ||
+    lower.includes("resource exhausted")
+  ) {
+    return {
+      message:
+        "Gemini API 할당량을 초과했습니다. 1~2분 후 다시 시도하거나 API 키·빌링을 확인해 주세요.",
+      status: 429,
+    };
+  }
+  if (msg.includes("404") || lower.includes("not found") || lower.includes("model")) {
+    return {
+      message: "선택한 모델을 사용할 수 없습니다. 다른 모델을 선택해 주세요.",
+      status: 502,
+    };
+  }
+  return {
+    message: "Gemini 응답 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    status: 502,
+  };
+}
+
+async function generateReply(prompt: string, preferredModel: string): Promise<string> {
+  const apiKey = resolveApiKey();
+  if (!apiKey) {
+    throw new Error("API key not configured");
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const tryOrder = [
+    preferredModel,
+    ...MODEL_FALLBACKS.filter((m) => m !== preferredModel),
+  ];
+
+  let lastError: unknown;
+  for (const modelName of tryOrder) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const result = await model.generateContent(prompt);
+      const text = extractReplyText(result);
+      if (!text) {
+        throw new Error("Empty model response");
+      }
+      return text;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw lastError ?? new Error("Gemini generate failed");
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as { prompt?: string; message?: string };
+    const body = (await request.json()) as {
+      prompt?: string;
+      message?: string;
+      model?: string;
+    };
     const prompt = (body.prompt ?? body.message ?? "").trim();
+    const modelName = body.model?.trim() || DEFAULT_MODEL;
 
     if (!prompt) {
       return NextResponse.json(
@@ -13,25 +111,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "API 키가 설정되지 않았습니다." },
-        { status: 500 }
-      );
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-
+    const text = await generateReply(prompt, modelName);
     return NextResponse.json({ text, reply: text });
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return NextResponse.json(
-      { error: "서버 오류가 발생했습니다." },
-      { status: 500 }
-    );
+    const { message, status } = toClientError(error);
+    return NextResponse.json({ error: message }, { status });
   }
 }

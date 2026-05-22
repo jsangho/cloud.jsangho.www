@@ -17,12 +17,11 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+import { getChatEndpoint } from "@/lib/api";
 
 const MODEL_OPTIONS = [
   { value: "gemini-2.0-flash", label: "빠른 모델" },
+  { value: "gemini-1.5-flash", label: "표준 모델" },
   { value: "gemini-1.5-pro", label: "고성능 모델" },
 ] as const;
 
@@ -96,24 +95,32 @@ export function GeminiChatPanel({ className }: { className?: string }) {
     });
 
     try {
-      const response = await fetch(`${apiBaseUrl}/chat`, {
+      const response = await fetch(getChatEndpoint(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: historyToMessage(history),
+          model: modelId,
         }),
       });
 
       const data = (await response.json().catch(() => null)) as {
         reply?: string;
+        text?: string;
+        error?: string;
       } | null;
 
       if (!response.ok) {
-        patchState({ errorMessage: CHAT_REQUEST_FAILED });
+        patchState({
+          errorMessage:
+            typeof data?.error === "string" && data.error.trim()
+              ? data.error
+              : CHAT_REQUEST_FAILED,
+        });
         return;
       }
 
-      const reply = data?.reply?.trim();
+      const reply = (data?.reply ?? data?.text)?.trim();
       if (!reply) {
         patchState({ errorMessage: CHAT_REQUEST_FAILED });
         return;

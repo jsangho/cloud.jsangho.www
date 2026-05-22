@@ -1,6 +1,18 @@
 export const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
+/**
+ * Gemini 채팅 엔드포인트.
+ * Vercel 등 프론트만 배포할 때는 같은 출처 `/api/chat`(Next Route Handler)을 씁니다.
+ * 로컬에서 FastAPI `/chat`을 쓰려면 `.env.local`에
+ * `NEXT_PUBLIC_CHAT_API_URL=http://127.0.0.1:8000/chat` 을 설정하세요.
+ */
+export function getChatEndpoint(): string {
+  const explicit = process.env.NEXT_PUBLIC_CHAT_API_URL?.trim();
+  if (explicit) return explicit;
+  return "/api/chat";
+}
+
 /** Neon cold start·원격 DB를 고려한 요청 타임아웃 */
 export const requestTimeoutMs = 20000;
 
