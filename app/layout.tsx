@@ -13,20 +13,10 @@ export const metadata: Metadata = {
   description: 'WWE PLE 예측 게임',
   icons: {
     icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      { url: '/kayfabe-mark.svg', type: 'image/svg+xml' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
     ],
-    apple: '/apple-icon.png',
+    apple: '/kayfabe-mark.svg',
   },
 }
 

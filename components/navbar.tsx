@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { KayfabeLogo } from "@/components/kayfabe-logo";
 import { PlePickerDialog } from "@/components/ple-picker-dialog";
 import { WeatherWidget } from "@/components/weather-widget";
 import { authDisplayName, useAuth } from "@/context/auth-context";
@@ -68,15 +69,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full min-w-0 border-b border-stone-700/45 bg-stone-900/82 backdrop-blur-md supports-[backdrop-filter]:bg-stone-900/68">
       <div className="mx-auto grid w-full max-w-5xl min-w-0 grid-cols-1 gap-y-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center sm:gap-y-0">
-        <div className="text-center sm:text-left">
-          <Link href="/" className="block transition-colors hover:opacity-90">
-            <h1 className="text-xl font-bold tracking-tight text-stone-50">
-              KayFabe
-            </h1>
-          </Link>
-          <p className="mt-1 text-sm text-stone-400 tracking-wide">
-            WWE PLE 예측 게임
-          </p>
+        <div className="flex justify-center sm:justify-start">
+          <KayfabeLogo />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-center">

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Loader2, Database, RefreshCw } from "lucide-react";
 import { GeminiChatPanel } from "@/components/gemini-chat-panel";
 import { PleAiScoreboard } from "@/components/ple-ai-scoreboard";
+import { KayfabeMark } from "@/components/kayfabe-logo";
 import { PleEventGrid } from "@/components/ple-event-grid";
 
 const apiBaseUrl =
@@ -62,6 +63,7 @@ function TitanicQaAppContent() {
         <div className="flex min-h-[calc(100dvh-5.5rem)] flex-col">
           <section className="shrink-0 px-4 pt-6 pb-4 text-center sm:pt-8">
             <div className="mx-auto max-w-4xl">
+              <KayfabeMark className="mx-auto mb-4 h-14 w-14 sm:mb-5 sm:h-16 sm:w-16" />
               <h2 className="text-balance text-[1.75rem] font-extrabold leading-[1.06] tracking-tight text-stone-50 sm:text-4xl sm:leading-[1.05] md:text-[2.75rem]">
                 <span className="block">WWE PLE를</span>
                 <span className="block">색 다르게 즐기는 방법</span>
