@@ -47,17 +47,26 @@ export default function MyInfoPage() {
     }));
 
     void (async () => {
-      if (user.id != null) {
-        await linkPlePredictions(getPleClientId(), user.id);
+      try {
+        if (user.id != null) {
+          await linkPlePredictions(getPleClientId(), user.id);
+        }
+        const data = await fetchRankings({ nickname: user.nickname, limit: 1 });
+        if (cancelled) return;
+        const mine = data?.myRank ?? null;
+        setStatsState({
+          statsLoading: false,
+          stats: mine,
+          statsUnavailable: data === null,
+        });
+      } catch {
+        if (cancelled) return;
+        setStatsState({
+          statsLoading: false,
+          stats: null,
+          statsUnavailable: true,
+        });
       }
-      const data = await fetchRankings({ nickname: user.nickname, limit: 1 });
-      if (cancelled) return;
-      const mine = data?.myRank ?? null;
-      setStatsState({
-        statsLoading: false,
-        stats: mine,
-        statsUnavailable: data === null,
-      });
     })();
 
     return () => {

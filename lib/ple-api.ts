@@ -163,14 +163,23 @@ export async function linkPlePredictions(
   clientId: string,
   userId: number
 ): Promise<number | null> {
-  const res = await fetch(`${apiBaseUrl}/ple/link-predictions`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ clientId, userId }),
-  });
-  if (!res.ok) return null;
-  const data = (await res.json()) as { linked?: number };
-  return typeof data.linked === "number" ? data.linked : null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
+  try {
+    const res = await fetch(`${apiBaseUrl}/ple/link-predictions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clientId, userId }),
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { linked?: number };
+    return typeof data.linked === "number" ? data.linked : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export type BatchPredictionItem = {

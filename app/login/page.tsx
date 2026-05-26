@@ -3,7 +3,8 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IdCard, LockKeyhole, Mail, UserRound } from "lucide-react";
-import { useAuth } from "@/context/auth-context";
+import { useAuth, type AuthUser } from "@/context/auth-context";
+import { parseUserProfile } from "@/lib/auth-api";
 import {
   apiBaseUrl,
   getRequestTimeoutMessage,
@@ -130,6 +131,9 @@ export default function LoginPage() {
 
       const data = (await response.json().catch(() => null)) as {
         userId?: number;
+        id?: number;
+        loginId?: string;
+        login_id?: string;
         nickname?: string;
         email?: string;
         role?: string;
@@ -140,22 +144,17 @@ export default function LoginPage() {
         return;
       }
 
-      if (
-        data?.userId == null ||
-        !data.nickname ||
-        !data.email ||
-        !data.role
-      ) {
+      const profile = parseUserProfile(data);
+      if (!profile) {
         authFailureAlert(false, null);
         return;
       }
 
-      saveAuthUser({
-        id: data.userId,
-        nickname: data.nickname,
-        email: data.email,
-        role: data.role,
-      });
+      const authUser: AuthUser = {
+        ...profile,
+        loginId: profile.loginId || userId,
+      };
+      saveAuthUser(authUser);
       router.push("/");
     } catch (error) {
       authFailureAlert(false, error);

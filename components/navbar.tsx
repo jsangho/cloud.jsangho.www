@@ -6,7 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { PlePickerDialog } from "@/components/ple-picker-dialog";
 import { WeatherWidget } from "@/components/weather-widget";
-import { useAuth } from "@/context/auth-context";
+import { authDisplayName, useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 
 function navLinkClass(active: boolean) {
@@ -92,7 +92,7 @@ export function Navbar() {
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
           <WeatherWidget />
           <NavLink href="/titanic-home" active={isTitanicHome}>
-            [타이타닉]
+            Lesson
           </NavLink>
           {!showAuth ? (
             <div
@@ -113,8 +113,11 @@ export function Navbar() {
               >
                 로그아웃
               </Button>
-              <span className="px-1 text-sm font-semibold text-stone-100">
-                {user.nickname}
+              <span
+                className="max-w-[8rem] truncate px-1 text-sm font-semibold text-stone-100"
+                title={authDisplayName(user)}
+              >
+                {authDisplayName(user)}
               </span>
             </>
           ) : (
