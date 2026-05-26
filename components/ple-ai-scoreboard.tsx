@@ -9,6 +9,7 @@ import {
   type PleAiStats,
 } from "@/lib/ple-ai-stats";
 import { WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
+import { getPleMatches } from "@/lib/wwe-ple-matches";
 
 type PleAiGroup = {
   slug: string;
@@ -51,12 +52,24 @@ function groupRecordsByPle(records: PleAiRecord[]): PleAiGroup[] {
     WWE_PLE_MONTHLY_ORDER.map((e, i) => [e.slug, i] as const)
   );
 
-  return [...map.values()].sort((a, b) => {
-    const ai = order.get(a.slug) ?? 999;
-    const bi = order.get(b.slug) ?? 999;
-    if (ai !== bi) return ai - bi;
-    return a.label.localeCompare(b.label);
-  });
+  return [...map.values()]
+    .map((group) => {
+      const cardOrder = new Map(
+        getPleMatches(group.slug).map((m, i) => [m.id, i] as const)
+      );
+      const rows = [...group.rows].sort((a, b) => {
+        const ai = cardOrder.get(a.matchKey) ?? 999;
+        const bi = cardOrder.get(b.matchKey) ?? 999;
+        return ai - bi;
+      });
+      return { ...group, rows };
+    })
+    .sort((a, b) => {
+      const ai = order.get(a.slug) ?? 999;
+      const bi = order.get(b.slug) ?? 999;
+      if (ai !== bi) return ai - bi;
+      return a.label.localeCompare(b.label);
+    });
 }
 
 function AiMatchRow({ row }: { row: PleAiRecord }) {

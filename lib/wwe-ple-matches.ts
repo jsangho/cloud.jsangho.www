@@ -630,7 +630,7 @@ export const PLE_MATCH_CARDS: Record<PleSlug, PleMatchCard[]> = {
     ),
   ],
 
-  /** WWE Clash in Italy 2026.5.31 토리노 — 공식 발표 카드 (2026-05-18 기준) */
+  /** WWE Clash in Italy 2026.5.31 토리노 Inalpi Arena — 공식 카드 (2026-05-23 WWE/SNME 기준) */
   "clash-in-italy": [
     m2(
       "italy26-undisputed",
@@ -647,6 +647,22 @@ export const PLE_MATCH_CARDS: Record<PleSlug, PleMatchCard[]> = {
       { name: "Roman Reigns", isChampion: true },
       { name: "Jacob Fatu" },
       { left: 1.65, right: 2.2 }
+    ),
+    m2(
+      "italy26-women",
+      "WWE Women's Championship",
+      "sideA",
+      { name: "Rhea Ripley", isChampion: true },
+      { name: "Jade Cargill" },
+      { left: 1.58, right: 2.3 }
+    ),
+    m2(
+      "italy26-women-ic",
+      "Women's Intercontinental Championship",
+      "sideB",
+      { name: "Becky Lynch", isChampion: true },
+      { name: "Sol Ruca" },
+      { left: 1.62, right: 2.25 }
     ),
     m2(
       "italy26-lesnar-femi",

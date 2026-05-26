@@ -226,21 +226,29 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     highlights: [
       {
         title: "Undisputed WWE Championship",
-        detail: "Cody Rhodes (c) vs Gunther — SmackDown",
+        detail: "Cody Rhodes (c) vs Gunther",
       },
       {
         title: "WHC Tribal Combat",
-        detail: "Roman Reigns (c) vs Jacob Fatu — Raw (5.18 계약)",
+        detail: "Roman Reigns (c) vs Jacob Fatu",
       },
       {
-        title: "Brock Lesnar vs Oba Femi",
-        detail: "Raw에서 성사 — 비타이틀 싱글",
+        title: "WWE Women's Championship",
+        detail: "Rhea Ripley (c) vs Jade Cargill",
+      },
+      {
+        title: "Women's Intercontinental Championship",
+        detail: "Becky Lynch (c) vs Sol Ruca — SNME XLIV에서 성사",
+      },
+      {
+        title: "WrestleMania 42 리매치",
+        detail: "Brock Lesnar vs Oba Femi",
       },
     ],
     predictionFocus: [
-      "Undisputed 방어",
-      "Tribal Combat 승자",
-      "레스너·페미 승자",
+      "Undisputed·WHC 방어",
+      "여자 챔피언십 2장",
+      "레스너·페미 리매치",
     ],
   },
   "night-of-champions": {

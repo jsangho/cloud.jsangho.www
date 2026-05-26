@@ -15,6 +15,7 @@ export type PleAiStats = {
   correct: number;
   incorrect: number;
   accuracyPercent: number | null;
+  /** 채점된 경기 전체 (PLE·카드 순, API recent 필드) */
   recent: PleAiRecord[];
 };
 
