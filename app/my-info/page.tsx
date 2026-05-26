@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
-import { getPleClientId } from "@/lib/ple-client-id";
-import { linkPlePredictions } from "@/lib/ple-api";
 import {
   fetchRankings,
   formatAccuracy,
@@ -48,9 +46,6 @@ export default function MyInfoPage() {
 
     void (async () => {
       try {
-        if (user.id != null) {
-          await linkPlePredictions(getPleClientId(), user.id);
-        }
         const data = await fetchRankings({ nickname: user.nickname, limit: 1 });
         if (cancelled) return;
         const mine = data?.myRank ?? null;

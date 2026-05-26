@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 import { WweArenaShell } from "@/components/wwe-arena-shell";
-import { getPleClientId } from "@/lib/ple-client-id";
-import { linkPlePredictions } from "@/lib/ple-api";
 import {
   fetchRankings,
   formatAccuracy,
@@ -127,9 +125,6 @@ export default function RankingsPage() {
     setState((prev) => ({ ...prev, loading: true, unavailable: false }));
 
     void (async () => {
-      if (user?.id != null) {
-        await linkPlePredictions(getPleClientId(), user.id);
-      }
       const data = await fetchRankings({
         limit: 20,
         nickname: user?.nickname,

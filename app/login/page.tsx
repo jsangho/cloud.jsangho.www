@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { IdCard, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useAuth, type AuthUser } from "@/context/auth-context";
 import { parseUserProfile } from "@/lib/auth-api";
@@ -34,6 +34,7 @@ function authFailureAlert(isSignup: boolean, error: unknown) {
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login: saveAuthUser } = useAuth();
   const [state, setState] = useState<LoginPageState>(initialState);
   const isSignup = state.mode === "signup";
@@ -155,7 +156,8 @@ export default function LoginPage() {
         loginId: profile.loginId || userId,
       };
       saveAuthUser(authUser);
-      router.push("/");
+      const next = searchParams.get("next");
+      router.push(next?.startsWith("/") ? next : "/");
     } catch (error) {
       authFailureAlert(false, error);
     } finally {

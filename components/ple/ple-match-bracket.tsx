@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { BRACKET_LABELS } from "@/lib/bracket-labels";
@@ -21,7 +22,6 @@ import {
 } from "@/lib/ple-api";
 import { useAuth } from "@/context/auth-context";
 import { getPleClientId } from "@/lib/ple-client-id";
-import { linkPlePredictions } from "@/lib/ple-api";
 import { MatchBracketCard } from "@/components/ple/match-bracket-card";
 
 type Side = "left" | "right";
@@ -268,11 +268,15 @@ function allPredictionsCommitted(
 }
 
 export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
-  const { user } = useAuth();
+  const { user, isReady } = useAuth();
   const staticMatches = getPleMatches(slug);
   const bracketTheme = getBracketTheme(slug);
   const clientId = useMemo(() => getPleClientId(), []);
   const accountUserId = user?.id;
+  const boardQuery = useMemo(
+    () => ({ clientId, userId: accountUserId }),
+    [clientId, accountUserId]
+  );
 
   const [ui, setUi] = useState<BracketUiState>(initialBracketUiState);
   const [state, setState] = useState<StoredBracketState>(() =>
@@ -287,17 +291,12 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
   const eventFinished = ui.useApi && ui.board?.status === "finished";
 
   useEffect(() => {
-    if (accountUserId == null) return;
-    void linkPlePredictions(clientId, accountUserId);
-  }, [clientId, accountUserId]);
-
-  useEffect(() => {
     let cancelled = false;
     const staticCards = getPleMatches(slug);
 
     async function bootstrap() {
       try {
-        let data = await fetchPleBoard(slug, clientId);
+        let data = await fetchPleBoard(slug, boardQuery);
         if (needsStaticResync(data, staticCards)) {
           data = await syncPleFromClient(slug, staticCards);
         }
@@ -339,7 +338,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
     return () => {
       cancelled = true;
     };
-  }, [slug, clientId]);
+  }, [slug, boardQuery]);
 
   useEffect(() => {
     if (!ui.offline) return;
@@ -349,7 +348,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
 
     async function retryConnect() {
       try {
-        let data = await fetchPleBoard(slug, clientId);
+        let data = await fetchPleBoard(slug, boardQuery);
         if (needsStaticResync(data, staticCards)) {
           data = await syncPleFromClient(slug, staticCards);
         }
@@ -377,10 +376,10 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [slug, clientId, ui.offline]);
+  }, [slug, boardQuery, ui.offline]);
 
   useEffect(() => {
-    if (!ui.useApi) return;
+    if (!ui.useApi || accountUserId == null) return;
     return subscribePleLive(
       slug,
       clientId,
@@ -401,9 +400,10 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
       },
       () => {
         /* SSE 실패 시 폴링 없이 마지막 스냅샷 유지 */
-      }
+      },
+      accountUserId
     );
-  }, [slug, clientId, ui.useApi]);
+  }, [slug, clientId, accountUserId, ui.useApi]);
 
   const persistLocal = useCallback(
     (next: StoredBracketState) => {
@@ -419,7 +419,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
 
   const handleSelect = useCallback(
     (match: PleMatchCard, pick: Side | number) => {
-      if (ui.committed) return;
+      if (!user || ui.committed) return;
 
       setState((prev) => {
         const current = ensureVoteEntry(prev, match);
@@ -445,10 +445,10 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
         return prev;
       });
     },
-    [ui.committed]
+    [user, ui.committed]
   );
 
-  const canPredict = !eventFinished;
+  const canPredict = Boolean(user) && !eventFinished;
 
   const pickableIds = useMemo(
     () =>
@@ -472,7 +472,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
   const showActionBar = matches.length > 0;
 
   const handleConfirm = useCallback(async () => {
-    if (!canConfirm || ui.submitting) return;
+    if (!canConfirm || ui.submitting || accountUserId == null) return;
 
     const items = pickableIds.map((matchId) => {
       const entry = state[matchId];
@@ -487,22 +487,14 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
     patchUi({ submitting: true, submitError: null });
 
     if (!ui.useApi) {
-      for (const item of items) {
-        saveMyPick(slug, item.matchKey, item.pick);
-      }
-      try {
-        localStorage.setItem(storageKey(slug), JSON.stringify(state));
-      } catch {
-        /* quota */
-      }
-      patchUi({ submitting: false, committed: true });
+      patchUi({
+        submitting: false,
+        submitError: "서버에 연결된 뒤 로그인 상태에서 예측을 확정해 주세요.",
+      });
       return;
     }
 
     try {
-      if (accountUserId != null) {
-        await linkPlePredictions(clientId, accountUserId);
-      }
       const updated = await submitPlePredictionsBatch(
         slug,
         clientId,
@@ -537,22 +529,43 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
 
   if (matches.length === 0) return null;
 
+  if (!isReady) {
+    return (
+      <section className={cn("space-y-4", className)}>
+        <p className="text-sm text-stone-500">예측 보드 불러오는 중…</p>
+      </section>
+    );
+  }
+
   return (
     <section className={cn("space-y-4 pb-28", className)}>
       <div>
         <h2 className="text-lg font-bold text-stone-50">전체 경기 · 예측</h2>
         <p className="mt-1 text-xs text-stone-500">
-          {ui.committed
-            ? "예측이 확정되었습니다 · 아래에서 다시 정할 수 있습니다"
-            : "모든 경기를 고른 뒤 맨 아래 「예측 확정」을 눌러 주세요"}
+          {user
+            ? ui.committed
+              ? "예측이 확정되었습니다 · 아래에서 다시 정할 수 있습니다"
+              : "모든 경기를 고른 뒤 맨 아래 「예측 확정」을 눌러 주세요"
+            : "승부 예측은 로그인한 회원만 할 수 있습니다 · 경기 카드는 조회만 가능"}
           {" · 사이트 투표와 북메이커 승률은 별도 표시"}
           {eventFinished && (
             <span className="ml-1 text-emerald-400">· {BRACKET_LABELS.liveResults}</span>
           )}
         </p>
+        {!user && !eventFinished && (
+          <p className="mt-2 rounded-lg border border-violet-500/35 bg-violet-950/30 px-3 py-2 text-sm text-violet-100">
+            <Link
+              href={`/login?next=${encodeURIComponent(`/ple/${slug}`)}`}
+              className="font-semibold underline underline-offset-2 hover:text-white"
+            >
+              로그인
+            </Link>
+            하면 승부 예측에 참여할 수 있습니다.
+          </p>
+        )}
         {ui.offline && (
           <p className="mt-1 text-xs text-amber-500/90">
-            서버 연결 없음 — 로컬 예측만 저장됩니다
+            서버 연결 없음 — 예측 확정은 연결 후 로그인 상태에서만 가능합니다
           </p>
         )}
       </div>
@@ -576,7 +589,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
           const votes = entry.kind === "multi" ? entry.votes : entry.votes;
           const selected = entry.selected;
           const pickable = matchPickable(matchRow, !!eventFinished);
-          const cardLocked = ui.committed || !pickable;
+          const cardLocked = !user || ui.committed || !pickable;
 
           return (
             <li key={match.id}>
@@ -597,7 +610,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
         })}
       </ul>
 
-      {showActionBar && (
+      {showActionBar && user && (
         <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-stone-700/80 bg-stone-900/95 px-4 py-4 backdrop-blur-md">
           <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-center text-sm text-stone-400 sm:text-left">

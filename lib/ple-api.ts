@@ -95,11 +95,21 @@ export async function syncPleFromClient(slug: PleSlug, cards: PleMatchCard[]): P
   return res.json();
 }
 
+export type FetchPleBoardOptions = {
+  clientId?: string;
+  userId?: number;
+};
+
 export async function fetchPleBoard(
   slug: PleSlug,
-  clientId?: string
+  options?: FetchPleBoardOptions | string
 ): Promise<PleBoard | null> {
-  const q = clientId ? `?client_id=${encodeURIComponent(clientId)}` : "";
+  const opts: FetchPleBoardOptions =
+    typeof options === "string" ? { clientId: options } : (options ?? {});
+  const params = new URLSearchParams();
+  if (opts.clientId) params.set("client_id", opts.clientId);
+  if (opts.userId != null) params.set("user_id", String(opts.userId));
+  const q = params.toString() ? `?${params.toString()}` : "";
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
   const res = await fetch(`${apiBaseUrl}/ple/${slug}${q}`, {
@@ -191,15 +201,15 @@ export async function submitPlePredictionsBatch(
   slug: PleSlug,
   clientId: string,
   predictions: BatchPredictionItem[],
-  userId?: number
+  userId: number
 ): Promise<PleBoard> {
   const res = await fetch(`${apiBaseUrl}/ple/${slug}/predictions/batch`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       clientId,
+      userId,
       predictions,
-      ...(userId != null ? { userId } : {}),
     }),
   });
   if (!res.ok) {
@@ -238,7 +248,7 @@ export async function submitPlePrediction(
   matchKey: string,
   pick: string,
   clientId: string,
-  userId?: number
+  userId: number
 ): Promise<PleBoard> {
   const res = await fetch(`${apiBaseUrl}/ple/${slug}/matches/${matchKey}/predict`, {
     method: "POST",
@@ -246,7 +256,7 @@ export async function submitPlePrediction(
     body: JSON.stringify({
       pick,
       clientId,
-      ...(userId != null ? { userId } : {}),
+      userId,
     }),
   });
   if (!res.ok) {
@@ -277,9 +287,12 @@ export function subscribePleLive(
   slug: PleSlug,
   clientId: string,
   onBoard: (board: PleBoard) => void,
-  onError?: (err: unknown) => void
+  onError?: (err: unknown) => void,
+  userId?: number
 ): () => void {
-  const url = `${apiBaseUrl}/ple/${slug}/live?client_id=${encodeURIComponent(clientId)}`;
+  const params = new URLSearchParams({ client_id: clientId });
+  if (userId != null) params.set("user_id", String(userId));
+  const url = `${apiBaseUrl}/ple/${slug}/live?${params.toString()}`;
   const source = new EventSource(url);
 
   source.onmessage = (event) => {
