@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function TitanicAnalysisRedirectPage() {
+export default function LessonAnalysisRedirectPage() {
   redirect("/lesson/titanic");
 }

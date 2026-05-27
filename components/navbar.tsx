@@ -54,9 +54,8 @@ export function Navbar() {
   const isPle = mounted && (pathname === "/ple" || pathname.startsWith("/ple/"));
   const isResults = mounted && pathname === "/results";
   const isRankings = mounted && pathname === "/rankings";
-  const isTitanicHome =
-    mounted &&
-    (pathname === "/titanic-home" || pathname.startsWith("/titanic-home/"));
+  const isLesson =
+    mounted && (pathname === "/lesson" || pathname.startsWith("/lesson/"));
   const isLogin = mounted && pathname === "/login";
   const isMyInfo = mounted && pathname === "/my-info";
   const showAuth = mounted && isReady;
@@ -85,7 +84,7 @@ export function Navbar() {
 
         <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
           <WeatherWidget />
-          <NavLink href="/titanic-home" active={isTitanicHome}>
+          <NavLink href="/lesson" active={isLesson}>
             Lesson
           </NavLink>
           {!showAuth ? (

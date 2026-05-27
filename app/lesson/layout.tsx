@@ -6,18 +6,18 @@ import { useEffect, useState } from "react";
 import { ChevronRight, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const ANALYSIS_HREF = "/titanic-home/analysis";
-const DATA_COLLECTION_HREF = "/titanic-home/data-collection";
+const TITANIC_HREF = "/lesson/titanic";
+const DATA_COLLECTION_HREF = "/lesson/titanic/data-collection";
 
-export default function TitanicHomeLayout({
+export default function LessonLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAnalysis = pathname === ANALYSIS_HREF;
+  const isTitanic = pathname === TITANIC_HREF;
   const isDataCollection = pathname === DATA_COLLECTION_HREF;
-  const isTitanicSection = isAnalysis || isDataCollection;
+  const isLessonSection = isTitanic || isDataCollection;
 
   const [expanded, setExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -33,20 +33,20 @@ export default function TitanicHomeLayout({
   }, [pathname]);
 
   const nav = (
-    <nav className="flex flex-col gap-1" aria-label="타이타닉 메뉴">
+    <nav className="flex flex-col gap-1" aria-label="수업 메뉴">
       <div
         className={cn(
           "flex items-center rounded-lg text-sm font-medium transition-colors",
-          isTitanicSection ? "bg-stone-100 text-stone-950" : "text-stone-300"
+          isLessonSection ? "bg-stone-100 text-stone-950" : "text-stone-300"
         )}
       >
         <Link
-          href={ANALYSIS_HREF}
-          aria-current={isAnalysis ? "page" : undefined}
+          href={TITANIC_HREF}
+          aria-current={isTitanic ? "page" : undefined}
           className={cn(
             "min-w-0 flex-1 rounded-l-lg px-3 py-2.5 transition-colors",
-            !isTitanicSection && "hover:bg-stone-800/60 hover:text-stone-50",
-            isTitanicSection && "hover:bg-stone-50"
+            !isLessonSection && "hover:bg-stone-800/60 hover:text-stone-50",
+            isLessonSection && "hover:bg-stone-50"
           )}
         >
           타이타닉
@@ -58,8 +58,8 @@ export default function TitanicHomeLayout({
           aria-label={expanded ? "하위 메뉴 접기" : "하위 메뉴 펼치기"}
           className={cn(
             "flex shrink-0 items-center justify-center rounded-r-lg px-2 py-2.5 transition-colors",
-            !isTitanicSection && "hover:bg-stone-800/60 hover:text-stone-50",
-            isTitanicSection && "hover:bg-stone-50"
+            !isLessonSection && "hover:bg-stone-800/60 hover:text-stone-50",
+            isLessonSection && "hover:bg-stone-50"
           )}
         >
           <ChevronRight
@@ -161,3 +161,4 @@ export default function TitanicHomeLayout({
     </div>
   );
 }
+
