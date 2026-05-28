@@ -7,14 +7,20 @@ type UploadState =
   | { kind: "empty" }
   | { kind: "ready"; fileName: string; text: string };
 
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+
 export function TitanicCsvUpload() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedCount, setUploadedCount] = useState<number | null>(null);
   const [state, setState] = useState<UploadState>({ kind: "empty" });
 
   const ingestFile = useCallback((file: File | undefined) => {
     setError(null);
+    setUploadedCount(null);
     if (!file) return;
 
     if (!file.name.toLowerCase().endsWith(".csv")) {
@@ -32,6 +38,38 @@ export function TitanicCsvUpload() {
     };
     reader.readAsText(file, "UTF-8");
   }, []);
+
+  const uploadToServer = useCallback(async () => {
+    if (state.kind !== "ready") return;
+    if (uploading) return;
+    setError(null);
+    setUploading(true);
+    try {
+      const blob = new Blob([state.text], { type: "text/csv;charset=utf-8" });
+      const file = new File([blob], state.fileName, { type: "text/csv" });
+      const form = new FormData();
+      form.append("file", file);
+
+      const res = await fetch(`${apiBaseUrl}/titanic/james/fileupload`, {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        const detail =
+          (data && typeof data === "object" && "detail" in data && (data as any).detail) ||
+          "업로드에 실패했습니다.";
+        throw new Error(String(detail));
+      }
+      const count =
+        data && typeof data === "object" && "count" in data ? Number((data as any).count) : null;
+      setUploadedCount(Number.isFinite(count) ? count : null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "업로드 중 오류가 발생했습니다.");
+    } finally {
+      setUploading(false);
+    }
+  }, [state, uploading]);
 
   const openPicker = () => {
     inputRef.current?.click();
@@ -147,12 +185,31 @@ export function TitanicCsvUpload() {
               <Upload className="size-4" aria-hidden />
               CSV 업로드
             </button>
+            <button
+              type="button"
+              onClick={uploadToServer}
+              disabled={state.kind !== "ready" || uploading}
+              className={[
+                "inline-flex min-w-[200px] items-center justify-center rounded-xl border px-8 py-3.5 text-sm font-semibold shadow-sm transition-colors",
+                state.kind !== "ready" || uploading
+                  ? "cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400"
+                  : "border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50",
+              ].join(" ")}
+            >
+              {uploading ? "업로드 중..." : "서버로 전송"}
+            </button>
             <p className="max-w-xs text-center text-sm text-zinc-500 sm:text-left">
               버튼을 누르면 파일 선택 창이 열립니다.
             </p>
           </div>
         </section>
       </div>
+
+      {uploadedCount !== null && (
+        <p className="mt-6 text-sm font-medium text-zinc-700">
+          서버 수신 완료: {uploadedCount.toLocaleString("ko-KR")}건
+        </p>
+      )}
 
       {error && (
         <p

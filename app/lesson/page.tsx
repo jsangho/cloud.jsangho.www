@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, Database, ArrowRight } from "lucide-react";
+import { BookOpen, Database, ArrowRight, ListChecks } from "lucide-react";
 
 export default function LessonHomePage() {
   return (
@@ -46,6 +46,27 @@ export default function LessonHomePage() {
                 </div>
                 <p className="mt-2 text-sm text-stone-300">
                   CSV 업로드(브라우저) 등 데이터 준비 연습으로 이동합니다.
+                </p>
+              </div>
+              <ArrowRight
+                className="mt-1 size-5 text-stone-400 transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </div>
+          </Link>
+
+          <Link
+            href="/lesson/titanic/titaniclist"
+            className="group rounded-3xl border border-stone-700/60 bg-stone-950/45 p-6 shadow-lg shadow-black/20 backdrop-blur-sm transition-colors hover:border-stone-500/70 hover:bg-stone-950/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500/50"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 text-sm font-semibold text-stone-100">
+                  <ListChecks className="size-5 text-stone-300" aria-hidden />
+                  DB 리스트
+                </div>
+                <p className="mt-2 text-sm text-stone-300">
+                  Neon DB의 타이타닉 테이블 데이터를 50개씩 조회합니다.
                 </p>
               </div>
               <ArrowRight

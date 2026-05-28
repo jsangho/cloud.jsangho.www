@@ -1,0 +1,244 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+type TitanicRow = {
+  PassengerId: number | null;
+  Survived: number | null;
+  Pclass: number | null;
+  Name: string | null;
+  gender: string | null;
+  Age: number | null;
+  SibSp: number | null;
+  Parch: number | null;
+  Ticket: string | null;
+  Fare: number | null;
+  Cabin: string | null;
+  Embarked: string | null;
+};
+
+type TitanicPageResponse = {
+  page: number;
+  pageSize: number;
+  total: number;
+  items: TitanicRow[];
+};
+
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+
+export default function LessonTitanicListPage() {
+  const [rows, setRows] = useState<TitanicRow[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 50;
+  const [total, setTotal] = useState(0);
+
+  const columns = useMemo(
+    () =>
+      [
+        "PassengerId",
+        "Survived",
+        "Pclass",
+        "Name",
+        "gender",
+        "Age",
+        "SibSp",
+        "Parch",
+        "Ticket",
+        "Fare",
+        "Cabin",
+        "Embarked",
+      ] as const,
+    []
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(
+          `${apiBaseUrl}/titanic/walter/openfile?page=${page}&pageSize=${pageSize}`,
+          { cache: "no-store" }
+        );
+        const data = (await res.json().catch(() => null)) as TitanicPageResponse | null;
+        if (!res.ok) {
+          const detail =
+            (data && typeof data === "object" && "detail" in data && (data as any).detail) ||
+            "목록을 불러오지 못했습니다.";
+          throw new Error(String(detail));
+        }
+        if (!cancelled) {
+          setRows(Array.isArray(data?.items) ? data!.items : []);
+          setTotal(typeof data?.total === "number" ? data.total : 0);
+        }
+      } catch (e) {
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "목록을 불러오지 못했습니다.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [page, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(Math.max(page, 1), totalPages);
+
+  const pageItems = useMemo(() => {
+    // Google-style: 1 ... (p-1) p (p+1) ... n
+    const items: Array<number | "..."> = [];
+    const n = totalPages;
+    const p = safePage;
+    if (n <= 10) {
+      for (let i = 1; i <= n; i += 1) items.push(i);
+      return items;
+    }
+    items.push(1);
+    const left = Math.max(2, p - 1);
+    const right = Math.min(n - 1, p + 1);
+    if (left > 2) items.push("...");
+    for (let i = left; i <= right; i += 1) items.push(i);
+    if (right < n - 1) items.push("...");
+    items.push(n);
+    return items;
+  }, [totalPages, safePage]);
+
+  return (
+    <main className="px-4 py-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+              Titanic DB 리스트
+            </h1>
+            <p className="mt-2 text-sm text-stone-300">
+              Neon DB의{" "}
+              <code className="rounded bg-stone-950/40 px-1.5 py-0.5 text-xs text-stone-100">
+                titanic_passengers
+              </code>{" "}
+              내용을 조회합니다.
+            </p>
+          </div>
+          <div className="text-sm text-stone-300">
+            {loading
+              ? "불러오는 중..."
+              : `rows: ${total.toLocaleString("ko-KR")} · page ${safePage}/${totalPages}`}
+          </div>
+        </div>
+
+        {error && (
+          <p className="mt-6 rounded-lg border border-red-900/40 bg-red-950/30 px-4 py-3 text-sm text-red-200">
+            {error}
+          </p>
+        )}
+
+        <div className="mt-6 overflow-auto rounded-xl border border-stone-800/70 bg-stone-950/30">
+          <table className="min-w-[1100px] w-full text-left text-sm">
+            <thead className="sticky top-0 bg-stone-950/80 backdrop-blur">
+              <tr className="border-b border-stone-800/70">
+                {columns.map((c) => (
+                  <th key={c} className="px-3 py-2 font-semibold text-stone-200">
+                    {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, idx) => (
+                <tr
+                  key={`${r.PassengerId ?? "-"}-${idx}`}
+                  className="border-b border-stone-900/60"
+                >
+                  {columns.map((c) => (
+                    <td key={c} className="px-3 py-2 text-stone-200/90">
+                      {String((r as any)[c] ?? "-")}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+              {!loading && !error && rows.length === 0 && (
+                <tr>
+                  <td
+                    className="px-3 py-10 text-center text-stone-400"
+                    colSpan={columns.length}
+                  >
+                    데이터가 없습니다.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {!loading && !error && total > 0 && (
+          <nav className="mt-8 flex justify-center" aria-label="Titanic list pagination">
+            <div className="inline-flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage === 1}
+                className={[
+                  "inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition-colors",
+                  safePage === 1
+                    ? "cursor-not-allowed border-stone-800/60 bg-stone-950/30 text-stone-600"
+                    : "border-stone-200/10 bg-stone-950/20 text-stone-100 hover:bg-stone-800/60",
+                ].join(" ")}
+                aria-label="이전 페이지"
+              >
+                ‹
+              </button>
+
+              <div className="flex items-center gap-2">
+                {pageItems.map((it, i) =>
+                  it === "..." ? (
+                    <span key={`dots-${i}`} className="px-1 text-sm text-stone-500">
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={it}
+                      type="button"
+                      onClick={() => setPage(it)}
+                      aria-current={it === safePage ? "page" : undefined}
+                      className={[
+                        "inline-flex h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-semibold transition-colors",
+                        it === safePage
+                          ? "border-stone-800/60 bg-stone-50 text-stone-700 hover:bg-stone-100"
+                          : "border-stone-200/10 bg-stone-950/20 text-stone-100",
+                      ].join(" ")}
+                    >
+                      {it}
+                    </button>
+                  )
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage === totalPages}
+                className={[
+                  "inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition-colors",
+                  safePage === totalPages
+                    ? "cursor-not-allowed border-stone-800/60 bg-stone-950/30 text-stone-600"
+                    : "border-stone-200/10 bg-stone-950/20 text-stone-100 hover:bg-stone-800/60",
+                ].join(" ")}
+                aria-label="다음 페이지"
+              >
+                ›
+              </button>
+            </div>
+          </nav>
+        )}
+      </div>
+    </main>
+  );
+}
+

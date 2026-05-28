@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 const TITANIC_HREF = "/lesson/titanic";
 const DATA_COLLECTION_HREF = "/lesson/titanic/data-collection";
+const TITANIC_LIST_HREF = "/lesson/titanic/titaniclist";
 
 export default function LessonLayout({
   children,
@@ -17,16 +18,17 @@ export default function LessonLayout({
   const pathname = usePathname();
   const isTitanic = pathname === TITANIC_HREF;
   const isDataCollection = pathname === DATA_COLLECTION_HREF;
-  const isLessonSection = isTitanic || isDataCollection;
+  const isTitanicList = pathname === TITANIC_LIST_HREF;
+  const isLessonSection = isTitanic || isDataCollection || isTitanicList;
 
   const [expanded, setExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    if (isDataCollection) {
+    if (isDataCollection || isTitanicList) {
       setExpanded(true);
     }
-  }, [isDataCollection]);
+  }, [isDataCollection, isTitanicList]);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -73,18 +75,32 @@ export default function LessonLayout({
       </div>
 
       {expanded && (
-        <Link
-          href={DATA_COLLECTION_HREF}
-          aria-current={isDataCollection ? "page" : undefined}
-          className={cn(
-            "rounded-lg py-2 pl-6 pr-3 text-sm transition-colors",
-            isDataCollection
-              ? "bg-stone-100/90 font-semibold text-stone-950"
-              : "text-stone-300 hover:bg-stone-800/60 hover:text-stone-50"
-          )}
-        >
-          1. 데이터 수집
-        </Link>
+        <>
+          <Link
+            href={DATA_COLLECTION_HREF}
+            aria-current={isDataCollection ? "page" : undefined}
+            className={cn(
+              "rounded-lg py-2 pl-6 pr-3 text-sm transition-colors",
+              isDataCollection
+                ? "bg-stone-100/90 font-semibold text-stone-950"
+                : "text-stone-300 hover:bg-stone-800/60 hover:text-stone-50"
+            )}
+          >
+            1. 데이터 수집
+          </Link>
+          <Link
+            href={TITANIC_LIST_HREF}
+            aria-current={isTitanicList ? "page" : undefined}
+            className={cn(
+              "rounded-lg py-2 pl-6 pr-3 text-sm transition-colors",
+              isTitanicList
+                ? "bg-stone-100/90 font-semibold text-stone-950"
+                : "text-stone-300 hover:bg-stone-800/60 hover:text-stone-50"
+            )}
+          >
+            2. DB 리스트
+          </Link>
+        </>
       )}
     </nav>
   );
