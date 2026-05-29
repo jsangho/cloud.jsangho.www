@@ -27,13 +27,27 @@ type TitanicPageResponse = {
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
+const pageSize = 50;
+
+type ListState = {
+  rows: TitanicRow[];
+  loading: boolean;
+  error: string | null;
+  page: number;
+  total: number;
+};
+
+const initialListState: ListState = {
+  rows: [],
+  loading: false,
+  error: null,
+  page: 1,
+  total: 0,
+};
+
 export default function LessonTitanicListPage() {
-  const [rows, setRows] = useState<TitanicRow[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const pageSize = 50;
-  const [total, setTotal] = useState(0);
+  const [state, setState] = useState<ListState>(initialListState);
+  const { rows, loading, error, page, total } = state;
 
   const columns = useMemo(
     () =>
@@ -57,8 +71,7 @@ export default function LessonTitanicListPage() {
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      setLoading(true);
-      setError(null);
+      setState((s) => ({ ...s, loading: true, error: null }));
       try {
         const res = await fetch(
           `${apiBaseUrl}/titanic/walter/openfile?page=${page}&pageSize=${pageSize}`,
@@ -72,14 +85,21 @@ export default function LessonTitanicListPage() {
           throw new Error(String(detail));
         }
         if (!cancelled) {
-          setRows(Array.isArray(data?.items) ? data!.items : []);
-          setTotal(typeof data?.total === "number" ? data.total : 0);
+          setState((s) => ({
+            ...s,
+            rows: Array.isArray(data?.items) ? data!.items : [],
+            total: typeof data?.total === "number" ? data.total : 0,
+          }));
         }
       } catch (e) {
-        if (!cancelled)
-          setError(e instanceof Error ? e.message : "목록을 불러오지 못했습니다.");
+        if (!cancelled) {
+          setState((s) => ({
+            ...s,
+            error: e instanceof Error ? e.message : "목록을 불러오지 못했습니다.",
+          }));
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setState((s) => ({ ...s, loading: false }));
       }
     };
     run();
@@ -182,7 +202,9 @@ export default function LessonTitanicListPage() {
             <div className="inline-flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() =>
+                  setState((s) => ({ ...s, page: Math.max(1, s.page - 1) }))
+                }
                 disabled={safePage === 1}
                 className={[
                   "inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition-colors",
@@ -205,7 +227,7 @@ export default function LessonTitanicListPage() {
                     <button
                       key={it}
                       type="button"
-                      onClick={() => setPage(it)}
+                      onClick={() => setState((s) => ({ ...s, page: it }))}
                       aria-current={it === safePage ? "page" : undefined}
                       className={[
                         "inline-flex h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-semibold transition-colors",
@@ -222,7 +244,12 @@ export default function LessonTitanicListPage() {
 
               <button
                 type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setState((s) => ({
+                    ...s,
+                    page: Math.min(totalPages, s.page + 1),
+                  }))
+                }
                 disabled={safePage === totalPages}
                 className={[
                   "inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition-colors",
