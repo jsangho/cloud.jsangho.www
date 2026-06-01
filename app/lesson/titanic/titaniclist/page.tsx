@@ -69,13 +69,14 @@ export default function LessonTitanicListPage() {
   );
 
   useEffect(() => {
-    let cancelled = false;
+    const ac = new AbortController();
+
     const run = async () => {
       setState((s) => ({ ...s, loading: true, error: null }));
       try {
         const res = await fetch(
-          `${apiBaseUrl}/titanic/walter/openfile?page=${page}&pageSize=${pageSize}`,
-          { cache: "no-store" }
+          `${apiBaseUrl}/titanic/walter-roaster/openfile?page=${page}&pageSize=${pageSize}`,
+          { cache: "no-store", signal: ac.signal }
         );
         const data = (await res.json().catch(() => null)) as TitanicPageResponse | null;
         if (!res.ok) {
@@ -84,29 +85,28 @@ export default function LessonTitanicListPage() {
             "목록을 불러오지 못했습니다.";
           throw new Error(String(detail));
         }
-        if (!cancelled) {
-          setState((s) => ({
-            ...s,
-            rows: Array.isArray(data?.items) ? data!.items : [],
-            total: typeof data?.total === "number" ? data.total : 0,
-          }));
-        }
+        if (ac.signal.aborted) return;
+        setState((s) => ({
+          ...s,
+          rows: Array.isArray(data?.items) ? data!.items : [],
+          total: typeof data?.total === "number" ? data.total : 0,
+        }));
       } catch (e) {
-        if (!cancelled) {
-          setState((s) => ({
-            ...s,
-            error: e instanceof Error ? e.message : "목록을 불러오지 못했습니다.",
-          }));
-        }
+        if (ac.signal.aborted) return;
+        setState((s) => ({
+          ...s,
+          error: e instanceof Error ? e.message : "목록을 불러오지 못했습니다.",
+        }));
       } finally {
-        if (!cancelled) setState((s) => ({ ...s, loading: false }));
+        if (!ac.signal.aborted) {
+          setState((s) => ({ ...s, loading: false }));
+        }
       }
     };
+
     run();
-    return () => {
-      cancelled = true;
-    };
-  }, [page, pageSize]);
+    return () => ac.abort();
+  }, [page]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const safePage = Math.min(Math.max(page, 1), totalPages);

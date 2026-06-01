@@ -18,39 +18,14 @@ export function TitanicCsvUpload() {
   const [uploadedCount, setUploadedCount] = useState<number | null>(null);
   const [state, setState] = useState<UploadState>({ kind: "empty" });
 
-  const ingestFile = useCallback((file: File | undefined) => {
-    setError(null);
-    setUploadedCount(null);
-    if (!file) return;
-
-    if (!file.name.toLowerCase().endsWith(".csv")) {
-      setError("CSV 파일(.csv)만 업로드할 수 있습니다.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const text = typeof reader.result === "string" ? reader.result : "";
-      setState({ kind: "ready", fileName: file.name, text });
-    };
-    reader.onerror = () => {
-      setError("파일을 읽는 중 오류가 발생했습니다.");
-    };
-    reader.readAsText(file, "UTF-8");
-  }, []);
-
-  const uploadToServer = useCallback(async () => {
-    if (state.kind !== "ready") return;
-    if (uploading) return;
+  const uploadFile = useCallback(async (file: File) => {
     setError(null);
     setUploading(true);
     try {
-      const blob = new Blob([state.text], { type: "text/csv;charset=utf-8" });
-      const file = new File([blob], state.fileName, { type: "text/csv" });
       const form = new FormData();
       form.append("file", file);
 
-      const res = await fetch(`${apiBaseUrl}/titanic/james/fileupload`, {
+      const res = await fetch(`${apiBaseUrl}/titanic/james-director/fileupload`, {
         method: "POST",
         body: form,
       });
@@ -69,7 +44,33 @@ export function TitanicCsvUpload() {
     } finally {
       setUploading(false);
     }
-  }, [state, uploading]);
+  }, []);
+
+  const ingestFile = useCallback(
+    (file: File | undefined) => {
+      setError(null);
+      setUploadedCount(null);
+      if (!file) return;
+
+      if (!file.name.toLowerCase().endsWith(".csv")) {
+        setError("CSV 파일(.csv)만 업로드할 수 있습니다.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = typeof reader.result === "string" ? reader.result : "";
+        setState({ kind: "ready", fileName: file.name, text });
+      };
+      reader.onerror = () => {
+        setError("파일을 읽는 중 오류가 발생했습니다.");
+      };
+      reader.readAsText(file, "UTF-8");
+
+      void uploadFile(file);
+    },
+    [uploadFile]
+  );
 
   const openPicker = () => {
     inputRef.current?.click();
@@ -138,12 +139,15 @@ export function TitanicCsvUpload() {
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
             onDrop={onDrop}
+            disabled={uploading}
             aria-label="CSV 파일을 여기에 놓거나 클릭하여 선택"
             className={[
               "flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors",
-              dragOver
-                ? "border-zinc-900 bg-zinc-100"
-                : "border-zinc-300 bg-zinc-50/50 hover:border-zinc-400 hover:bg-zinc-50",
+              uploading
+                ? "cursor-wait border-zinc-300 bg-zinc-100"
+                : dragOver
+                  ? "border-zinc-900 bg-zinc-100"
+                  : "border-zinc-300 bg-zinc-50/50 hover:border-zinc-400 hover:bg-zinc-50",
             ].join(" ")}
           >
             <Upload
@@ -152,10 +156,12 @@ export function TitanicCsvUpload() {
               aria-hidden
             />
             <p className="text-base font-medium text-zinc-800">
-              파일을 이 영역에 끌어다 놓기
+              {uploading ? "서버로 전송 중..." : "파일을 이 영역에 끌어다 놓기"}
             </p>
             <p className="mt-1 text-sm text-zinc-500">
-              또는 클릭해서 탐색기에서 선택
+              {uploading
+                ? "잠시만 기다려 주세요."
+                : "또는 클릭해서 탐색기에서 선택 (선택 즉시 전송)"}
             </p>
           </button>
         </section>
@@ -180,26 +186,19 @@ export function TitanicCsvUpload() {
             <button
               type="button"
               onClick={openPicker}
-              className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-xl border border-zinc-900 bg-zinc-900 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-800"
-            >
-              <Upload className="size-4" aria-hidden />
-              CSV 업로드
-            </button>
-            <button
-              type="button"
-              onClick={uploadToServer}
-              disabled={state.kind !== "ready" || uploading}
+              disabled={uploading}
               className={[
-                "inline-flex min-w-[200px] items-center justify-center rounded-xl border px-8 py-3.5 text-sm font-semibold shadow-sm transition-colors",
-                state.kind !== "ready" || uploading
-                  ? "cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400"
-                  : "border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50",
+                "inline-flex min-w-[200px] items-center justify-center gap-2 rounded-xl border px-8 py-3.5 text-sm font-semibold shadow-sm transition-colors",
+                uploading
+                  ? "cursor-wait border-zinc-300 bg-zinc-200 text-zinc-500"
+                  : "border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800",
               ].join(" ")}
             >
-              {uploading ? "업로드 중..." : "서버로 전송"}
+              <Upload className="size-4" aria-hidden />
+              {uploading ? "업로드 중..." : "CSV 업로드"}
             </button>
             <p className="max-w-xs text-center text-sm text-zinc-500 sm:text-left">
-              버튼을 누르면 파일 선택 창이 열립니다.
+              파일을 고르면 자동으로 서버에 전송됩니다.
             </p>
           </div>
         </section>
