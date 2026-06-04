@@ -18,6 +18,9 @@ type TitanicRow = {
 };
 
 type TitanicPageResponse = {
+  id: number;
+  name: string;
+  memo: string;
   page: number;
   pageSize: number;
   total: number;
@@ -31,6 +34,9 @@ const pageSize = 50;
 
 type ListState = {
   rows: TitanicRow[];
+  walterId: number | null;
+  walterName: string | null;
+  walterMemo: string | null;
   loading: boolean;
   error: string | null;
   page: number;
@@ -39,6 +45,9 @@ type ListState = {
 
 const initialListState: ListState = {
   rows: [],
+  walterId: null,
+  walterName: null,
+  walterMemo: null,
   loading: false,
   error: null,
   page: 1,
@@ -47,7 +56,7 @@ const initialListState: ListState = {
 
 export default function LessonTitanicListPage() {
   const [state, setState] = useState<ListState>(initialListState);
-  const { rows, loading, error, page, total } = state;
+  const { rows, walterId, walterName, walterMemo, loading, error, page, total } = state;
 
   const columns = useMemo(
     () =>
@@ -89,6 +98,9 @@ export default function LessonTitanicListPage() {
         setState((s) => ({
           ...s,
           rows: Array.isArray(data?.items) ? data!.items : [],
+          walterId: typeof data?.id === "number" ? data.id : null,
+          walterName: typeof data?.name === "string" ? data.name : null,
+          walterMemo: typeof data?.memo === "string" ? data.memo : null,
           total: typeof data?.total === "number" ? data.total : 0,
         }));
       } catch (e) {
@@ -141,7 +153,11 @@ export default function LessonTitanicListPage() {
             <p className="mt-2 text-sm text-stone-300">
               Neon DB의{" "}
               <code className="rounded bg-stone-950/40 px-1.5 py-0.5 text-xs text-stone-100">
-                titanic_passengers
+                titanic_persons
+              </code>
+              {" + "}
+              <code className="rounded bg-stone-950/40 px-1.5 py-0.5 text-xs text-stone-100">
+                titanic_bookings
               </code>{" "}
               내용을 조회합니다.
             </p>
@@ -157,6 +173,26 @@ export default function LessonTitanicListPage() {
           <p className="mt-6 rounded-lg border border-red-900/40 bg-red-950/30 px-4 py-3 text-sm text-red-200">
             {error}
           </p>
+        )}
+
+        {!error && (walterId !== null || walterName || walterMemo) && (
+          <section className="mt-6 rounded-xl border border-stone-800/70 bg-stone-950/40 px-4 py-4">
+            <h2 className="text-sm font-semibold text-stone-200">월터 (Walter Roaster)</h2>
+            <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+              <div>
+                <dt className="text-stone-500">ID</dt>
+                <dd className="font-medium text-stone-100">{walterId ?? "-"}</dd>
+              </div>
+              <div>
+                <dt className="text-stone-500">이름</dt>
+                <dd className="font-medium text-stone-100">{walterName ?? "-"}</dd>
+              </div>
+              <div className="sm:col-span-1">
+                <dt className="text-stone-500">비고</dt>
+                <dd className="font-medium text-stone-100">{walterMemo ?? "-"}</dd>
+              </div>
+            </dl>
+          </section>
         )}
 
         <div className="mt-6 overflow-auto rounded-xl border border-stone-800/70 bg-stone-950/30">
