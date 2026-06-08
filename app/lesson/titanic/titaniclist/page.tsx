@@ -84,7 +84,7 @@ export default function LessonTitanicListPage() {
       setState((s) => ({ ...s, loading: true, error: null }));
       try {
         const res = await fetch(
-          `${apiBaseUrl}/titanic/walter-roaster/openfile?page=${page}&pageSize=${pageSize}`,
+          `${apiBaseUrl}/titanic/walter/openfile?page=${page}&pageSize=${pageSize}`,
           { cache: "no-store", signal: ac.signal }
         );
         const data = (await res.json().catch(() => null)) as TitanicPageResponse | null;
