@@ -25,7 +25,7 @@ export function TitanicCsvUpload() {
       const form = new FormData();
       form.append("file", file);
 
-      const res = await fetch(`${apiBaseUrl}/titanic/james-director/fileupload`, {
+      const res = await fetch(`${apiBaseUrl}/titanic/james/fileupload`, {
         method: "POST",
         body: form,
       });
