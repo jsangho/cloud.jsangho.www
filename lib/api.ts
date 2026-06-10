@@ -1,6 +1,8 @@
 export const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
+export const titanicApiBaseUrl = `${apiBaseUrl}/api/titanic`;
+
 /**
  * Gemini 채팅 엔드포인트.
  * Vercel 등 프론트만 배포할 때는 같은 출처 `/api/chat`(Next Route Handler)을 씁니다.

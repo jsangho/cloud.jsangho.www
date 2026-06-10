@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const TITANIC_HREF = "/lesson/titanic";
 const DATA_COLLECTION_HREF = "/lesson/titanic/data-collection";
 const TITANIC_LIST_HREF = "/lesson/titanic/titaniclist";
-
+const SMITH_SAILOR_HREF = "/lesson/titanic/smith-sailor";
 export default function LessonLayout({
   children,
 }: {
@@ -19,16 +19,18 @@ export default function LessonLayout({
   const isTitanic = pathname === TITANIC_HREF;
   const isDataCollection = pathname === DATA_COLLECTION_HREF;
   const isTitanicList = pathname === TITANIC_LIST_HREF;
-  const isLessonSection = isTitanic || isDataCollection || isTitanicList;
+  const isSmithSailor = pathname === SMITH_SAILOR_HREF;
+  const isLessonSection =
+    isTitanic || isDataCollection || isTitanicList || isSmithSailor;
 
   const [expanded, setExpanded] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    if (isDataCollection || isTitanicList) {
+    if (isDataCollection || isTitanicList || isSmithSailor) {
       setExpanded(true);
     }
-  }, [isDataCollection, isTitanicList]);
+  }, [isDataCollection, isTitanicList, isSmithSailor]);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -100,6 +102,18 @@ export default function LessonLayout({
           >
             2. DB 리스트
           </Link>
+          <Link
+            href={SMITH_SAILOR_HREF}
+            aria-current={isSmithSailor ? "page" : undefined}
+            className={cn(
+              "rounded-lg py-2 pl-6 pr-3 text-sm transition-colors",
+              isSmithSailor
+                ? "bg-stone-100/90 font-semibold text-stone-950"
+                : "text-stone-300 hover:bg-stone-800/60 hover:text-stone-50"
+            )}  
+          >
+            3. 스미스 선장과 대화
+          </Link>
         </>
       )}
     </nav>
@@ -134,7 +148,12 @@ export default function LessonLayout({
       </aside>
 
       {/* Mobile: hamburger + drawer */}
-      <div className="relative z-10 min-w-0 flex-1">
+      <div
+        className={cn(
+          "relative z-10 flex min-h-0 min-w-0 flex-1 flex-col",
+          isSmithSailor && "overflow-hidden"
+        )}
+      >
         <div className="sticky top-[4.25rem] z-20 flex items-center gap-2 border-b border-stone-800/60 bg-stone-900/70 px-4 py-3 backdrop-blur md:hidden">
           <button
             type="button"

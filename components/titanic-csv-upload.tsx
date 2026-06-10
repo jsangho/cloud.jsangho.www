@@ -2,13 +2,11 @@
 
 import { useCallback, useRef, useState } from "react";
 import { Upload } from "lucide-react";
+import { titanicApiBaseUrl } from "@/lib/api";
 
 type UploadState =
   | { kind: "empty" }
   | { kind: "ready"; fileName: string; text: string };
-
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
 export function TitanicCsvUpload() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,7 +23,7 @@ export function TitanicCsvUpload() {
       const form = new FormData();
       form.append("file", file);
 
-      const res = await fetch(`${apiBaseUrl}/titanic/james/fileupload`, {
+      const res = await fetch(`${titanicApiBaseUrl}/james/fileupload`, {
         method: "POST",
         body: form,
       });

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { titanicApiBaseUrl } from "@/lib/api";
 
 type TitanicRow = {
   PassengerId: number | null;
@@ -26,9 +27,6 @@ type TitanicPageResponse = {
   total: number;
   items: TitanicRow[];
 };
-
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
 const pageSize = 50;
 
@@ -84,7 +82,7 @@ export default function LessonTitanicListPage() {
       setState((s) => ({ ...s, loading: true, error: null }));
       try {
         const res = await fetch(
-          `${apiBaseUrl}/titanic/walter/openfile?page=${page}&pageSize=${pageSize}`,
+          `${titanicApiBaseUrl}/walter/openfile?page=${page}&pageSize=${pageSize}`,
           { cache: "no-store", signal: ac.signal }
         );
         const data = (await res.json().catch(() => null)) as TitanicPageResponse | null;

@@ -99,12 +99,54 @@ async function generateReply(prompt: string, preferredModel: string): Promise<st
   throw lastError ?? new Error("Gemini generate failed");
 }
 
+async function streamReply(prompt: string, preferredModel: string): Promise<ReadableStream<Uint8Array>> {
+  const apiKey = resolveApiKey();
+  if (!apiKey) {
+    throw new Error("API key not configured");
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const tryOrder = [
+    preferredModel,
+    ...MODEL_FALLBACKS.filter((m) => m !== preferredModel),
+  ];
+
+  let lastError: unknown;
+  for (const modelName of tryOrder) {
+    try {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const result = await model.generateContentStream(prompt);
+      const encoder = new TextEncoder();
+
+      return new ReadableStream<Uint8Array>({
+        async start(controller) {
+          try {
+            for await (const chunk of result.stream) {
+              const text = chunk.text();
+              if (text) {
+                controller.enqueue(encoder.encode(text));
+              }
+            }
+            controller.close();
+          } catch (error) {
+            controller.error(error);
+          }
+        },
+      });
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw lastError ?? new Error("Gemini generate failed");
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as {
       prompt?: string;
       message?: string;
       model?: string;
+      stream?: boolean;
     };
     const prompt = (body.prompt ?? body.message ?? "").trim();
     const modelName = body.model?.trim() || DEFAULT_MODEL;
@@ -114,6 +156,16 @@ export async function POST(request: NextRequest) {
         { error: "메시지가 비어 있습니다." },
         { status: 400 }
       );
+    }
+
+    if (body.stream) {
+      const stream = await streamReply(prompt, modelName);
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-cache",
+        },
+      });
     }
 
     const text = await generateReply(prompt, modelName);
