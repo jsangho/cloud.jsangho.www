@@ -1,12 +1,17 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Oswald } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from '@/components/navbar'
 import { AuthProvider } from '@/context/auth-context'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
+const oswald = Oswald({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  variable: '--font-sport',
+})
 
 export const metadata: Metadata = {
   title: 'KayFabe',
@@ -27,7 +32,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="h-full">
-      <body className="min-h-full w-full overflow-x-hidden font-sans antialiased bg-stone-950 text-stone-100">
+      <body
+        className={`${geist.variable} ${geistMono.variable} ${oswald.variable} min-h-full w-full overflow-x-hidden font-sans antialiased bg-[#0a0a0c] text-stone-100`}
+      >
         <AuthProvider>
           <Navbar />
           {children}

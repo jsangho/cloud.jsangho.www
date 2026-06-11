@@ -7,44 +7,13 @@ import { GeminiChatPanel } from "@/components/gemini-chat-panel";
 import { PleAiScoreboard } from "@/components/ple-ai-scoreboard";
 import { KayfabeMark } from "@/components/kayfabe-logo";
 import { PleEventGrid } from "@/components/ple-event-grid";
+import { WweArenaShell } from "@/components/wwe-arena-shell";
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
 interface SampleDataItem {
   [key: string]: string | number | boolean | null;
-}
-
-/** Soft warm “arena dim” — low contrast, easy on the eyes. */
-function WweArenaShell({ children }: { children: React.ReactNode }) {
-  return (
-    <main className="relative min-h-screen w-full min-w-0 overflow-x-hidden bg-stone-900 text-stone-100">
-      {/* Gentle overhead wash */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_85%_at_50%_-35%,rgba(168,162,158,0.2),transparent_62%)]"
-      />
-      {/* Warm corner depth (muted, no saturated red/gold) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_0%_100%,rgba(120,113,108,0.14),transparent_58%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_50%_at_100%_0%,rgba(87,83,78,0.12),transparent_52%)]"
-      />
-      {/* Barely-there grain (avoids harsh stripes) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.025] bg-[repeating-linear-gradient(118deg,#fafaf9_0px,#fafaf9_1px,transparent_1px,transparent_24px)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-stone-950/25 via-transparent to-stone-950/75"
-      />
-      <div className="relative z-10">{children}</div>
-    </main>
-  );
 }
 
 function TitanicQaAppContent() {
@@ -61,24 +30,37 @@ function TitanicQaAppContent() {
     <WweArenaShell>
       {currentView === "qa" ? (
         <div className="flex min-h-[calc(100dvh-5.5rem)] flex-col">
-          <section className="shrink-0 px-4 pt-6 pb-4 text-center sm:pt-8">
-            <div className="mx-auto max-w-4xl">
-              <KayfabeMark className="mx-auto mb-4 h-14 w-14 sm:mb-5 sm:h-16 sm:w-16" />
-              <h2 className="text-balance text-[1.75rem] font-extrabold leading-[1.06] tracking-tight text-stone-50 sm:text-4xl sm:leading-[1.05] md:text-[2.75rem]">
-                <span className="block">WWE PLE를</span>
-                <span className="block">색 다르게 즐기는 방법</span>
-              </h2>
-              <p className="mx-auto mt-2.5 max-w-xl text-balance text-base font-semibold leading-snug text-stone-300 sm:mt-3 sm:text-lg">
-                결과를 예측해서 Head of Table이 되어보자!
+          <section className="shrink-0 px-4 pt-6 pb-4 text-center sm:pt-10">
+            <div className="relative mx-auto max-w-4xl">
+              <KayfabeMark className="hero-ring-glow relative z-10 mx-auto mb-5 h-16 w-16 rounded-2xl sm:mb-6 sm:h-[4.5rem] sm:w-[4.5rem]" />
+              <div className="relative mx-auto max-w-3xl px-2 py-2 sm:py-3">
+                <div aria-hidden className="hero-title-backdrop" />
+                <h2 className="font-kr-hero relative z-10 text-balance text-[1.75rem] text-white sm:text-[2.5rem] md:text-[2.875rem] lg:text-[3.25rem]">
+                  <span className="font-sport text-[1.05em] tracking-[-0.05em] text-white">
+                    WWE PLE
+                  </span>{" "}
+                  승부 예측,
+                  <br />
+                  당신의 본능을 증명하라
+                </h2>
+              </div>
+              <p className="relative z-10 mx-auto mt-4 max-w-2xl text-balance text-base font-medium leading-relaxed text-stone-400 sm:mt-5 sm:text-lg">
+                경기 결과를 예측하고 점수를 쌓아{" "}
+                <span className="font-sport font-semibold text-white">2026</span>
+                년의{" "}
+                <span className="text-head-of-table font-sport text-lg font-semibold sm:text-xl">
+                  Head of the Table
+                </span>{" "}
+                자리를 차지하세요!
               </p>
             </div>
           </section>
 
           <section className="mx-auto flex w-full max-w-5xl min-h-0 flex-1 flex-col justify-center px-4 py-3 sm:py-5">
-            <div className="w-full rounded-2xl border border-stone-700/70 bg-stone-950/55 p-4 shadow-lg shadow-black/25 backdrop-blur-sm sm:rounded-3xl sm:p-6">
+            <div className="ple-section-glow w-full rounded-2xl border border-stone-700/50 bg-stone-950/60 p-4 backdrop-blur-sm sm:rounded-3xl sm:p-6">
               <div className="mb-3 text-center sm:mb-4">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-stone-400">
-                  2026 월별 PLE
+                <p className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-400 sm:text-base">
+                  <span className="text-white">2026</span> Monthly PLE
                 </p>
                 <p className="mt-1 text-sm text-stone-500">
                   이벤트를 골라 승부 예측에 참여하세요

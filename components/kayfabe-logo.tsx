@@ -16,17 +16,17 @@ export function KayfabeMark({ className }: { className?: string }) {
       className={cn("shrink-0", className)}
       aria-hidden
     >
-      <rect width="32" height="32" rx="7" fill="#050505" />
+      <rect width="32" height="32" rx="9" fill="#050505" />
       <rect
         width="32"
         height="32"
-        rx="7"
-        stroke="#3f3f46"
-        strokeWidth="0.6"
+        rx="9"
+        stroke="#52525b"
+        strokeWidth="0.5"
         fill="none"
       />
 
-      <rect width="32" height="32" rx="7" fill={`url(#kf-arena-${uid})`} />
+      <rect width="32" height="32" rx="9" fill={`url(#kf-arena-${uid})`} />
 
       <path
         d="M0 32V24.5L16 19.8L32 24.5V32H0Z"
@@ -188,7 +188,7 @@ type KayfabeLogoProps = {
 
 export function KayfabeLogo({
   className,
-  markClassName = "h-9 w-9",
+  markClassName = "h-9 w-9 rounded-xl",
   showTagline = true,
   href = "/",
   children,
@@ -197,7 +197,7 @@ export function KayfabeLogo({
     <>
       <KayfabeMark className={markClassName} />
       <div className="min-w-0">
-        <span className="block text-xl font-bold tracking-tight text-stone-50">
+        <span className="font-sport block text-2xl font-semibold leading-none tracking-[-0.04em] text-stone-50">
           KayFabe
         </span>
         {showTagline && (

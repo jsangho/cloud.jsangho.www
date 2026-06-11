@@ -45,9 +45,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "rumble",
     signatureLabel: "로열 럼블 매치",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient:
-        "from-amber-950/80 via-stone-900 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-blue-950/15 via-transparent to-transparent",
       accent: "text-amber-300",
       accentMuted: "text-amber-200/70",
       border: "border-amber-700/50",
@@ -67,8 +66,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "chamber",
     signatureLabel: "엘리미네이션 챔버",
     theme: {
-      pageBg: "bg-zinc-950",
-      heroGradient: "from-zinc-400/15 via-stone-900 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-zinc-500/10 via-transparent to-transparent",
       accent: "text-zinc-200",
       accentMuted: "text-zinc-400",
       border: "border-zinc-500/50",
@@ -88,8 +87,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "nxt",
     signatureLabel: "NXT 타이틀 매치",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-violet-950/70 via-stone-900 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-violet-950/15 via-transparent to-transparent",
       accent: "text-violet-300",
       accentMuted: "text-violet-200/70",
       border: "border-violet-600/45",
@@ -109,9 +108,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "mania",
     signatureLabel: "WrestleMania 카드",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient:
-        "from-fuchsia-950/60 via-violet-950/50 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-amber-950/15 via-transparent to-transparent",
       accent: "text-fuchsia-200",
       accentMuted: "text-violet-200/75",
       border: "border-fuchsia-500/40",
@@ -131,8 +129,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "fallout",
     signatureLabel: "백래시 카드",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-red-950/55 via-stone-900 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-red-950/15 via-transparent to-transparent",
       accent: "text-red-300",
       accentMuted: "text-red-200/65",
       border: "border-red-700/45",
@@ -152,8 +150,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "ladder",
     signatureLabel: "머니 인 더 뱅크 래더",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-emerald-950/65 via-stone-900 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-emerald-950/15 via-transparent to-transparent",
       accent: "text-emerald-300",
       accentMuted: "text-emerald-200/70",
       border: "border-emerald-600/45",
@@ -173,8 +171,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "tournament",
     signatureLabel: "킹 & 퀸 토너먼트",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-yellow-950/50 via-amber-950/30 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-yellow-950/15 via-transparent to-transparent",
       accent: "text-yellow-200",
       accentMuted: "text-amber-200/65",
       border: "border-yellow-700/40",
@@ -194,8 +192,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "summer",
     signatureLabel: "SummerSlam 메인 카드",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-orange-950/60 via-amber-950/25 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-orange-950/15 via-transparent to-transparent",
       accent: "text-orange-300",
       accentMuted: "text-orange-200/70",
       border: "border-orange-600/45",
@@ -215,8 +213,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "international",
     signatureLabel: "Clash in Italy",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-emerald-950/45 via-stone-900 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-emerald-950/15 via-transparent to-transparent",
       accent: "text-emerald-300",
       accentMuted: "text-emerald-200/70",
       border: "border-emerald-600/40",
@@ -257,8 +255,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "fallout",
     signatureLabel: "Night of Champions",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-amber-950/55 via-yellow-950/25 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-amber-950/15 via-transparent to-transparent",
       accent: "text-amber-300",
       accentMuted: "text-amber-200/70",
       border: "border-amber-600/45",
@@ -278,8 +276,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "cell",
     signatureLabel: "Hell in a Cell",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-red-950/70 via-stone-950 to-black",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-red-950/15 via-transparent to-transparent",
       accent: "text-red-400",
       accentMuted: "text-red-300/60",
       border: "border-red-800/50",
@@ -299,8 +297,8 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
     layout: "teams",
     signatureLabel: "서바이버 시리즈",
     theme: {
-      pageBg: "bg-stone-950",
-      heroGradient: "from-blue-950/45 via-red-950/35 to-stone-950",
+      pageBg: "bg-[#0a0a0c]",
+      heroGradient: "from-blue-950/15 via-transparent to-transparent",
       accent: "text-blue-300",
       accentMuted: "text-red-200/65",
       border: "border-blue-600/35",

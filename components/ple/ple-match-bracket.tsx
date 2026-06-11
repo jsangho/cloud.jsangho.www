@@ -540,8 +540,8 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
   return (
     <section className={cn("space-y-4 pb-28", className)}>
       <div>
-        <h2 className="text-lg font-bold text-stone-50">전체 경기 · 예측</h2>
-        <p className="mt-1 text-xs text-stone-500">
+        <h2 className="font-kr-hero text-xl text-white sm:text-2xl">전체 경기 · 예측</h2>
+        <p className="mt-1.5 text-xs text-stone-500">
           {user
             ? ui.committed
               ? "예측이 확정되었습니다 · 아래에서 다시 정할 수 있습니다"
@@ -553,18 +553,19 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
           )}
         </p>
         {!user && !eventFinished && (
-          <p className="mt-2 rounded-lg border border-violet-500/35 bg-violet-950/30 px-3 py-2 text-sm text-violet-100">
+          <div className="ple-login-callout mt-3 rounded-xl px-4 py-3 text-sm text-stone-300">
             <Link
               href={`/login?next=${encodeURIComponent(`/ple/${slug}`)}`}
-              className="font-semibold underline underline-offset-2 hover:text-white"
+              className="font-semibold text-amber-400 underline decoration-amber-500/40 underline-offset-2 transition-colors hover:text-amber-300"
             >
               로그인
             </Link>
             하면 승부 예측에 참여할 수 있습니다.
-          </p>
+          </div>
         )}
         {ui.offline && (
-          <p className="mt-1 text-xs text-amber-500/90">
+          <p className="mt-2 flex items-start gap-2 rounded-lg border border-amber-500/25 bg-amber-950/20 px-3 py-2 text-xs text-amber-200/90">
+            <span className="shrink-0 font-bold text-amber-400">!</span>
             서버 연결 없음 — 예측 확정은 연결 후 로그인 상태에서만 가능합니다
           </p>
         )}
@@ -611,7 +612,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
       </ul>
 
       {showActionBar && user && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-stone-700/80 bg-stone-900/95 px-4 py-4 backdrop-blur-md">
+        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-[#0a0a0c]/95 px-4 py-4 backdrop-blur-md">
           <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-center text-sm text-stone-400 sm:text-left">
               {!canPredict ? (
@@ -639,7 +640,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
                 <button
                   type="button"
                   onClick={handleEditDraft}
-                  className="rounded-lg border border-stone-600 px-4 py-2.5 text-sm font-medium text-stone-200 hover:bg-stone-800"
+                  className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-stone-200 backdrop-blur-sm hover:bg-white/10"
                 >
                   예측 다시 정하기
                 </button>
@@ -650,10 +651,10 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
                   disabled={!canConfirm || ui.submitting}
                   onClick={() => void handleConfirm()}
                   className={cn(
-                    "rounded-lg px-6 py-2.5 text-sm font-bold transition-colors",
+                    "rounded-lg px-6 py-2.5 text-sm font-bold transition-all",
                     canConfirm && !ui.submitting
-                      ? "bg-violet-600 text-white hover:bg-violet-500"
-                      : "cursor-not-allowed bg-stone-700 text-stone-500"
+                      ? "btn-predict-confirm"
+                      : "cursor-not-allowed bg-stone-800 text-stone-600"
                   )}
                 >
                   {ui.submitting ? "저장 중…" : "예측 확정"}

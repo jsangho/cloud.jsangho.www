@@ -1,11 +1,22 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { PleEventDetail } from "@/lib/wwe-ple-detail";
+import type { PleEventDetail, PleLayoutVariant } from "@/lib/wwe-ple-detail";
 import type { PleSlug } from "@/lib/wwe-ple";
-import { formatPleMonth, WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
+import {
+  formatPleMonth,
+  formatPleSchedule,
+  WWE_PLE_MONTHLY_ORDER,
+} from "@/lib/wwe-ple";
 import { PleMatchBracket } from "@/components/ple/ple-match-bracket";
+import { WweArenaShell } from "@/components/wwe-arena-shell";
 
 type PleBase = (typeof WWE_PLE_MONTHLY_ORDER)[number];
+
+const HERO_BANNER_CLASS: Partial<Record<PleLayoutVariant, string>> = {
+  rumble: "ple-hero-banner--rumble",
+  chamber: "ple-hero-banner--chamber",
+  mania: "ple-hero-banner--mania",
+};
 
 type PleEventDetailViewProps = {
   ple: PleBase;
@@ -21,20 +32,15 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
       ? WWE_PLE_MONTHLY_ORDER[idx + 1]
       : undefined;
 
+  const bannerModifier = HERO_BANNER_CLASS[detail.layout];
+
   return (
-    <main className={cn("relative min-h-[calc(100dvh-5.5rem)] overflow-hidden", theme.pageBg)}>
-      <div
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute inset-0 bg-gradient-to-b",
-          theme.heroGradient
-        )}
-      />
-      <div className="relative z-10 mx-auto max-w-3xl px-4 py-10 sm:py-14">
+    <WweArenaShell>
+      <div className="relative mx-auto max-w-3xl px-4 py-8 sm:py-12">
         <nav className="mb-8 flex flex-wrap items-center justify-between gap-3 text-sm">
           <Link
             href="/ple"
-            className="text-stone-400 transition-colors hover:text-stone-200"
+            className="text-stone-500 transition-colors hover:text-stone-200"
           >
             ← PLE 목록
           </Link>
@@ -42,7 +48,7 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
             {prev && (
               <Link
                 href={`/ple/${prev.slug}`}
-                className="rounded-lg border border-stone-700/60 px-3 py-1 text-stone-400 hover:border-stone-500 hover:text-stone-200"
+                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-stone-400 backdrop-blur-sm transition-colors hover:border-white/20 hover:text-stone-100"
               >
                 {formatPleMonth(prev.month)}
               </Link>
@@ -50,7 +56,7 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
             {next && (
               <Link
                 href={`/ple/${next.slug}`}
-                className="rounded-lg border border-stone-700/60 px-3 py-1 text-stone-400 hover:border-stone-500 hover:text-stone-200"
+                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-stone-400 backdrop-blur-sm transition-colors hover:border-white/20 hover:text-stone-100"
               >
                 {formatPleMonth(next.month)}
               </Link>
@@ -60,28 +66,29 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
 
         <header
           className={cn(
-            "rounded-2xl border p-6 sm:p-8",
-            theme.border,
-            theme.glow,
-            "bg-stone-900/55 backdrop-blur-sm"
+            "ple-hero-banner p-6 sm:p-8",
+            bannerModifier
           )}
         >
           <span
             className={cn(
-              "inline-flex rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset",
+              "inline-flex rounded-full px-3 py-1 text-xs font-bold tracking-wide ring-1 ring-inset",
               theme.badge
             )}
           >
             {formatPleMonth(ple.month)} · {detail.signatureLabel}
           </span>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-stone-50 sm:text-4xl">
+          <h1 className="font-sport mt-4 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
             {ple.label}
           </h1>
-          <p className={cn("mt-2 text-lg font-medium", theme.accent)}>
+          <p className="font-kr-hero mt-3 text-lg text-stone-200 sm:text-xl">
             {detail.tagline}
           </p>
-          <p className="mt-4 text-sm leading-relaxed text-stone-400">
-            {ple.description}
+          <p className="mt-4 text-sm leading-relaxed text-stone-500">
+            {formatPleSchedule(ple)}
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-stone-600">
+            {ple.highlight}
           </p>
         </header>
 
@@ -92,24 +99,19 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link
             href="/"
-            className="rounded-lg border border-stone-600 bg-stone-800/60 px-4 py-2 text-sm font-medium text-stone-200 transition-colors hover:bg-stone-700"
+            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-stone-300 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
           >
             홈으로
           </Link>
           <Link
             href="/ple"
-            className={cn(
-              "rounded-lg border px-4 py-2 text-sm font-medium transition-colors",
-              theme.border,
-              theme.accent,
-              "bg-stone-900/50 hover:bg-stone-800/80"
-            )}
+            className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-stone-200 backdrop-blur-sm transition-colors hover:border-amber-500/30 hover:text-white"
           >
             다른 PLE 보기
           </Link>
         </div>
       </div>
-    </main>
+    </WweArenaShell>
   );
 }
 
@@ -118,8 +120,8 @@ function PleHighlightsSection({ detail }: { detail: PleEventDetail }) {
 
   return (
     <section className="mt-8">
-      <h2 className={cn("mb-3 text-sm font-semibold uppercase tracking-wider", theme.accentMuted)}>
-        PLE 안내
+      <h2 className="font-sport mb-3 text-sm font-semibold tracking-[-0.03em] text-stone-400">
+        PLE INFO
       </h2>
       <HighlightList highlights={highlights} theme={theme} />
     </section>
@@ -138,10 +140,13 @@ function HighlightList({
       {highlights.map((h) => (
         <li
           key={h.title}
-          className={cn("rounded-xl border p-4", theme.border, "bg-stone-900/45")}
+          className={cn(
+            "rounded-xl border border-white/8 bg-white/[0.04] p-4 backdrop-blur-sm",
+            theme.border
+          )}
         >
-          <p className={cn("font-semibold", theme.accent)}>{h.title}</p>
-          <p className="mt-1 text-sm text-stone-400">{h.detail}</p>
+          <p className="font-semibold text-stone-200">{h.title}</p>
+          <p className="mt-1 text-sm text-stone-500">{h.detail}</p>
         </li>
       ))}
     </ul>

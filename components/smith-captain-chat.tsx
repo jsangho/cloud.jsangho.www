@@ -10,13 +10,9 @@ import {
 } from "react";
 import { Loader2, Plus, RefreshCw, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getChatEndpoint } from "@/lib/api";
+import { parseApiError, titanicApiBaseUrl } from "@/lib/api";
 
-const SMITH_PERSONA =
-  "당신은 RMS 타이타닉의 에드워드 스미스 선장입니다. 1912년 어조로 한국어로 2~4문장 안에 간결히 답하세요.";
-
-const SMITH_CHAT_MODEL = "gemini-2.5-flash";
-const MAX_PROMPT_MESSAGES = 8;
+const SMITH_CHAT_ENDPOINT = `${titanicApiBaseUrl}/smith/chat`;
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -47,15 +43,6 @@ const initialState: ChatState = {
 };
 
 const CHAT_REQUEST_FAILED = "메시지를 전송하지 못했습니다.";
-
-function historyToPrompt(history: ChatMessage[]): string {
-  const dialogue = history.slice(1);
-  const recent = dialogue.slice(-MAX_PROMPT_MESSAGES);
-  const lines = recent.map((m) =>
-    m.role === "user" ? `승객: ${m.text.trim()}` : `선장: ${m.text.trim()}`
-  );
-  return `${SMITH_PERSONA}\n\n${lines.join("\n")}\n선장:`;
-}
 
 export function SmithCaptainChat({ className }: { className?: string }) {
   const [state, setState] = useState<ChatState>(initialState);
@@ -92,26 +79,22 @@ export function SmithCaptainChat({ className }: { className?: string }) {
     });
 
     try {
-      const response = await fetch(getChatEndpoint(), {
+      const response = await fetch(SMITH_CHAT_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: historyToPrompt(history),
-          model: SMITH_CHAT_MODEL,
+          messages: history.map((m) => ({ role: m.role, text: m.text })),
           stream: true,
         }),
       });
 
       if (!response.ok) {
         const data = (await response.json().catch(() => null)) as {
-          error?: string;
+          detail?: string;
         } | null;
         patchState({
           messages: history,
-          errorMessage:
-            typeof data?.error === "string" && data.error.trim()
-              ? data.error
-              : CHAT_REQUEST_FAILED,
+          errorMessage: parseApiError(data, response.status) || CHAT_REQUEST_FAILED,
         });
         return;
       }

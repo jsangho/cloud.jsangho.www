@@ -1,6 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  formatPleMonth,
+  formatPleSchedule,
+  getPleStatusBadge,
+  getPleThemeClass,
+  isPleTbd,
+  type PleStatusBadge,
+  WWE_PLE_MONTHLY_ORDER,
+} from "@/lib/wwe-ple";
 import { cn } from "@/lib/utils";
-import { formatPleMonth, WWE_PLE_MONTHLY_ORDER } from "@/lib/wwe-ple";
 
 type PleEventGridProps = {
   variant?: "compact" | "large";
@@ -10,6 +21,27 @@ type PleEventGridProps = {
   hrefPrefix?: string;
 };
 
+const STATUS_CLASS: Record<PleStatusBadge["variant"], string> = {
+  deadline: "ple-status-badge--deadline",
+  done: "ple-status-badge--done",
+  ended: "ple-status-badge--ended",
+  open: "ple-status-badge--open",
+  tbd: "ple-status-badge--tbd",
+};
+
+function resolveBadge(slug: string, base: PleStatusBadge): PleStatusBadge {
+  if (typeof window === "undefined") return base;
+  if (base.variant === "ended" || base.variant === "tbd") return base;
+  try {
+    if (localStorage.getItem(`ple-predicted-${slug}`) === "1") {
+      return { label: "예측 참여 완료", variant: "done" };
+    }
+  } catch {
+    /* ignore */
+  }
+  return base;
+}
+
 export function PleEventGrid({
   variant = "large",
   className,
@@ -17,58 +49,101 @@ export function PleEventGrid({
   hrefPrefix = "/ple",
 }: PleEventGridProps) {
   const isLarge = variant === "large";
+  const [badges, setBadges] = useState<Record<string, PleStatusBadge>>({});
+
+  useEffect(() => {
+    const next: Record<string, PleStatusBadge> = {};
+    for (const ple of WWE_PLE_MONTHLY_ORDER) {
+      next[ple.slug] = resolveBadge(ple.slug, getPleStatusBadge(ple));
+    }
+    setBadges(next);
+  }, []);
 
   return (
     <ul
       className={cn(
-        "list-none m-0 w-full p-0",
+        "m-0 w-full list-none p-0",
         isLarge
           ? "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
           : "mx-auto flex max-w-5xl flex-wrap justify-center gap-2 sm:gap-2.5",
         className
       )}
     >
-      {WWE_PLE_MONTHLY_ORDER.map((ple) => (
-        <li
-          key={ple.slug}
-          className={cn("min-w-0", !isLarge && "w-[calc(50%-0.25rem)] sm:w-[9.5rem]")}
-        >
-          <Link
-            href={`${hrefPrefix}/${ple.slug}`}
-            onClick={onNavigate}
-            className={cn(
-              "block h-full w-full min-w-0 rounded-xl border text-left shadow-sm transition-colors",
-              isLarge
-                ? "border-stone-600/80 bg-stone-800/55 px-3.5 py-3 hover:border-stone-500 hover:bg-stone-700/70 sm:px-4 sm:py-3.5"
-                : "border-stone-600/80 bg-stone-800/55 px-2.5 py-2 text-xs text-stone-200 hover:border-stone-500 hover:bg-stone-700/70 hover:text-stone-50 sm:px-3 sm:text-sm"
-            )}
+      {WWE_PLE_MONTHLY_ORDER.map((ple) => {
+        const tbd = isPleTbd(ple);
+        const themeClass = getPleThemeClass(ple.slug);
+        const badge = badges[ple.slug] ?? getPleStatusBadge(ple);
+
+        return (
+          <li
+            key={ple.slug}
+            className={cn("min-w-0", !isLarge && "w-[calc(50%-0.25rem)] sm:w-[9.5rem]")}
           >
-            <span
+            <Link
+              href={`${hrefPrefix}/${ple.slug}`}
+              onClick={onNavigate}
               className={cn(
-                "font-medium text-stone-500",
-                isLarge ? "text-sm" : "block text-[10px] font-normal sm:text-xs"
-              )}
-            >
-              {formatPleMonth(ple.month)}
-            </span>
-            <span
-              className={cn(
-                "block font-semibold text-stone-50",
+                "ple-card group relative flex h-full w-full min-w-0 flex-col rounded-xl border text-left",
+                tbd
+                  ? "ple-card--tbd border-stone-800/80 bg-stone-950/40"
+                  : "border-stone-700/60 bg-stone-900/55",
+                !tbd && themeClass,
                 isLarge
-                  ? "mt-0.5 text-base leading-tight sm:text-lg"
-                  : "font-medium leading-snug"
+                  ? "px-4 pb-3.5 pt-10 sm:px-4 sm:pb-4 sm:pt-11"
+                  : "px-2.5 py-2 text-xs sm:px-3 sm:text-sm"
               )}
             >
-              {ple.label}
-            </span>
-            {isLarge && (
-              <span className="mt-1.5 block text-xs leading-snug text-stone-400 sm:text-sm">
-                {ple.description}
+              <span
+                className={cn(
+                  "ple-status-badge absolute right-3 top-3 z-10",
+                  STATUS_CLASS[badge.variant]
+                )}
+              >
+                {badge.label}
               </span>
-            )}
-          </Link>
-        </li>
-      ))}
+
+              <span
+                className={cn(
+                  "ple-month-badge absolute left-3 top-3",
+                  tbd && "opacity-60"
+                )}
+              >
+                {formatPleMonth(ple.month)}
+              </span>
+
+              <span
+                className={cn(
+                  "block font-bold leading-tight tracking-tight",
+                  tbd ? "text-stone-600" : "text-stone-50",
+                  isLarge ? "font-sport text-xl sm:text-2xl" : "font-semibold"
+                )}
+              >
+                {ple.label}
+              </span>
+
+              <span
+                className={cn(
+                  "mt-1.5 block leading-snug",
+                  tbd ? "text-[11px] text-stone-700 sm:text-xs" : "text-xs text-stone-500 sm:text-sm"
+                )}
+              >
+                {formatPleSchedule(ple)}
+              </span>
+
+              {isLarge && (
+                <span
+                  className={cn(
+                    "mt-2.5 block text-[11px] leading-snug sm:text-xs",
+                    tbd ? "text-stone-800" : "text-stone-500"
+                  )}
+                >
+                  {ple.highlight}
+                </span>
+              )}
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   );
 }
