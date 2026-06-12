@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { Loader2, Search } from "lucide-react";
+import { WweArenaShell } from "@/components/wwe-arena-shell";
 import { fetchCompetitorNames } from "@/lib/records-api";
 import { cn } from "@/lib/utils";
 
@@ -43,67 +45,85 @@ export default function RecordsPage() {
   }, [state.loading, state.query]);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
-      <header className="mb-5">
-        <h1 className="text-xl font-extrabold tracking-tight text-stone-50 sm:text-2xl">
-          기록
-        </h1>
-        <p className="mt-1 text-sm font-medium text-stone-400">
-          PLE 출전 선수 목록에서 선택하면 승패 기록을 확인할 수 있습니다.
-        </p>
-      </header>
-
-      <section className="mb-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <label className="text-sm font-semibold text-stone-200" htmlFor="records-search">
-            선수 검색
-          </label>
-          <input
-            id="records-search"
-            type="search"
-            value={state.query}
-            onChange={(e) => patchState({ query: e.target.value })}
-            placeholder="이름으로 검색"
-            className={cn(
-              "h-10 w-full rounded-xl border border-stone-700/70 bg-stone-950/40 px-3 text-sm text-stone-100",
-              "placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/40 sm:max-w-sm"
-            )}
+    <WweArenaShell>
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:py-10">
+        <header className="relative mb-8 text-center sm:mb-10">
+          <div
+            aria-hidden
+            className="hero-title-backdrop mx-auto"
+            style={{ height: "8rem", width: "min(100%, 22rem)" }}
           />
-        </div>
-      </section>
+          <h1 className="font-kr-hero relative z-10 text-2xl text-white sm:text-3xl md:text-4xl">
+            기록
+          </h1>
+          <p className="relative z-10 mx-auto mt-3 max-w-lg text-sm font-medium leading-relaxed text-stone-400 sm:text-base">
+            PLE 출전 선수 목록에서 선택하면{" "}
+            <span className="font-semibold text-stone-200">승패 기록</span>을 확인할 수
+            있습니다.
+          </p>
+        </header>
 
-      <section aria-label="선수 목록">
-        {state.loading ? (
-          <div className="rounded-xl border border-stone-700/60 bg-stone-950/40 p-4 text-sm text-stone-300">
-            불러오는 중…
+        <section className="ple-section-glow mb-6 rounded-2xl border border-stone-700/50 bg-stone-950/60 p-4 backdrop-blur-sm sm:rounded-3xl sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <label
+              className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-300"
+              htmlFor="records-search"
+            >
+              선수 검색
+            </label>
+            <div className="relative w-full sm:max-w-sm">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500"
+                aria-hidden
+              />
+              <input
+                id="records-search"
+                type="search"
+                value={state.query}
+                onChange={(e) => patchState({ query: e.target.value })}
+                placeholder="이름으로 검색"
+                className={cn(
+                  "records-search-input h-10 w-full rounded-xl pl-9 pr-3 text-sm text-white",
+                  "placeholder:text-stone-500"
+                )}
+              />
+            </div>
           </div>
-        ) : (
-          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {state.names.map((name) => (
-              <li key={name} className="min-w-0">
-                <Link
-                  href={`/records/${encodeURIComponent(name)}`}
-                  className={cn(
-                    "block rounded-xl border border-stone-700/70 bg-stone-950/40 px-3 py-3",
-                    "transition-colors hover:border-stone-500/80 hover:bg-stone-900/40"
-                  )}
-                >
-                  <div className="truncate text-sm font-semibold text-stone-50">{name}</div>
-                  <div className="mt-0.5 text-xs font-medium text-stone-400">
-                    상세 기록 보기
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+        </section>
 
-        {!state.loading && state.names.length === 0 && emptyMessage && (
-          <div className="mt-8 rounded-xl border border-stone-700/60 bg-stone-950/40 p-4 text-sm text-stone-300">
-            {emptyMessage}
-          </div>
-        )}
-      </section>
-    </main>
+        <section aria-label="선수 목록">
+          {state.loading ? (
+            <div className="flex items-center justify-center gap-2 rounded-2xl border border-stone-700/50 bg-stone-950/50 px-4 py-10 text-sm text-stone-400">
+              <Loader2 className="h-4 w-4 animate-spin text-amber-400/80" />
+              불러오는 중…
+            </div>
+          ) : (
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {state.names.map((name) => (
+                <li key={name} className="min-w-0">
+                  <Link
+                    href={`/records/${encodeURIComponent(name)}`}
+                    className="records-competitor-card group block rounded-xl border px-4 py-3.5"
+                  >
+                    <div className="truncate text-sm font-bold text-white transition-colors group-hover:text-amber-50">
+                      {name}
+                    </div>
+                    <div className="mt-1 text-xs font-medium text-stone-500 transition-colors group-hover:text-amber-200/70">
+                      상세 기록 보기 →
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {!state.loading && state.names.length === 0 && emptyMessage && (
+            <div className="mt-6 rounded-2xl border border-dashed border-stone-700/50 bg-stone-950/40 px-4 py-10 text-center text-sm text-stone-400">
+              {emptyMessage}
+            </div>
+          )}
+        </section>
+      </div>
+    </WweArenaShell>
   );
 }

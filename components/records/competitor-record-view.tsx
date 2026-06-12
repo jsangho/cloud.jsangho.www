@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { resolveCompetitorInfo } from "@/lib/wrestler-info";
 import type { CompetitorProfile, CompetitorMatchRecord } from "@/lib/records-api";
@@ -13,12 +14,14 @@ type CompetitorRecordViewState = {
   q: string;
   result: FilterResult;
   format: FilterFormat;
+  titleHistoryOpen: boolean;
 };
 
 const initialState: CompetitorRecordViewState = {
   q: "",
   result: "all",
   format: "all",
+  titleHistoryOpen: false,
 };
 
 function pct(n: number): string {
@@ -309,20 +312,51 @@ export function CompetitorRecordView({
             </div>
 
             <div className="rounded-xl border border-amber-800/40 bg-stone-950/20 p-3">
-              <p className="text-xs font-bold text-stone-400">획득 이력</p>
-              <ul className="mt-2 space-y-2">
-                {titleHistory.map((h, idx) => (
-                  <li
-                    key={`${h.beltName}:${h.wonAt}:${h.matchKey ?? idx}`}
-                    className="rounded-lg border border-stone-800/70 bg-stone-950/30 px-3 py-2"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-sm font-semibold text-stone-100">{h.beltName}</span>
-                      <span className="text-xs font-medium text-stone-400">{h.wonAt}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <button
+                type="button"
+                onClick={() =>
+                  patchState({ titleHistoryOpen: !state.titleHistoryOpen })
+                }
+                aria-expanded={state.titleHistoryOpen}
+                aria-controls="title-acquisition-history"
+                className="flex w-full items-center justify-between gap-2 rounded-lg text-left transition-colors hover:bg-stone-950/30"
+              >
+                <span className="text-xs font-bold text-stone-400">
+                  획득 이력
+                  <span className="ml-1.5 font-semibold text-stone-500">
+                    ({titleHistory.length})
+                  </span>
+                </span>
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 shrink-0 text-amber-200/70 transition-transform duration-200",
+                    state.titleHistoryOpen && "rotate-180"
+                  )}
+                  aria-hidden
+                />
+              </button>
+              {state.titleHistoryOpen ? (
+                <ul
+                  id="title-acquisition-history"
+                  className="mt-2 space-y-2"
+                >
+                  {titleHistory.map((h, idx) => (
+                    <li
+                      key={`${h.beltName}:${h.wonAt}:${h.matchKey ?? idx}`}
+                      className="rounded-lg border border-stone-800/70 bg-stone-950/30 px-3 py-2"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-sm font-semibold text-stone-100">
+                          {h.beltName}
+                        </span>
+                        <span className="text-xs font-medium text-stone-400">
+                          {h.wonAt}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </div>
         )}

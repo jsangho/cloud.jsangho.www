@@ -69,6 +69,9 @@ export function Navbar() {
   const isResults = mounted && pathname === "/results";
   const isRankings = mounted && pathname === "/rankings";
   const isRecords = mounted && (pathname === "/records" || pathname.startsWith("/records/"));
+  const isChampionship =
+    mounted &&
+    (pathname === "/championship" || pathname.startsWith("/championship/"));
   const isLesson =
     mounted && (pathname === "/lesson" || pathname.startsWith("/lesson/"));
   const isLogin = mounted && pathname === "/login";
@@ -102,6 +105,9 @@ export function Navbar() {
           </NavLink>
           <NavLink href="/records" active={isRecords}>
             기록
+          </NavLink>
+          <NavLink href="/championship" active={isChampionship}>
+            챔피언십
           </NavLink>
         </div>
 

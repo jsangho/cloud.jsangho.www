@@ -10,9 +10,8 @@ import {
 } from "react";
 import { Loader2, Plus, RefreshCw, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { parseApiError, titanicApiBaseUrl } from "@/lib/api";
+import { parseApiError } from "@/lib/api";
 
-const SMITH_CHAT_ENDPOINT = `${titanicApiBaseUrl}/smith/chat`;
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -79,7 +78,7 @@ export function SmithCaptainChat({ className }: { className?: string }) {
     });
 
     try {
-      const response = await fetch(SMITH_CHAT_ENDPOINT, {
+      const response = await fetch("/api/titanic/smith/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

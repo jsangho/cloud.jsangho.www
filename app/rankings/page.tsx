@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 import { WweArenaShell } from "@/components/wwe-arena-shell";
@@ -25,51 +26,35 @@ const initialState: RankingsPageState = {
 };
 
 function rankRowClass(rank: number, isMe: boolean) {
-  const base = "border-b border-stone-800/60";
-  const meRing = isMe ? "ring-1 ring-inset ring-amber-500/40" : "";
+  const base = "border-b border-stone-800/35";
 
   if (rank === 1) {
+    return cn(base, "rankings-row-first", isMe && "ring-1 ring-inset ring-amber-400/20");
+  }
+  if (rank === 2 || rank === 3) {
     return cn(
       base,
-      meRing,
-      "bg-gradient-to-r from-amber-400/22 via-amber-500/12 to-amber-950/5"
+      "bg-stone-900/15",
+      isMe && "bg-amber-500/[0.04] ring-1 ring-inset ring-amber-500/15"
     );
   }
-  if (rank === 2) {
-    return cn(
-      base,
-      meRing,
-      "bg-gradient-to-r from-stone-300/18 via-stone-400/10 to-stone-950/5"
-    );
-  }
-  if (rank === 3) {
-    return cn(
-      base,
-      meRing,
-      "bg-gradient-to-r from-orange-700/22 via-amber-800/14 to-stone-950/5"
-    );
-  }
-  if (rank >= 4 && rank <= 10) {
-    return cn(base, meRing, "bg-stone-800/45");
-  }
-  return cn(base, isMe && "bg-amber-500/10");
+  return cn(
+    base,
+    isMe && "bg-amber-500/[0.04] ring-1 ring-inset ring-amber-500/15"
+  );
 }
 
 function rankNumberClass(rank: number) {
-  const base = "text-sm font-bold tabular-nums";
-  if (rank === 1) return cn(base, "text-amber-200");
-  if (rank === 2) return cn(base, "text-stone-200");
-  if (rank === 3) return cn(base, "text-orange-300/95");
-  if (rank >= 4 && rank <= 10) return cn(base, "text-stone-300");
-  return cn(base, "text-stone-400 font-semibold");
+  const base = "text-sm tabular-nums";
+  if (rank === 1) return cn(base, "font-black text-amber-300/90");
+  if (rank <= 3) return cn(base, "font-bold text-stone-300");
+  return cn(base, "font-semibold text-stone-500");
 }
 
 function rankTextClass(rank: number) {
-  if (rank === 1) return "text-amber-50";
-  if (rank === 2) return "text-stone-100";
-  if (rank === 3) return "text-orange-50/95";
-  if (rank >= 4 && rank <= 10) return "text-stone-200";
-  return "text-stone-100";
+  if (rank === 1) return "text-white";
+  if (rank <= 3) return "text-stone-200";
+  return "text-stone-300";
 }
 
 function TableRow({
@@ -83,20 +68,27 @@ function TableRow({
 
   return (
     <tr className={rankRowClass(row.rank, isMe)}>
-      <td className={cn("py-3 pr-3 text-right", rankNumberClass(row.rank))}>
+      <td className={cn("py-3.5 pr-3 text-right", rankNumberClass(row.rank))}>
         {row.rank}
       </td>
-      <td className={cn("py-3 pr-3 text-sm font-semibold", text)}>
-        {row.nickname}
+      <td className={cn("py-3.5 pr-3", text)}>
+        <span
+          className={cn(
+            "text-sm",
+            row.rank === 1 ? "font-bold text-head-of-table" : "font-medium"
+          )}
+        >
+          {row.nickname}
+        </span>
         {isMe && (
-          <span className="ml-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-200">
+          <span className="ml-2 rounded-md border border-amber-500/25 bg-amber-950/30 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-200/90">
             나
           </span>
         )}
       </td>
       <td
         className={cn(
-          "py-3 pr-3 text-right text-sm font-semibold tabular-nums",
+          "py-3.5 pr-3 text-right text-sm font-medium tabular-nums",
           text
         )}
       >
@@ -104,13 +96,53 @@ function TableRow({
       </td>
       <td
         className={cn(
-          "py-3 text-right text-sm font-semibold tabular-nums",
+          "py-3.5 text-right text-sm font-medium tabular-nums",
           text
         )}
       >
         {formatAccuracy(row.accuracy)}
       </td>
     </tr>
+  );
+}
+
+function RankingsTable({
+  rows,
+  userNickname,
+}: {
+  rows: RankingRow[];
+  userNickname?: string;
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[520px]">
+        <thead>
+          <tr className="border-b border-stone-700/50">
+            <th className="py-3 pr-3 text-right text-[11px] font-bold uppercase tracking-wider text-stone-500">
+              순위
+            </th>
+            <th className="py-3 pr-3 text-left text-[11px] font-bold uppercase tracking-wider text-stone-500">
+              닉네임
+            </th>
+            <th className="py-3 pr-3 text-right text-[11px] font-bold uppercase tracking-wider text-stone-500">
+              점수
+            </th>
+            <th className="py-3 text-right text-[11px] font-bold uppercase tracking-wider text-stone-500">
+              성공 확률
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <TableRow
+              key={`${row.rank}-${row.nickname}`}
+              row={row}
+              isMe={!!userNickname && row.nickname === userNickname}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -150,125 +182,86 @@ export default function RankingsPage() {
   }, [state.rows, state.myRank, user]);
 
   const showMySection =
-    !!user && myRow != null && !state.rows.some((r) => r.nickname === user.nickname);
+    !!user &&
+    myRow != null &&
+    !state.rows.some((r) => r.nickname === user.nickname);
 
   return (
     <WweArenaShell>
-      <div className="mx-auto max-w-5xl px-4 py-10">
-        <header className="flex flex-col items-center gap-3 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500">
-            KayFabe
-          </p>
-          <h1 className="text-2xl font-bold tracking-tight text-stone-50">
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:py-10">
+        <header className="relative mb-8 text-center sm:mb-10">
+          <div
+            aria-hidden
+            className="hero-title-backdrop mx-auto"
+            style={{ height: "8rem", width: "min(100%, 22rem)" }}
+          />
+          <h1 className="font-kr-hero relative z-10 text-2xl text-white sm:text-3xl md:text-4xl">
             순위표
           </h1>
-          <p className="max-w-2xl text-sm text-stone-400">
-            닉네임 · 점수 · 예측 성공 확률(%) 기준으로 표시합니다. 로그인 후 예측한
-            회원만 집계됩니다.
+          <p className="relative z-10 mx-auto mt-3 max-w-2xl text-sm font-medium leading-relaxed tracking-tight text-stone-400 sm:text-base">
+            닉네임 · 점수 · 예측 성공 확률(%) 기준으로 표시합니다.
+            <br className="hidden sm:inline" /> 로그인 후 예측한 회원만 집계됩니다.
           </p>
         </header>
 
         {!isReady || state.loading ? (
-          <div className="mt-10 text-center text-sm text-stone-400">
-            불러오는 중...
+          <div className="flex items-center justify-center gap-2 py-16 text-sm text-stone-400">
+            <Loader2 className="h-4 w-4 animate-spin text-amber-400/80" />
+            불러오는 중…
           </div>
         ) : state.unavailable ? (
-          <div className="mt-10 rounded-2xl border border-stone-700/60 bg-stone-900/40 px-4 py-6 text-center text-sm text-stone-400">
+          <div className="rankings-panel rounded-2xl px-4 py-8 text-center text-sm text-stone-400 sm:rounded-3xl">
             순위를 불러오지 못했습니다. 백엔드가 실행 중인지 확인해 주세요.
           </div>
         ) : (
           <>
-            <section className="mt-10 rounded-3xl border border-stone-700/70 bg-stone-950/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-7">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="text-lg font-bold tracking-tight text-stone-50">
-                  TOP 20
-                </h2>
+            <section className="rankings-panel ple-section-glow rounded-2xl p-4 sm:rounded-3xl sm:p-6">
+              <div className="mb-4 text-center sm:mb-5">
+                <p className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-400">
+                  <span className="text-white">TOP</span> 20
+                </p>
               </div>
+
               {state.rows.length === 0 ? (
-                <p className="rounded-2xl border border-dashed border-stone-600/60 bg-stone-900/40 px-4 py-6 text-center text-sm text-stone-400">
+                <p className="rounded-xl border border-dashed border-stone-700/45 bg-stone-950/30 px-4 py-8 text-center text-sm text-stone-400">
                   아직 순위에 올라온 유저가 없습니다. PLE에서 예측하고 결과가
                   확정되면 표시됩니다.
                 </p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[520px]">
-                    <thead>
-                      <tr className="border-b border-stone-700/70">
-                        <th className="py-3 pr-3 text-right text-xs font-semibold tracking-wider text-stone-500">
-                          순위
-                        </th>
-                        <th className="py-3 pr-3 text-left text-xs font-semibold tracking-wider text-stone-500">
-                          닉네임
-                        </th>
-                        <th className="py-3 pr-3 text-right text-xs font-semibold tracking-wider text-stone-500">
-                          점수
-                        </th>
-                        <th className="py-3 text-right text-xs font-semibold tracking-wider text-stone-500">
-                          성공 확률
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {state.rows.map((row) => (
-                        <TableRow
-                          key={`${row.rank}-${row.nickname}`}
-                          row={row}
-                          isMe={!!user && row.nickname === user.nickname}
-                        />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <RankingsTable rows={state.rows} userNickname={user?.nickname} />
               )}
             </section>
 
-            <section className="mt-6 rounded-3xl border border-stone-700/70 bg-stone-950/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-7">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="text-lg font-bold tracking-tight text-stone-50">
+            <section className="rankings-panel mt-5 rounded-2xl p-4 sm:mt-6 sm:rounded-3xl sm:p-6">
+              <div className="mb-4">
+                <h2 className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-300">
                   내 순위
                 </h2>
                 {!user && (
-                  <span className="text-xs font-medium text-stone-500">
+                  <p className="mt-1 text-xs font-medium text-stone-500">
                     로그인하면 내 순위가 표시됩니다.
-                  </span>
+                  </p>
                 )}
               </div>
 
               {!user ? (
-                <div className="rounded-2xl border border-stone-700/60 bg-stone-900/40 px-4 py-3 text-sm text-stone-300">
-                  로그인이 필요합니다.
+                <div className="ple-login-callout rounded-xl px-5 py-6 text-center">
+                  <p className="text-sm font-medium text-stone-400">
+                    로그인이 필요합니다.
+                  </p>
                 </div>
               ) : myRow == null ? (
-                <div className="rounded-2xl border border-stone-700/60 bg-stone-900/40 px-4 py-3 text-sm text-stone-300">
-                  아직 채점된 예측이 없습니다. PLE 페이지에서 예측하고 결과가
-                  나오면 순위에 반영됩니다.
+                <div className="ple-login-callout rounded-xl px-5 py-6 text-center">
+                  <p className="text-sm font-medium leading-relaxed text-stone-400">
+                    아직 채점된 예측이 없습니다.
+                    <br />
+                    PLE 페이지에서 예측하고 결과가 나오면 순위에 반영됩니다.
+                  </p>
                 </div>
               ) : showMySection ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[520px]">
-                    <thead>
-                      <tr className="border-b border-stone-700/70">
-                        <th className="py-3 pr-3 text-right text-xs font-semibold tracking-wider text-stone-500">
-                          순위
-                        </th>
-                        <th className="py-3 pr-3 text-left text-xs font-semibold tracking-wider text-stone-500">
-                          닉네임
-                        </th>
-                        <th className="py-3 pr-3 text-right text-xs font-semibold tracking-wider text-stone-500">
-                          점수
-                        </th>
-                        <th className="py-3 text-right text-xs font-semibold tracking-wider text-stone-500">
-                          성공 확률
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <TableRow row={myRow} isMe />
-                    </tbody>
-                  </table>
-                </div>
+                <RankingsTable rows={[myRow]} userNickname={user.nickname} />
               ) : (
-                <p className="text-sm text-stone-400">
+                <p className="text-sm font-medium text-stone-500">
                   TOP 20 표에 내 순위가 포함되어 있습니다.
                 </p>
               )}
