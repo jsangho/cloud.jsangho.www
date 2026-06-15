@@ -1,7 +1,7 @@
-# 프론트엔드 행동 지침 (보조)
+# 프론트엔드 행동 지침 (메인)
 
-> **메인 규칙:** [`www/.cursorrules`](.cursorrules)를 먼저 Read한다.  
-> 본 문서는 Karpathy 원칙의 **프론트 적용 보조**다. 충돌 시 `.cursorrules`가 우선한다.  
+> **본 문서가 메인 규칙이다.** 충돌 시 `CLAUDE.md`가 우선한다.  
+> [`www/.cursorrules`](.cursorrules)는 보조 참고용이다.  
 **스택:** Next.js (App Router) · React · TypeScript · Tailwind CSS · Radix UI
 
 ---
@@ -16,7 +16,7 @@
 
 ## 2. 단순성 · 3. 정밀한 수정 · 4. 목표 중심 실행
 
-상세는 [루트 `.cursorrules`](../.cursorrules) §2–4 및 [`www/.cursorrules`](.cursorrules) §2–5를 따른다.
+상세는 [루트 `CLAUDE.md`](../CLAUDE.md) §1–4 및 [`www/.cursorrules`](.cursorrules)(보조)를 따른다.
 
 | 작업 | 검증 |
 |------|------|
@@ -30,8 +30,8 @@
 
 ## 관련 메인 규칙
 
-| 영역 | `.cursorrules` |
-|------|----------------|
-| 루트 | [`.cursorrules`](../.cursorrules) |
-| 백엔드 API | [`sangho/.cursorrules`](../sangho/.cursorrules) |
-| Titanic | [`sangho/apps/titanic/_docs/.cursorrules`](../sangho/apps/titanic/_docs/.cursorrules) |
+| 영역 | 메인 `CLAUDE.md` | 보조 `.cursorrules` |
+|------|------------------|---------------------|
+| 루트 | [`CLAUDE.md`](../CLAUDE.md) | [`.cursorrules`](../.cursorrules) |
+| 백엔드 API | [`sangho/_claude/CLAUDE.md`](../sangho/_claude/CLAUDE.md) | [`sangho/.cursorrules`](../sangho/.cursorrules) |
+| Titanic | [`titanic/_docs/CLAUDE.md`](../sangho/apps/titanic/_docs/CLAUDE.md) | [`titanic/_docs/.cursorrules`](../sangho/apps/titanic/_docs/.cursorrules) |
