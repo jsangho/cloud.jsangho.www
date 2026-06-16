@@ -1,4 +1,4 @@
-import { apiBaseUrl, requestTimeoutMs } from "@/lib/api";
+import { pleMatchPicksBaseUrl, requestTimeoutMs } from "@/lib/api";
 
 export type RankingRow = {
   rank: number;
@@ -33,7 +33,7 @@ export async function fetchRankings(options?: {
     params.set("nickname", options.nickname);
   }
   const q = params.toString();
-  const url = `${apiBaseUrl}/rankings${q ? `?${q}` : ""}`;
+  const url = `${pleMatchPicksBaseUrl}/${q ? `?${q}` : ""}`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);

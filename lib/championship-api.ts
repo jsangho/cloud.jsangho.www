@@ -1,4 +1,4 @@
-import { apiBaseUrl, requestTimeoutMs } from "@/lib/api";
+import { titleAcquisitionsBaseUrl, requestTimeoutMs } from "@/lib/api";
 
 export type ChampionshipTier = "main" | "secondary" | "tag" | "other";
 
@@ -25,7 +25,7 @@ export type ChampionshipBoard = {
 };
 
 export async function fetchChampionshipBoard(): Promise<ChampionshipBoard | null> {
-  const url = `${apiBaseUrl}/championship`;
+  const url = `${titleAcquisitionsBaseUrl}/`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
   try {

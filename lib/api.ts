@@ -1,7 +1,11 @@
 export const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
-export const titanicApiBaseUrl = `${apiBaseUrl}/api/titanic`;
+export const titanicApiBaseUrl        = `${apiBaseUrl}/api/titanic`;
+export const pleEventsBaseUrl         = `${apiBaseUrl}/api/ple_events`;
+export const pleMatchPicksBaseUrl     = `${apiBaseUrl}/api/ple-match-picks`;
+export const pleMatchesBaseUrl        = `${apiBaseUrl}/api/ple-matches`;
+export const titleAcquisitionsBaseUrl = `${apiBaseUrl}/api/title-acquisitions`;
 
 /**
  * Gemini 채팅 엔드포인트.

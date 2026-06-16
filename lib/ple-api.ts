@@ -1,4 +1,4 @@
-import { apiBaseUrl, requestTimeoutMs } from "@/lib/api";
+import { pleEventsBaseUrl, pleMatchesBaseUrl, pleMatchPicksBaseUrl, requestTimeoutMs } from "@/lib/api";
 import type { PleMatchCard } from "@/lib/wwe-ple-matches";
 import type { PleSlug } from "@/lib/wwe-ple";
 import { getPleBySlug } from "@/lib/wwe-ple";
@@ -83,7 +83,7 @@ export function buildSyncPayload(slug: PleSlug, cards: PleMatchCard[]) {
 }
 
 export async function syncPleFromClient(slug: PleSlug, cards: PleMatchCard[]): Promise<PleBoard> {
-  const res = await fetch(`${apiBaseUrl}/ple/${slug}/sync-from-client`, {
+  const res = await fetch(`${pleEventsBaseUrl}/${slug}/sync-from-client`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(buildSyncPayload(slug, cards)),
@@ -112,7 +112,7 @@ export async function fetchPleBoard(
   const q = params.toString() ? `?${params.toString()}` : "";
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
-  const res = await fetch(`${apiBaseUrl}/ple/${slug}${q}`, {
+  const res = await fetch(`${pleEventsBaseUrl}/${slug}${q}`, {
     signal: controller.signal,
   }).finally(() => clearTimeout(timer));
   if (res.status === 404) return null;
@@ -150,7 +150,7 @@ export async function submitPleMatchResult(
   body: MatchResultPayload
 ): Promise<PleBoard> {
   const res = await fetch(
-    `${apiBaseUrl}/ple/${slug}/matches/${matchKey}/result`,
+    `${pleMatchesBaseUrl}/${slug}/matches/${matchKey}/result`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -176,7 +176,7 @@ export async function linkPlePredictions(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
   try {
-    const res = await fetch(`${apiBaseUrl}/ple/link-predictions`, {
+    const res = await fetch(`${pleMatchPicksBaseUrl}/link-predictions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ clientId, userId }),
@@ -203,7 +203,7 @@ export async function submitPlePredictionsBatch(
   predictions: BatchPredictionItem[],
   userId: number
 ): Promise<PleBoard> {
-  const res = await fetch(`${apiBaseUrl}/ple/${slug}/predictions/batch`, {
+  const res = await fetch(`${pleMatchPicksBaseUrl}/${slug}/predictions/batch`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -231,7 +231,7 @@ export async function submitPleResultsBatch(
   slug: PleSlug,
   results: BatchResultItem[]
 ): Promise<PleBoard> {
-  const res = await fetch(`${apiBaseUrl}/ple/${slug}/results/batch`, {
+  const res = await fetch(`${pleMatchesBaseUrl}/${slug}/results/batch`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ results }),
@@ -250,7 +250,7 @@ export async function submitPlePrediction(
   clientId: string,
   userId: number
 ): Promise<PleBoard> {
-  const res = await fetch(`${apiBaseUrl}/ple/${slug}/matches/${matchKey}/predict`, {
+  const res = await fetch(`${pleMatchPicksBaseUrl}/${slug}/matches/${matchKey}/predict`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -271,7 +271,7 @@ export async function setPleMatchResult(
   matchKey: string,
   payload: PleMatchResult
 ): Promise<PleBoard> {
-  const res = await fetch(`${apiBaseUrl}/ple/${slug}/matches/${matchKey}/result`, {
+  const res = await fetch(`${pleMatchesBaseUrl}/${slug}/matches/${matchKey}/result`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -292,7 +292,7 @@ export function subscribePleLive(
 ): () => void {
   const params = new URLSearchParams({ client_id: clientId });
   if (userId != null) params.set("user_id", String(userId));
-  const url = `${apiBaseUrl}/ple/${slug}/live?${params.toString()}`;
+  const url = `${pleEventsBaseUrl}/${slug}/live?${params.toString()}`;
   const source = new EventSource(url);
 
   source.onmessage = (event) => {

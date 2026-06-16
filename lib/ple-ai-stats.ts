@@ -1,4 +1,4 @@
-import { apiBaseUrl, requestTimeoutMs } from "@/lib/api";
+import { pleEventsBaseUrl, requestTimeoutMs } from "@/lib/api";
 
 export type PleAiRecord = {
   eventSlug: string;
@@ -23,7 +23,7 @@ export async function fetchPleAiStats(): Promise<PleAiStats | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
   try {
-    const res = await fetch(`${apiBaseUrl}/ple/ai-stats`, {
+    const res = await fetch(`${pleEventsBaseUrl}/ai-stats`, {
       signal: controller.signal,
     });
     if (!res.ok) return null;

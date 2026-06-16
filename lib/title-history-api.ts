@@ -1,4 +1,4 @@
-import { apiBaseUrl, requestTimeoutMs } from "@/lib/api";
+import { titleAcquisitionsBaseUrl, requestTimeoutMs } from "@/lib/api";
 
 export type TitleAcquisition = {
   beltName: string;
@@ -16,7 +16,7 @@ export type CompetitorTitleHistory = {
 export async function fetchCompetitorTitleHistory(
   name: string
 ): Promise<CompetitorTitleHistory | null> {
-  const url = `${apiBaseUrl}/title-history/competitors/${encodeURIComponent(name)}`;
+  const url = `${titleAcquisitionsBaseUrl}/competitors/${encodeURIComponent(name)}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
   try {

@@ -1,4 +1,4 @@
-import { apiBaseUrl, requestTimeoutMs } from "@/lib/api";
+import { pleMatchesBaseUrl, requestTimeoutMs } from "@/lib/api";
 
 export type CompetitorSummary = {
   total: number;
@@ -34,7 +34,7 @@ export async function fetchCompetitorNames(q?: string): Promise<string[]> {
   const params = new URLSearchParams();
   if (q?.trim()) params.set("q", q.trim());
   const query = params.toString();
-  const url = `${apiBaseUrl}/records/competitors${query ? `?${query}` : ""}`;
+  const url = `${pleMatchesBaseUrl}/competitors${query ? `?${query}` : ""}`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
@@ -51,7 +51,7 @@ export async function fetchCompetitorNames(q?: string): Promise<string[]> {
 }
 
 export async function fetchCompetitorProfile(name: string): Promise<CompetitorProfile | null> {
-  const url = `${apiBaseUrl}/records/competitors/${encodeURIComponent(name)}`;
+  const url = `${pleMatchesBaseUrl}/competitors/${encodeURIComponent(name)}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
   try {
