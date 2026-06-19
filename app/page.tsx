@@ -35,8 +35,8 @@ function TitanicQaAppContent() {
               <KayfabeMark className="hero-ring-glow relative z-10 mx-auto mb-5 h-16 w-16 rounded-2xl sm:mb-6 sm:h-[4.5rem] sm:w-[4.5rem]" />
               <div className="relative mx-auto max-w-3xl px-2 py-2 sm:py-3">
                 <div aria-hidden className="hero-title-backdrop" />
-                <h2 className="font-kr-hero relative z-10 text-balance text-[1.75rem] text-white sm:text-[2.5rem] md:text-[2.875rem] lg:text-[3.25rem]">
-                  <span className="font-sport text-[1.05em] tracking-[-0.05em] text-white">
+                <h2 className="font-kr-hero relative z-10 text-balance text-[1.75rem] text-stone-900 dark:text-white sm:text-[2.5rem] md:text-[2.875rem] lg:text-[3.25rem]">
+                  <span className="font-sport text-[1.05em] tracking-[-0.05em] text-stone-900 dark:text-white">
                     WWE PLE
                   </span>{" "}
                   승부 예측,
@@ -44,9 +44,9 @@ function TitanicQaAppContent() {
                   당신의 본능을 증명하라
                 </h2>
               </div>
-              <p className="relative z-10 mx-auto mt-4 max-w-2xl text-balance text-base font-medium leading-relaxed text-stone-400 sm:mt-5 sm:text-lg">
+              <p className="relative z-10 mx-auto mt-4 max-w-2xl text-balance text-base font-medium leading-relaxed text-stone-600 dark:text-stone-400 sm:mt-5 sm:text-lg">
                 경기 결과를 예측하고 점수를 쌓아{" "}
-                <span className="font-sport font-semibold text-white">2026</span>
+                <span className="font-sport font-semibold text-stone-900 dark:text-white">2026</span>
                 년의{" "}
                 <span className="text-head-of-table font-sport text-lg font-semibold sm:text-xl">
                   Head of the Table
@@ -57,10 +57,10 @@ function TitanicQaAppContent() {
           </section>
 
           <section className="mx-auto flex w-full max-w-5xl min-h-0 flex-1 flex-col justify-center px-4 py-3 sm:py-5">
-            <div className="ple-section-glow w-full rounded-2xl border border-stone-700/50 bg-stone-950/60 p-4 backdrop-blur-sm sm:rounded-3xl sm:p-6">
+            <div className="ple-section-glow w-full rounded-2xl border border-stone-300/50 dark:border-stone-700/50 bg-stone-50/60 dark:bg-stone-950/60 p-4 backdrop-blur-sm sm:rounded-3xl sm:p-6">
               <div className="mb-3 text-center sm:mb-4">
-                <p className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-400 sm:text-base">
-                  <span className="text-white">2026</span> Monthly PLE
+                <p className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-500 dark:text-stone-400 sm:text-base">
+                  <span className="text-stone-900 dark:text-white">2026</span> Monthly PLE
                 </p>
                 <p className="mt-1 text-sm text-stone-500">
                   이벤트를 골라 승부 예측에 참여하세요

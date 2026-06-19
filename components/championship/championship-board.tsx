@@ -20,28 +20,28 @@ const BRAND_ACCENT: Record<
   { border: string; glow: string; badge: string; label: string }
 > = {
   red: {
-    border: "border-red-700/45",
-    glow: "from-red-950/50 via-stone-950/40 to-stone-950/70",
-    badge: "border-red-600/50 bg-red-950/40 text-red-200",
-    label: "text-red-300/90",
+    border: "border-red-300/60 dark:border-red-700/45",
+    glow: "from-red-50/60 via-stone-50/30 to-stone-50/50 dark:from-red-950/50 dark:via-stone-950/40 dark:to-stone-950/70",
+    badge: "border-red-400/50 bg-red-50 text-red-700 dark:border-red-600/50 dark:bg-red-950/40 dark:text-red-200",
+    label: "text-red-600 dark:text-red-300/90",
   },
   blue: {
-    border: "border-blue-700/45",
-    glow: "from-blue-950/50 via-stone-950/40 to-stone-950/70",
-    badge: "border-blue-600/50 bg-blue-950/40 text-blue-200",
-    label: "text-blue-300/90",
+    border: "border-blue-300/60 dark:border-blue-700/45",
+    glow: "from-blue-50/60 via-stone-50/30 to-stone-50/50 dark:from-blue-950/50 dark:via-stone-950/40 dark:to-stone-950/70",
+    badge: "border-blue-400/50 bg-blue-50 text-blue-700 dark:border-blue-600/50 dark:bg-blue-950/40 dark:text-blue-200",
+    label: "text-blue-600 dark:text-blue-300/90",
   },
   gold: {
-    border: "border-amber-600/45",
-    glow: "from-amber-950/45 via-stone-950/40 to-stone-950/70",
-    badge: "border-amber-600/50 bg-amber-950/40 text-amber-200",
-    label: "text-amber-300/90",
+    border: "border-amber-300/60 dark:border-amber-600/45",
+    glow: "from-amber-50/60 via-stone-50/30 to-stone-50/50 dark:from-amber-950/45 dark:via-stone-950/40 dark:to-stone-950/70",
+    badge: "border-amber-400/50 bg-amber-50 text-amber-700 dark:border-amber-600/50 dark:bg-amber-950/40 dark:text-amber-200",
+    label: "text-amber-600 dark:text-amber-300/90",
   },
   purple: {
-    border: "border-violet-700/45",
-    glow: "from-violet-950/45 via-stone-950/40 to-stone-950/70",
-    badge: "border-violet-600/50 bg-violet-950/40 text-violet-200",
-    label: "text-violet-300/90",
+    border: "border-violet-300/60 dark:border-violet-700/45",
+    glow: "from-violet-50/60 via-stone-50/30 to-stone-50/50 dark:from-violet-950/45 dark:via-stone-950/40 dark:to-stone-950/70",
+    badge: "border-violet-400/50 bg-violet-50 text-violet-700 dark:border-violet-600/50 dark:bg-violet-950/40 dark:text-violet-200",
+    label: "text-violet-600 dark:text-violet-300/90",
   },
 };
 
@@ -117,7 +117,7 @@ function TitleCard({
         <div className="mb-3 flex items-start justify-between gap-2">
           <p
             className={cn(
-              "font-medium leading-snug text-stone-400",
+              "font-medium leading-snug text-stone-500 dark:text-stone-400",
               isMain ? "text-xs sm:text-sm" : "text-[11px] sm:text-xs"
             )}
           >
@@ -140,7 +140,7 @@ function TitleCard({
           {reign.teamName ? (
             <p
               className={cn(
-                "font-sport font-bold uppercase tracking-wide text-amber-200/85",
+                "font-sport font-bold uppercase tracking-wide text-amber-700 dark:text-amber-200/85",
                 isTag ? "text-sm sm:text-base" : "text-xs"
               )}
             >
@@ -149,7 +149,7 @@ function TitleCard({
           ) : null}
           <div
             className={cn(
-              "font-bold tracking-tight text-white",
+              "font-bold tracking-tight text-stone-900 dark:text-white",
               isMain && "font-kr-hero text-2xl sm:text-3xl md:text-4xl",
               tier === "secondary" && "text-lg sm:text-xl",
               isTag && "text-base sm:text-lg",
@@ -211,12 +211,12 @@ function BrandSection({ brand }: { brand: BrandRoster }) {
   return (
     <section
       className={cn(
-        "ple-section-glow rounded-2xl border bg-stone-950/55 p-4 backdrop-blur-sm sm:rounded-3xl sm:p-6",
+        "ple-section-glow rounded-2xl border bg-stone-50/55 dark:bg-stone-950/55 p-4 backdrop-blur-sm sm:rounded-3xl sm:p-6",
         styles.border
       )}
       aria-labelledby={`brand-${brand.id}`}
     >
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-stone-800/60 pb-4">
+      <header className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-stone-200/60 dark:border-stone-800/60 pb-4">
         <div>
           <p
             className={cn(
@@ -228,7 +228,7 @@ function BrandSection({ brand }: { brand: BrandRoster }) {
           </p>
           <h2
             id={`brand-${brand.id}`}
-            className="mt-1 text-xl font-extrabold text-white sm:text-2xl"
+            className="mt-1 text-xl font-extrabold text-stone-900 dark:text-white sm:text-2xl"
           >
             {brand.label}
           </h2>
@@ -299,7 +299,7 @@ export function ChampionshipBoard() {
 
   if (state.loading) {
     return (
-      <div className="flex items-center justify-center gap-2 rounded-2xl border border-stone-700/50 bg-stone-950/50 px-4 py-10 text-sm text-stone-400">
+      <div className="flex items-center justify-center gap-2 rounded-2xl border border-stone-300/50 dark:border-stone-700/50 bg-stone-100/50 dark:bg-stone-950/50 px-4 py-10 text-sm text-stone-500 dark:text-stone-400">
         <Loader2 className="h-4 w-4 animate-spin text-amber-400/80" />
         불러오는 중…
       </div>
@@ -308,7 +308,7 @@ export function ChampionshipBoard() {
 
   if (state.unavailable || state.brands.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-stone-700/50 bg-stone-950/40 px-4 py-10 text-center text-sm text-stone-400">
+      <div className="rounded-2xl border border-dashed border-stone-300/50 dark:border-stone-700/50 bg-stone-100/40 dark:bg-stone-950/40 px-4 py-10 text-center text-sm text-stone-500 dark:text-stone-400">
         챔피언십 정보를 불러오지 못했습니다. 백엔드가 켜져 있는지 확인해 주세요.
       </div>
     );

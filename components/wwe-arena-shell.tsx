@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 /** 네온 톤 다크 아레나 배경 — 링 주변·상단 레드 글로우 */
 export function WweArenaShell({ children }: { children: ReactNode }) {
   return (
-    <main className="relative min-h-screen w-full min-w-0 overflow-x-hidden bg-[#0a0a0c] text-stone-100">
+    <main className="relative min-h-screen w-full min-w-0 overflow-x-hidden bg-white text-stone-900 dark:bg-[#0a0a0c] dark:text-stone-100">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_-8%,rgba(224,32,32,0.22),transparent_68%)]"
@@ -26,7 +26,7 @@ export function WweArenaShell({ children }: { children: ReactNode }) {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80"
+        className="pointer-events-none absolute inset-0 dark:bg-gradient-to-b dark:from-black/40 dark:via-transparent dark:to-black/80"
       />
       <div className="relative z-10">{children}</div>
     </main>

@@ -53,20 +53,20 @@ export default function RecordsPage() {
             className="hero-title-backdrop mx-auto"
             style={{ height: "8rem", width: "min(100%, 22rem)" }}
           />
-          <h1 className="font-kr-hero relative z-10 text-2xl text-white sm:text-3xl md:text-4xl">
+          <h1 className="font-kr-hero relative z-10 text-2xl text-stone-900 dark:text-white sm:text-3xl md:text-4xl">
             기록
           </h1>
           <p className="relative z-10 mx-auto mt-3 max-w-lg text-sm font-medium leading-relaxed text-stone-400 sm:text-base">
             PLE 출전 선수 목록에서 선택하면{" "}
-            <span className="font-semibold text-stone-200">승패 기록</span>을 확인할 수
+            <span className="font-semibold text-stone-700 dark:text-stone-200">승패 기록</span>을 확인할 수
             있습니다.
           </p>
         </header>
 
-        <section className="ple-section-glow mb-6 rounded-2xl border border-stone-700/50 bg-stone-950/60 p-4 backdrop-blur-sm sm:rounded-3xl sm:p-5">
+        <section className="ple-section-glow mb-6 rounded-2xl border border-stone-300/50 dark:border-stone-700/50 bg-stone-50/60 dark:bg-stone-950/60 p-4 backdrop-blur-sm sm:rounded-3xl sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <label
-              className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-300"
+              className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-600 dark:text-stone-300"
               htmlFor="records-search"
             >
               선수 검색
@@ -83,7 +83,7 @@ export default function RecordsPage() {
                 onChange={(e) => patchState({ query: e.target.value })}
                 placeholder="이름으로 검색"
                 className={cn(
-                  "records-search-input h-10 w-full rounded-xl pl-9 pr-3 text-sm text-white",
+                  "records-search-input h-10 w-full rounded-xl pl-9 pr-3 text-sm text-stone-900 dark:text-white",
                   "placeholder:text-stone-500"
                 )}
               />
@@ -93,7 +93,7 @@ export default function RecordsPage() {
 
         <section aria-label="선수 목록">
           {state.loading ? (
-            <div className="flex items-center justify-center gap-2 rounded-2xl border border-stone-700/50 bg-stone-950/50 px-4 py-10 text-sm text-stone-400">
+            <div className="flex items-center justify-center gap-2 rounded-2xl border border-stone-300/50 dark:border-stone-700/50 bg-stone-100/50 dark:bg-stone-950/50 px-4 py-10 text-sm text-stone-500 dark:text-stone-400">
               <Loader2 className="h-4 w-4 animate-spin text-amber-400/80" />
               불러오는 중…
             </div>
@@ -105,7 +105,7 @@ export default function RecordsPage() {
                     href={`/records/${encodeURIComponent(name)}`}
                     className="records-competitor-card group block rounded-xl border px-4 py-3.5"
                   >
-                    <div className="truncate text-sm font-bold text-white transition-colors group-hover:text-amber-50">
+                    <div className="truncate text-sm font-bold text-stone-900 dark:text-white transition-colors group-hover:text-amber-50 dark:group-hover:text-amber-50">
                       {name}
                     </div>
                     <div className="mt-1 text-xs font-medium text-stone-500 transition-colors group-hover:text-amber-200/70">
@@ -118,7 +118,7 @@ export default function RecordsPage() {
           )}
 
           {!state.loading && state.names.length === 0 && emptyMessage && (
-            <div className="mt-6 rounded-2xl border border-dashed border-stone-700/50 bg-stone-950/40 px-4 py-10 text-center text-sm text-stone-400">
+            <div className="mt-6 rounded-2xl border border-dashed border-stone-300/50 dark:border-stone-700/50 bg-stone-100/40 dark:bg-stone-950/40 px-4 py-10 text-center text-sm text-stone-500 dark:text-stone-400">
               {emptyMessage}
             </div>
           )}

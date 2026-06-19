@@ -39,7 +39,7 @@ const HIGHLIGHTS = [
 
 function BulletList({ items }: { items: readonly string[] }) {
   return (
-    <ul className="mt-3 space-y-2 text-sm leading-relaxed text-stone-300">
+    <ul className="mt-3 space-y-2 text-sm leading-relaxed text-stone-600 dark:text-stone-300">
       {items.map((item) => (
         <li key={item} className="flex gap-2">
           <span className="mt-2 size-1.5 shrink-0 rounded-full bg-stone-400" aria-hidden />
@@ -56,10 +56,10 @@ export function LessonTitanicOverview() {
       <p className="text-xs font-semibold uppercase tracking-widest text-stone-500">
         Lesson
       </p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-stone-50 md:text-4xl">
+      <h1 className="mt-2 text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 md:text-4xl">
         타이타닉 모델 분석
       </h1>
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-stone-300 md:text-base">
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-stone-600 dark:text-stone-300 md:text-base">
         역사 속 가장 유명한 해양사고인 타이타닉 침몰 사건을 데이터 분석을 통해
         살펴봅니다. 머신러닝 모델을 활용하여 승객의 생존 확률을 예측하는 방법을
         배웁니다.
@@ -68,23 +68,23 @@ export function LessonTitanicOverview() {
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_minmax(220px,280px)] lg:gap-10">
         <div className="min-w-0 space-y-8">
           <section>
-            <h2 className="text-lg font-bold text-stone-100">학습 목표</h2>
+            <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">학습 목표</h2>
             <BulletList items={LEARNING_OBJECTIVES} />
           </section>
           <section>
-            <h2 className="text-lg font-bold text-stone-100">주요 내용</h2>
+            <h2 className="text-lg font-bold text-stone-800 dark:text-stone-100">주요 내용</h2>
             <BulletList items={MAIN_TOPICS} />
           </section>
         </div>
 
-        <aside className="h-fit rounded-2xl border border-stone-700/60 bg-stone-950/50 p-5 shadow-lg shadow-black/20 backdrop-blur-sm">
+        <aside className="h-fit rounded-2xl border border-stone-300/60 dark:border-stone-700/60 bg-stone-100/50 dark:bg-stone-950/50 p-5 shadow-lg shadow-black/20 backdrop-blur-sm">
           <ul className="space-y-5">
             {HIGHLIGHTS.map(({ icon: Icon, title, lines }) => (
               <li key={title} className="flex flex-col items-center text-center">
-                <div className="flex size-12 items-center justify-center rounded-xl bg-stone-800/80 text-stone-200">
+                <div className="flex size-12 items-center justify-center rounded-xl bg-stone-200/80 dark:bg-stone-800/80 text-stone-700 dark:text-stone-200">
                   <Icon className="size-6" aria-hidden />
                 </div>
-                <p className="mt-2 text-sm font-semibold text-stone-100">{title}</p>
+                <p className="mt-2 text-sm font-semibold text-stone-800 dark:text-stone-100">{title}</p>
                 {lines.map((line) => (
                   <p key={line} className="text-xs text-stone-400">
                     {line}

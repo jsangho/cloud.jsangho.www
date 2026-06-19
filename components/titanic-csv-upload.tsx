@@ -142,10 +142,10 @@ export function TitanicCsvUpload() {
             className={[
               "flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-14 text-center transition-colors",
               uploading
-                ? "cursor-wait border-zinc-300 bg-zinc-100"
+                ? "cursor-wait border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800/60"
                 : dragOver
-                  ? "border-zinc-900 bg-zinc-100"
-                  : "border-zinc-300 bg-zinc-50/50 hover:border-zinc-400 hover:bg-zinc-50",
+                  ? "border-zinc-900 dark:border-zinc-400 bg-zinc-100 dark:bg-zinc-800/60"
+                  : "border-zinc-300 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50 hover:border-zinc-400 dark:hover:border-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/60",
             ].join(" ")}
           >
             <Upload
@@ -153,7 +153,7 @@ export function TitanicCsvUpload() {
               strokeWidth={1.25}
               aria-hidden
             />
-            <p className="text-base font-medium text-zinc-800">
+            <p className="text-base font-medium text-zinc-800 dark:text-zinc-200">
               {uploading ? "서버로 전송 중..." : "파일을 이 영역에 끌어다 놓기"}
             </p>
             <p className="mt-1 text-sm text-zinc-500">
@@ -169,7 +169,7 @@ export function TitanicCsvUpload() {
             <div className="w-full border-t border-zinc-200" />
           </div>
           <div className="relative flex justify-center text-xs uppercase tracking-wide text-zinc-400">
-            <span className="bg-white px-3">또는</span>
+            <span className="bg-white dark:bg-stone-900 px-3 dark:text-zinc-400">또는</span>
           </div>
         </div>
 
@@ -218,15 +218,15 @@ export function TitanicCsvUpload() {
       )}
 
       {state.kind === "ready" && summary && (
-        <div className="mt-8 rounded-xl border border-zinc-200 bg-zinc-50/80 p-4">
-          <p className="text-sm font-medium text-zinc-800">
+        <div className="mt-8 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-900/80 p-4">
+          <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
             불러온 파일: {state.fileName}
           </p>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
             {summary.lines.toLocaleString("ko-KR")}줄 ·{" "}
             {summary.bytes.toLocaleString("ko-KR")}바이트
           </p>
-          <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-lg border border-zinc-200 bg-white p-3 text-xs text-zinc-700">
+          <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 p-3 text-xs text-zinc-700 dark:text-zinc-300">
             {summary.preview}
             {state.text.length > summary.preview.length ? "\n…" : ""}
           </pre>

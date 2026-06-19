@@ -4,7 +4,7 @@ export default function LessonSmithSailorPage() {
   return (
     <main className="flex h-[calc(100dvh-7.75rem)] max-h-[calc(100dvh-7.75rem)] flex-col overflow-hidden px-4 py-6 md:h-[calc(100dvh-4.25rem)] md:max-h-[calc(100dvh-4.25rem)] md:px-6">
       <div className="mx-auto flex w-full max-w-3xl shrink-0 flex-col gap-1 pb-3">
-        <h1 className="text-2xl font-bold tracking-tight text-stone-50 md:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50 md:text-3xl">
           3. 스미스 선장과 대화
         </h1>
         <p className="text-sm text-stone-400">

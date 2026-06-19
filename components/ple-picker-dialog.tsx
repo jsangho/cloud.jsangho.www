@@ -35,7 +35,7 @@ export function PlePickerDialog({ triggerClassName }: PlePickerDialogProps) {
       </DialogTrigger>
       <DialogContent
         className={cn(
-          "max-h-[min(90dvh,820px)] overflow-y-auto border-stone-700 bg-stone-900 text-stone-100 sm:max-w-3xl"
+          "max-h-[min(90dvh,820px)] overflow-y-auto border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100 sm:max-w-3xl"
         )}
         showCloseButton
       >

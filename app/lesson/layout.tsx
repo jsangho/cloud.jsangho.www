@@ -41,7 +41,7 @@ export default function LessonLayout({
       <div
         className={cn(
           "flex items-center rounded-lg text-sm font-medium transition-colors",
-          isLessonSection ? "bg-stone-100 text-stone-950" : "text-stone-300"
+          isLessonSection ? "bg-stone-100 text-stone-950" : "text-stone-600 dark:text-stone-300"
         )}
       >
         <Link
@@ -49,7 +49,7 @@ export default function LessonLayout({
           aria-current={isTitanic ? "page" : undefined}
           className={cn(
             "min-w-0 flex-1 rounded-l-lg px-3 py-2.5 transition-colors",
-            !isLessonSection && "hover:bg-stone-800/60 hover:text-stone-50",
+            !isLessonSection && "hover:bg-stone-100/60 dark:hover:bg-stone-800/60 hover:text-stone-900 dark:hover:text-stone-50",
             isLessonSection && "hover:bg-stone-50"
           )}
         >
@@ -62,7 +62,7 @@ export default function LessonLayout({
           aria-label={expanded ? "하위 메뉴 접기" : "하위 메뉴 펼치기"}
           className={cn(
             "flex shrink-0 items-center justify-center rounded-r-lg px-2 py-2.5 transition-colors",
-            !isLessonSection && "hover:bg-stone-800/60 hover:text-stone-50",
+            !isLessonSection && "hover:bg-stone-100/60 dark:hover:bg-stone-800/60 hover:text-stone-900 dark:hover:text-stone-50",
             isLessonSection && "hover:bg-stone-50"
           )}
         >
@@ -85,7 +85,7 @@ export default function LessonLayout({
               "rounded-lg py-2 pl-6 pr-3 text-sm transition-colors",
               isDataCollection
                 ? "bg-stone-100/90 font-semibold text-stone-950"
-                : "text-stone-300 hover:bg-stone-800/60 hover:text-stone-50"
+                : "text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60 hover:text-stone-900 dark:hover:text-stone-50"
             )}
           >
             1. 데이터 수집
@@ -97,7 +97,7 @@ export default function LessonLayout({
               "rounded-lg py-2 pl-6 pr-3 text-sm transition-colors",
               isTitanicList
                 ? "bg-stone-100/90 font-semibold text-stone-950"
-                : "text-stone-300 hover:bg-stone-800/60 hover:text-stone-50"
+                : "text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60 hover:text-stone-900 dark:hover:text-stone-50"
             )}
           >
             2. DB 리스트
@@ -109,7 +109,7 @@ export default function LessonLayout({
               "rounded-lg py-2 pl-6 pr-3 text-sm transition-colors",
               isSmithSailor
                 ? "bg-stone-100/90 font-semibold text-stone-950"
-                : "text-stone-300 hover:bg-stone-800/60 hover:text-stone-50"
+                : "text-stone-600 dark:text-stone-300 hover:bg-stone-100/60 dark:hover:bg-stone-800/60 hover:text-stone-900 dark:hover:text-stone-50"
             )}  
           >
             3. 스미스 선장과 대화
@@ -120,7 +120,7 @@ export default function LessonLayout({
   );
 
   return (
-    <div className="relative flex min-h-[calc(100vh-1px)] bg-stone-900 text-stone-100">
+    <div className="relative flex min-h-[calc(100vh-1px)] bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_85%_at_50%_-35%,rgba(168,162,158,0.2),transparent_62%)]"
@@ -143,7 +143,7 @@ export default function LessonLayout({
       />
 
       {/* Desktop sidebar */}
-      <aside className="relative z-10 hidden w-52 shrink-0 border-r border-stone-800/70 bg-stone-950/35 px-3 py-6 backdrop-blur-sm md:block">
+      <aside className="relative z-10 hidden w-52 shrink-0 border-r border-stone-200/70 dark:border-stone-800/70 bg-white/35 dark:bg-stone-950/35 px-3 py-6 backdrop-blur-sm md:block">
         {nav}
       </aside>
 
@@ -154,16 +154,16 @@ export default function LessonLayout({
           isSmithSailor && "overflow-hidden"
         )}
       >
-        <div className="sticky top-[4.25rem] z-20 flex items-center gap-2 border-b border-stone-800/60 bg-stone-900/70 px-4 py-3 backdrop-blur md:hidden">
+        <div className="sticky top-[4.25rem] z-20 flex items-center gap-2 border-b border-stone-200/60 dark:border-stone-800/60 bg-white/70 dark:bg-stone-900/70 px-4 py-3 backdrop-blur md:hidden">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-700/70 bg-stone-800/40 text-stone-100 hover:bg-stone-700/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500/50"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-300/70 dark:border-stone-700/70 bg-stone-100/40 dark:bg-stone-800/40 text-stone-700 dark:text-stone-100 hover:bg-stone-200/60 dark:hover:bg-stone-700/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500/50"
             aria-label="메뉴 열기"
           >
             <Menu className="size-5" aria-hidden />
           </button>
-          <span className="text-sm font-semibold text-stone-200">타이타닉</span>
+          <span className="text-sm font-semibold text-stone-700 dark:text-stone-200">타이타닉</span>
         </div>
 
         {children}
@@ -177,13 +177,13 @@ export default function LessonLayout({
             aria-label="메뉴 닫기"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="absolute left-0 top-0 h-full w-[18rem] border-r border-stone-800/70 bg-stone-950/90 px-3 py-6 backdrop-blur">
+          <aside className="absolute left-0 top-0 h-full w-[18rem] border-r border-stone-200/70 dark:border-stone-800/70 bg-white/90 dark:bg-stone-950/90 px-3 py-6 backdrop-blur">
             <div className="mb-4 flex items-center justify-between">
-              <span className="text-sm font-bold text-stone-100">타이타닉</span>
+              <span className="text-sm font-bold text-stone-900 dark:text-stone-100">타이타닉</span>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-800/70 bg-stone-900/50 text-stone-200 hover:bg-stone-800/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500/50"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200/70 dark:border-stone-800/70 bg-stone-100/50 dark:bg-stone-900/50 text-stone-600 dark:text-stone-200 hover:bg-stone-200/70 dark:hover:bg-stone-800/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500/50"
                 aria-label="닫기"
               >
                 <X className="size-5" aria-hidden />

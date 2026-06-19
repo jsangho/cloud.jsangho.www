@@ -80,7 +80,7 @@ export function WeatherWidget({ className }: { className?: string }) {
   }, [load]);
 
   const pillClass =
-    "inline-flex min-h-8 items-center gap-1.5 rounded-md border border-stone-600/70 bg-stone-800/45 px-2.5 py-1 text-sm text-stone-200";
+    "inline-flex min-h-8 items-center gap-1.5 rounded-md border border-stone-300/70 dark:border-stone-600/70 bg-stone-200/45 dark:bg-stone-800/45 px-2.5 py-1 text-sm text-stone-700 dark:text-stone-200";
 
   if (weather.status === "loading") {
     return (
@@ -101,7 +101,7 @@ export function WeatherWidget({ className }: { className?: string }) {
         onClick={load}
         className={cn(
           pillClass,
-          "cursor-pointer transition-colors hover:bg-stone-700/65 hover:text-stone-50",
+          "cursor-pointer transition-colors hover:bg-stone-200/65 dark:hover:bg-stone-700/65 hover:text-stone-950 dark:hover:text-stone-50",
           className
         )}
         title="서울 날씨를 불러오지 못했습니다. backend/.env 의 OPENWEATHER_API_KEY와 서버 실행을 확인하세요."

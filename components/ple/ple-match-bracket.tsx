@@ -540,7 +540,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
   return (
     <section className={cn("space-y-4 pb-28", className)}>
       <div>
-        <h2 className="font-kr-hero text-xl text-white sm:text-2xl">전체 경기 · 예측</h2>
+        <h2 className="font-kr-hero text-xl text-stone-900 dark:text-white sm:text-2xl">전체 경기 · 예측</h2>
         <p className="mt-1.5 text-xs text-stone-500">
           {user
             ? ui.committed
@@ -553,7 +553,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
           )}
         </p>
         {!user && !eventFinished && (
-          <div className="ple-login-callout mt-3 rounded-xl px-4 py-3 text-sm text-stone-300">
+          <div className="ple-login-callout mt-3 rounded-xl px-4 py-3 text-sm text-stone-700 dark:text-stone-300">
             <Link
               href={`/login?next=${encodeURIComponent(`/ple/${slug}`)}`}
               className="font-semibold text-amber-400 underline decoration-amber-500/40 underline-offset-2 transition-colors hover:text-amber-300"
@@ -564,7 +564,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
           </div>
         )}
         {ui.offline && (
-          <p className="mt-2 flex items-start gap-2 rounded-lg border border-amber-500/25 bg-amber-950/20 px-3 py-2 text-xs text-amber-200/90">
+          <p className="mt-2 flex items-start gap-2 rounded-lg border border-amber-500/25 bg-amber-100/60 dark:bg-amber-950/20 px-3 py-2 text-xs text-amber-700 dark:text-amber-200/90">
             <span className="shrink-0 font-bold text-amber-400">!</span>
             서버 연결 없음 — 예측 확정은 연결 후 로그인 상태에서만 가능합니다
           </p>
@@ -612,19 +612,19 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
       </ul>
 
       {showActionBar && user && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-[#0a0a0c]/95 px-4 py-4 backdrop-blur-md">
+        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-stone-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0a0a0c]/95 px-4 py-4 backdrop-blur-md">
           <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-center text-sm text-stone-400 sm:text-left">
               {!canPredict ? (
                 <span>이 PLE는 종료되어 새 예측을 받지 않습니다.</span>
               ) : ui.committed ? (
-                <span className="text-emerald-300/90">예측 확정 완료</span>
+                <span className="text-emerald-700 dark:text-emerald-300/90">예측 확정 완료</span>
               ) : pickableIds.length === 0 ? (
                 <span>예측 가능한 경기가 없습니다.</span>
               ) : (
                 <>
                   선택{" "}
-                  <span className="font-semibold tabular-nums text-stone-200">
+                  <span className="font-semibold tabular-nums text-stone-800 dark:text-stone-200">
                     {draftCount}/{pickableIds.length}
                   </span>
                   {draftCount < pickableIds.length && (
@@ -640,7 +640,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
                 <button
                   type="button"
                   onClick={handleEditDraft}
-                  className="rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium text-stone-200 backdrop-blur-sm hover:bg-white/10"
+                  className="rounded-lg border border-stone-300/70 dark:border-white/15 bg-stone-100/60 dark:bg-white/5 px-4 py-2.5 text-sm font-medium text-stone-700 dark:text-stone-200 backdrop-blur-sm hover:bg-stone-200 dark:hover:bg-white/10"
                 >
                   예측 다시 정하기
                 </button>
@@ -654,7 +654,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
                     "rounded-lg px-6 py-2.5 text-sm font-bold transition-all",
                     canConfirm && !ui.submitting
                       ? "btn-predict-confirm"
-                      : "cursor-not-allowed bg-stone-800 text-stone-600"
+                      : "cursor-not-allowed bg-stone-200 dark:bg-stone-800 text-stone-500 dark:text-stone-600"
                   )}
                 >
                   {ui.submitting ? "저장 중…" : "예측 확정"}

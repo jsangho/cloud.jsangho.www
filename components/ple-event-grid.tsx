@@ -85,8 +85,8 @@ export function PleEventGrid({
               className={cn(
                 "ple-card group relative flex h-full w-full min-w-0 flex-col rounded-xl border text-left",
                 tbd
-                  ? "ple-card--tbd border-stone-800/80 bg-stone-950/40"
-                  : "border-stone-700/60 bg-stone-900/55",
+                  ? "ple-card--tbd border-stone-300/80 dark:border-stone-800/80 bg-stone-100/40 dark:bg-stone-950/40"
+                  : "border-stone-300/60 dark:border-stone-700/60 bg-stone-50/55 dark:bg-stone-900/55",
                 !tbd && themeClass,
                 isLarge
                   ? "px-4 pb-3.5 pt-10 sm:px-4 sm:pb-4 sm:pt-11"
@@ -114,7 +114,7 @@ export function PleEventGrid({
               <span
                 className={cn(
                   "block font-bold leading-tight tracking-tight",
-                  tbd ? "text-stone-600" : "text-stone-50",
+                  tbd ? "text-stone-400 dark:text-stone-600" : "text-stone-800 dark:text-stone-50",
                   isLarge ? "font-sport text-xl sm:text-2xl" : "font-semibold"
                 )}
               >

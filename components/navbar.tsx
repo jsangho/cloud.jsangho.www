@@ -17,10 +17,10 @@ function navLinkClass(active: boolean, champion = false) {
   return cn(
     champion
       ? "btn-champion"
-      : "border-stone-600/70 bg-stone-800/45 text-stone-200 shadow-none hover:bg-stone-700/65 hover:text-stone-50 hover:border-stone-500 focus-visible:ring-stone-500/40",
+      : "border-stone-300/70 dark:border-stone-600/70 bg-stone-200/45 dark:bg-stone-800/45 text-stone-700 dark:text-stone-200 shadow-none hover:bg-stone-200/65 dark:hover:bg-stone-700/65 hover:text-stone-950 dark:hover:text-stone-50 hover:border-stone-400 dark:hover:border-stone-500 focus-visible:ring-stone-500/40",
     !champion &&
       active &&
-      "border-stone-400 bg-stone-600 text-stone-50 hover:bg-stone-600 hover:border-stone-400 hover:text-stone-50",
+      "border-stone-400 bg-stone-300 dark:bg-stone-600 text-stone-900 dark:text-stone-50 hover:bg-stone-300 dark:hover:bg-stone-600 hover:border-stone-400 hover:text-stone-900 dark:hover:text-stone-50",
     champion &&
       active &&
       "border-amber-400/80 !text-amber-50"
@@ -86,13 +86,13 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full min-w-0 border-b border-white/10 bg-[#0a0a0c]/85 backdrop-blur-[12px] supports-[backdrop-filter]:bg-[#0a0a0c]/70">
-      <div className="mx-auto grid w-full max-w-5xl min-w-0 grid-cols-1 gap-y-3 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center sm:gap-y-0">
-        <div className="flex justify-center sm:justify-start">
+    <header className="sticky top-0 z-50 w-full min-w-0 border-b border-stone-200/80 dark:border-white/10 bg-white/90 dark:bg-[#0a0a0c]/85 backdrop-blur-[12px] supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-[#0a0a0c]/70">
+      <div className="mx-auto flex w-full max-w-5xl min-w-0 items-center justify-between gap-2 px-4 py-3">
+        <div className="flex shrink-0 items-center">
           <KayfabeLogo />
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-center">
+        <div className="flex items-center gap-1.5 overflow-x-auto">
           <PlePickerDialog triggerClassName={navLinkClass(isPle)} />
           <NavLink href="/results" active={isResults}>
             결과
@@ -113,7 +113,7 @@ export function Navbar() {
           </NavLink>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
+        <div className="flex shrink-0 items-center gap-1.5">
           <WeatherWidget />
           <NavLink href="/lesson" active={isLesson}>
             Lesson
@@ -121,10 +121,9 @@ export function Navbar() {
           <NavLink href="/admin" active={isAdmin}>
             관리자
           </NavLink>
-          <ThemeToggle />
           {!showAuth ? (
             <div
-              className="h-8 w-[7.5rem] animate-pulse rounded-md border border-stone-700/50 bg-stone-800/60"
+              className="h-8 w-[7.5rem] animate-pulse rounded-md border border-stone-300/50 dark:border-stone-700/50 bg-stone-200/60 dark:bg-stone-800/60"
               aria-hidden
             />
           ) : user ? (
@@ -142,7 +141,7 @@ export function Navbar() {
                 로그아웃
               </Button>
               <span
-                className="max-w-[8rem] truncate px-1 text-sm font-semibold text-stone-100"
+                className="max-w-[8rem] truncate px-1 text-sm font-semibold text-stone-900 dark:text-stone-100"
                 title={authDisplayName(user)}
               >
                 {authDisplayName(user)}
@@ -158,6 +157,7 @@ export function Navbar() {
               로그인
             </NavLink>
           )}
+          <ThemeToggle />
         </div>
       </div>
       <WweTicker />

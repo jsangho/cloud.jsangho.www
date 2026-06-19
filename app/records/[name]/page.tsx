@@ -80,12 +80,12 @@ export default function RecordDetailPage() {
         </header>
 
         {state.loading ? (
-          <div className="flex items-center justify-center gap-2 rounded-2xl border border-stone-700/50 bg-stone-950/50 px-4 py-10 text-sm text-stone-400">
+          <div className="flex items-center justify-center gap-2 rounded-2xl border border-stone-300/50 dark:border-stone-700/50 bg-stone-100/50 dark:bg-stone-950/50 px-4 py-10 text-sm text-stone-500 dark:text-stone-400">
             <Loader2 className="h-4 w-4 animate-spin text-amber-400/80" />
             불러오는 중…
           </div>
         ) : state.missing || !state.profile ? (
-          <div className="rounded-2xl border border-dashed border-stone-700/50 bg-stone-950/40 px-4 py-10 text-center text-sm text-stone-400">
+          <div className="rounded-2xl border border-dashed border-stone-300/50 dark:border-stone-700/50 bg-stone-100/40 dark:bg-stone-950/40 px-4 py-10 text-center text-sm text-stone-500 dark:text-stone-400">
             <p>선수 정보를 찾을 수 없습니다.</p>
             <Link
               href="/records"

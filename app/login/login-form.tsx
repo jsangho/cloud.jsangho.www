@@ -172,15 +172,15 @@ export function LoginForm() {
   }
 
   return (
-    <main className="relative min-h-[calc(100dvh-5.5rem)] w-full min-w-0 overflow-x-hidden bg-stone-900 text-stone-100">
+    <main className="relative min-h-[calc(100dvh-5.5rem)] w-full min-w-0 overflow-x-hidden bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100">
       <LoginBackdrop />
       <section className="relative z-10 flex min-h-[calc(100dvh-5.5rem)] items-center justify-center px-4 py-10">
-        <div className="w-full max-w-[460px] rounded-3xl border border-stone-700/70 bg-stone-950/58 p-6 shadow-2xl shadow-black/35 backdrop-blur-xl sm:p-8">
+        <div className="w-full max-w-[460px] rounded-3xl border border-stone-300/70 dark:border-stone-700/70 bg-stone-50/80 dark:bg-stone-950/58 p-6 shadow-2xl shadow-black/35 backdrop-blur-xl sm:p-8">
           <div className="text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500">
               KayFabe
             </p>
-            <h1 className="mt-3 text-2xl font-bold tracking-tight text-stone-50">
+            <h1 className="mt-3 text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
               {isSignup ? "회원가입" : "로그인"}
             </h1>
             <p className="mt-2 text-sm text-stone-400">
@@ -193,85 +193,85 @@ export function LoginForm() {
           <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-4">
             {isSignup && (
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-stone-300">
+                <span className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300">
                   닉네임
                 </span>
-                <span className="flex items-center gap-3 rounded-2xl border border-stone-700/80 bg-stone-900/70 px-4 py-3 text-stone-300 transition-colors focus-within:border-stone-400 focus-within:bg-stone-900">
+                <span className="flex items-center gap-3 rounded-2xl border border-stone-300/80 dark:border-stone-700/80 bg-stone-100/70 dark:bg-stone-900/70 px-4 py-3 text-stone-600 dark:text-stone-300 transition-colors focus-within:border-stone-500 dark:focus-within:border-stone-400 focus-within:bg-stone-100 dark:focus-within:bg-stone-900">
                   <UserRound className="size-5 text-stone-500" />
                   <input
                     type="text"
                     name="nickname"
                     autoComplete="nickname"
                     placeholder="KayFabe 닉네임"
-                    className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-600 outline-none"
+                    className="w-full bg-transparent text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600 outline-none"
                   />
                 </span>
               </label>
             )}
 
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-stone-300">
+              <span className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300">
                 ID
               </span>
-              <span className="flex items-center gap-3 rounded-2xl border border-stone-700/80 bg-stone-900/70 px-4 py-3 text-stone-300 transition-colors focus-within:border-stone-400 focus-within:bg-stone-900">
+              <span className="flex items-center gap-3 rounded-2xl border border-stone-300/80 dark:border-stone-700/80 bg-stone-100/70 dark:bg-stone-900/70 px-4 py-3 text-stone-600 dark:text-stone-300 transition-colors focus-within:border-stone-500 dark:focus-within:border-stone-400 focus-within:bg-stone-100 dark:focus-within:bg-stone-900">
                 <IdCard className="size-5 text-stone-500" />
                 <input
                   type="text"
                   name="userId"
                   autoComplete="username"
                   placeholder="로그인 ID"
-                  className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-600 outline-none"
+                  className="w-full bg-transparent text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600 outline-none"
                 />
               </span>
             </label>
 
             {isSignup && (
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-stone-300">
+                <span className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300">
                   이메일
                 </span>
-                <span className="flex items-center gap-3 rounded-2xl border border-stone-700/80 bg-stone-900/70 px-4 py-3 text-stone-300 transition-colors focus-within:border-stone-400 focus-within:bg-stone-900">
+                <span className="flex items-center gap-3 rounded-2xl border border-stone-300/80 dark:border-stone-700/80 bg-stone-100/70 dark:bg-stone-900/70 px-4 py-3 text-stone-600 dark:text-stone-300 transition-colors focus-within:border-stone-500 dark:focus-within:border-stone-400 focus-within:bg-stone-100 dark:focus-within:bg-stone-900">
                   <Mail className="size-5 text-stone-500" />
                   <input
                     type="email"
                     name="email"
                     autoComplete="email"
                     placeholder="you@example.com"
-                    className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-600 outline-none"
+                    className="w-full bg-transparent text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600 outline-none"
                   />
                 </span>
               </label>
             )}
 
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-stone-300">
+              <span className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300">
                 비밀번호
               </span>
-              <span className="flex items-center gap-3 rounded-2xl border border-stone-700/80 bg-stone-900/70 px-4 py-3 text-stone-300 transition-colors focus-within:border-stone-400 focus-within:bg-stone-900">
+              <span className="flex items-center gap-3 rounded-2xl border border-stone-300/80 dark:border-stone-700/80 bg-stone-100/70 dark:bg-stone-900/70 px-4 py-3 text-stone-600 dark:text-stone-300 transition-colors focus-within:border-stone-500 dark:focus-within:border-stone-400 focus-within:bg-stone-100 dark:focus-within:bg-stone-900">
                 <LockKeyhole className="size-5 text-stone-500" />
                 <input
                   type="password"
                   name="password"
                   autoComplete={isSignup ? "new-password" : "current-password"}
                   placeholder="비밀번호"
-                  className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-600 outline-none"
+                  className="w-full bg-transparent text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600 outline-none"
                 />
               </span>
             </label>
 
             {isSignup && (
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-stone-300">
+                <span className="mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300">
                   비밀번호 확인
                 </span>
-                <span className="flex items-center gap-3 rounded-2xl border border-stone-700/80 bg-stone-900/70 px-4 py-3 text-stone-300 transition-colors focus-within:border-stone-400 focus-within:bg-stone-900">
+                <span className="flex items-center gap-3 rounded-2xl border border-stone-300/80 dark:border-stone-700/80 bg-stone-100/70 dark:bg-stone-900/70 px-4 py-3 text-stone-600 dark:text-stone-300 transition-colors focus-within:border-stone-500 dark:focus-within:border-stone-400 focus-within:bg-stone-100 dark:focus-within:bg-stone-900">
                   <LockKeyhole className="size-5 text-stone-500" />
                   <input
                     type="password"
                     name="passwordConfirm"
                     autoComplete="new-password"
                     placeholder="비밀번호 확인"
-                    className="w-full bg-transparent text-sm text-stone-100 placeholder:text-stone-600 outline-none"
+                    className="w-full bg-transparent text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-600 outline-none"
                   />
                 </span>
               </label>
@@ -296,7 +296,7 @@ export function LoginForm() {
               onClick={() =>
                 patchState({ mode: isSignup ? "login" : "signup" })
               }
-              className="rounded-full border border-stone-700/80 bg-stone-900/55 px-3 py-1.5 text-xs font-medium text-stone-400 transition-colors hover:border-stone-500 hover:bg-stone-800/80 hover:text-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500/60"
+              className="rounded-full border border-stone-300/80 dark:border-stone-700/80 bg-stone-100/55 dark:bg-stone-900/55 px-3 py-1.5 text-xs font-medium text-stone-600 dark:text-stone-400 transition-colors hover:border-stone-500 hover:bg-stone-200/80 dark:hover:bg-stone-800/80 hover:text-stone-900 dark:hover:text-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-500/60"
             >
               {isSignup ? "로그인으로 돌아가기" : "회원가입"}
             </button>

@@ -40,7 +40,7 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
         <nav className="mb-8 flex flex-wrap items-center justify-between gap-3 text-sm">
           <Link
             href="/ple"
-            className="text-stone-500 transition-colors hover:text-stone-200"
+            className="text-stone-500 transition-colors hover:text-stone-800 dark:hover:text-stone-200"
           >
             ← PLE 목록
           </Link>
@@ -48,7 +48,7 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
             {prev && (
               <Link
                 href={`/ple/${prev.slug}`}
-                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-stone-400 backdrop-blur-sm transition-colors hover:border-white/20 hover:text-stone-100"
+                className="rounded-lg border border-stone-300/70 dark:border-white/10 bg-stone-100/50 dark:bg-white/5 px-3 py-1 text-stone-500 dark:text-stone-400 backdrop-blur-sm transition-colors hover:border-stone-400/70 dark:hover:border-white/20 hover:text-stone-800 dark:hover:text-stone-100"
               >
                 {formatPleMonth(prev.month)}
               </Link>
@@ -56,7 +56,7 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
             {next && (
               <Link
                 href={`/ple/${next.slug}`}
-                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-stone-400 backdrop-blur-sm transition-colors hover:border-white/20 hover:text-stone-100"
+                className="rounded-lg border border-stone-300/70 dark:border-white/10 bg-stone-100/50 dark:bg-white/5 px-3 py-1 text-stone-500 dark:text-stone-400 backdrop-blur-sm transition-colors hover:border-stone-400/70 dark:hover:border-white/20 hover:text-stone-800 dark:hover:text-stone-100"
               >
                 {formatPleMonth(next.month)}
               </Link>
@@ -78,10 +78,10 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
           >
             {formatPleMonth(ple.month)} · {detail.signatureLabel}
           </span>
-          <h1 className="font-sport mt-4 text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+          <h1 className="font-sport mt-4 text-4xl font-semibold tracking-[-0.04em] text-stone-900 dark:text-white sm:text-5xl">
             {ple.label}
           </h1>
-          <p className="font-kr-hero mt-3 text-lg text-stone-200 sm:text-xl">
+          <p className="font-kr-hero mt-3 text-lg text-stone-700 dark:text-stone-200 sm:text-xl">
             {detail.tagline}
           </p>
           <p className="mt-4 text-sm leading-relaxed text-stone-500">
@@ -99,13 +99,13 @@ export function PleEventDetailView({ ple, detail }: PleEventDetailViewProps) {
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link
             href="/"
-            className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-stone-300 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
+            className="rounded-lg border border-stone-300/70 dark:border-white/10 bg-stone-100/50 dark:bg-white/5 px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-300 backdrop-blur-sm transition-colors hover:bg-stone-200/50 dark:hover:bg-white/10 hover:text-stone-900 dark:hover:text-white"
           >
             홈으로
           </Link>
           <Link
             href="/ple"
-            className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-stone-200 backdrop-blur-sm transition-colors hover:border-amber-500/30 hover:text-white"
+            className="rounded-lg border border-stone-300/70 dark:border-white/15 bg-stone-100/50 dark:bg-white/5 px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-200 backdrop-blur-sm transition-colors hover:border-amber-500/30 hover:text-stone-900 dark:hover:text-white"
           >
             다른 PLE 보기
           </Link>
@@ -120,7 +120,7 @@ function PleHighlightsSection({ detail }: { detail: PleEventDetail }) {
 
   return (
     <section className="mt-8">
-      <h2 className="font-sport mb-3 text-sm font-semibold tracking-[-0.03em] text-stone-400">
+      <h2 className="font-sport mb-3 text-sm font-semibold tracking-[-0.03em] text-stone-600 dark:text-stone-400">
         PLE INFO
       </h2>
       <HighlightList highlights={highlights} theme={theme} />
@@ -141,11 +141,11 @@ function HighlightList({
         <li
           key={h.title}
           className={cn(
-            "rounded-xl border border-white/8 bg-white/[0.04] p-4 backdrop-blur-sm",
+            "rounded-xl border border-stone-200/80 dark:border-white/8 bg-stone-100/40 dark:bg-white/[0.04] p-4 backdrop-blur-sm",
             theme.border
           )}
         >
-          <p className="font-semibold text-stone-200">{h.title}</p>
+          <p className="font-semibold text-stone-700 dark:text-stone-200">{h.title}</p>
           <p className="mt-1 text-sm text-stone-500">{h.detail}</p>
         </li>
       ))}

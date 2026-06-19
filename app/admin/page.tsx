@@ -98,7 +98,7 @@ const TT = {
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl border border-stone-700/50 bg-stone-950/70 ${className}`}>
+    <div className={`rounded-xl border border-stone-300/50 dark:border-stone-700/50 bg-stone-50/70 dark:bg-stone-950/70 ${className}`}>
       {children}
     </div>
   );
@@ -418,10 +418,10 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("대시보드");
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-stone-100">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0c] text-stone-900 dark:text-stone-100">
 
       {/* 서브 내비게이션 */}
-      <div className="border-b border-white/10 bg-[#0a0a0c]">
+      <div className="border-b border-stone-200/80 dark:border-white/10 bg-white dark:bg-[#0a0a0c]">
         <div className="mx-auto max-w-7xl px-3">
           <div className="flex gap-0.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {NAV_TABS.map(({ label, icon: Icon, dropdown }) => (
@@ -431,7 +431,7 @@ export default function AdminDashboard() {
                 className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
                   activeTab === label
                     ? "border border-stone-400 bg-stone-600 text-stone-50"
-                    : "border border-transparent text-stone-400 hover:bg-stone-800/60 hover:text-stone-200"
+                    : "border border-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-100/60 dark:hover:bg-stone-800/60 hover:text-stone-800 dark:hover:text-stone-200"
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />

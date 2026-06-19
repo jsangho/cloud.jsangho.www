@@ -26,7 +26,7 @@ const initialState: RankingsPageState = {
 };
 
 function rankRowClass(rank: number, isMe: boolean) {
-  const base = "border-b border-stone-800/35";
+  const base = "border-b border-stone-200/35 dark:border-stone-800/35";
 
   if (rank === 1) {
     return cn(base, "rankings-row-first", isMe && "ring-1 ring-inset ring-amber-400/20");
@@ -46,15 +46,15 @@ function rankRowClass(rank: number, isMe: boolean) {
 
 function rankNumberClass(rank: number) {
   const base = "text-sm tabular-nums";
-  if (rank === 1) return cn(base, "font-black text-amber-300/90");
-  if (rank <= 3) return cn(base, "font-bold text-stone-300");
+  if (rank === 1) return cn(base, "font-black text-amber-600 dark:text-amber-300/90");
+  if (rank <= 3) return cn(base, "font-bold text-stone-600 dark:text-stone-300");
   return cn(base, "font-semibold text-stone-500");
 }
 
 function rankTextClass(rank: number) {
-  if (rank === 1) return "text-white";
-  if (rank <= 3) return "text-stone-200";
-  return "text-stone-300";
+  if (rank === 1) return "text-stone-900 dark:text-white";
+  if (rank <= 3) return "text-stone-700 dark:text-stone-200";
+  return "text-stone-600 dark:text-stone-300";
 }
 
 function TableRow({
@@ -81,7 +81,7 @@ function TableRow({
           {row.nickname}
         </span>
         {isMe && (
-          <span className="ml-2 rounded-md border border-amber-500/25 bg-amber-950/30 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-200/90">
+          <span className="ml-2 rounded-md border border-amber-500/25 bg-amber-100 dark:bg-amber-950/30 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-700 dark:text-amber-200/90">
             나
           </span>
         )}
@@ -117,7 +117,7 @@ function RankingsTable({
     <div className="overflow-x-auto">
       <table className="w-full min-w-[520px]">
         <thead>
-          <tr className="border-b border-stone-700/50">
+          <tr className="border-b border-stone-200/50 dark:border-stone-700/50">
             <th className="py-3 pr-3 text-right text-[11px] font-bold uppercase tracking-wider text-stone-500">
               순위
             </th>
@@ -195,10 +195,10 @@ export default function RankingsPage() {
             className="hero-title-backdrop mx-auto"
             style={{ height: "8rem", width: "min(100%, 22rem)" }}
           />
-          <h1 className="font-kr-hero relative z-10 text-2xl text-white sm:text-3xl md:text-4xl">
+          <h1 className="font-kr-hero relative z-10 text-2xl text-stone-900 dark:text-white sm:text-3xl md:text-4xl">
             순위표
           </h1>
-          <p className="relative z-10 mx-auto mt-3 max-w-2xl text-sm font-medium leading-relaxed tracking-tight text-stone-400 sm:text-base">
+          <p className="relative z-10 mx-auto mt-3 max-w-2xl text-sm font-medium leading-relaxed tracking-tight text-stone-600 dark:text-stone-400 sm:text-base">
             닉네임 · 점수 · 예측 성공 확률(%) 기준으로 표시합니다.
             <br className="hidden sm:inline" /> 로그인 후 예측한 회원만 집계됩니다.
           </p>
@@ -217,13 +217,13 @@ export default function RankingsPage() {
           <>
             <section className="rankings-panel ple-section-glow rounded-2xl p-4 sm:rounded-3xl sm:p-6">
               <div className="mb-4 text-center sm:mb-5">
-                <p className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-400">
-                  <span className="text-white">TOP</span> 20
+                <p className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-500 dark:text-stone-400">
+                  <span className="text-stone-900 dark:text-white">TOP</span> 20
                 </p>
               </div>
 
               {state.rows.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-stone-700/45 bg-stone-950/30 px-4 py-8 text-center text-sm text-stone-400">
+                <p className="rounded-xl border border-dashed border-stone-300/45 dark:border-stone-700/45 bg-stone-100/30 dark:bg-stone-950/30 px-4 py-8 text-center text-sm text-stone-500 dark:text-stone-400">
                   아직 순위에 올라온 유저가 없습니다. PLE에서 예측하고 결과가
                   확정되면 표시됩니다.
                 </p>
@@ -234,7 +234,7 @@ export default function RankingsPage() {
 
             <section className="rankings-panel mt-5 rounded-2xl p-4 sm:mt-6 sm:rounded-3xl sm:p-6">
               <div className="mb-4">
-                <h2 className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-300">
+                <h2 className="font-sport text-sm font-semibold tracking-[-0.04em] text-stone-600 dark:text-stone-300">
                   내 순위
                 </h2>
                 {!user && (

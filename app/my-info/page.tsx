@@ -81,11 +81,11 @@ export default function MyInfoPage() {
 
   return (
     <main className="mx-auto max-w-lg px-4 py-10">
-      <div className="rounded-3xl border border-stone-700/70 bg-stone-950/58 p-6 shadow-2xl shadow-black/35 backdrop-blur-xl sm:p-8">
+      <div className="rounded-3xl border border-stone-300/70 dark:border-stone-700/70 bg-stone-50/80 dark:bg-stone-950/58 p-6 shadow-2xl shadow-black/35 backdrop-blur-xl sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500">
           KayFabe
         </p>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight text-stone-50">
+        <h1 className="mt-3 text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
           내 정보
         </h1>
         <dl className="mt-8 space-y-4 text-sm">
@@ -94,8 +94,8 @@ export default function MyInfoPage() {
           <InfoRow label="역할" value={user.role} />
         </dl>
 
-        <section className="mt-6 border-t border-stone-700/70 pt-6">
-          <h2 className="text-sm font-bold tracking-tight text-stone-200">
+        <section className="mt-6 border-t border-stone-200/70 dark:border-stone-700/70 pt-6">
+          <h2 className="text-sm font-bold tracking-tight text-stone-700 dark:text-stone-200">
             PLE 승부예측
           </h2>
           <p className="mt-1 text-xs text-stone-500">
@@ -126,7 +126,7 @@ export default function MyInfoPage() {
               />
             </dl>
           ) : (
-            <p className="mt-4 rounded-2xl border border-dashed border-stone-600/60 bg-stone-900/40 px-4 py-3 text-sm text-stone-400">
+            <p className="mt-4 rounded-2xl border border-dashed border-stone-300/60 dark:border-stone-600/60 bg-stone-100/40 dark:bg-stone-900/40 px-4 py-3 text-sm text-stone-500 dark:text-stone-400">
               아직 채점된 예측이 없습니다. PLE 페이지에서 예측하고 결과가
               나오면 점수가 쌓입니다.
             </p>
@@ -160,15 +160,15 @@ function InfoRow({
       className={
         highlight
           ? "rounded-2xl border border-amber-500/25 bg-amber-500/5 px-4 py-3"
-          : "rounded-2xl border border-stone-700/80 bg-stone-900/70 px-4 py-3"
+          : "rounded-2xl border border-stone-200/80 dark:border-stone-700/80 bg-stone-100/70 dark:bg-stone-900/70 px-4 py-3"
       }
     >
       <dt className="text-stone-500">{label}</dt>
       <dd
         className={
           highlight
-            ? "mt-1 text-lg font-bold tabular-nums text-amber-100"
-            : "mt-1 font-medium text-stone-100"
+            ? "mt-1 text-lg font-bold tabular-nums text-amber-800 dark:text-amber-100"
+            : "mt-1 font-medium text-stone-800 dark:text-stone-100"
         }
       >
         {value}

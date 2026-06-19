@@ -148,13 +148,13 @@ export default function LessonTitanicListPage() {
             <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
               Titanic DB 리스트
             </h1>
-            <p className="mt-2 text-sm text-stone-300">
+            <p className="mt-2 text-sm text-stone-600 dark:text-stone-300">
               Neon DB의{" "}
-              <code className="rounded bg-stone-950/40 px-1.5 py-0.5 text-xs text-stone-100">
+              <code className="rounded bg-stone-200/40 dark:bg-stone-950/40 px-1.5 py-0.5 text-xs text-stone-800 dark:text-stone-100">
                 titanic_persons
               </code>
               {" + "}
-              <code className="rounded bg-stone-950/40 px-1.5 py-0.5 text-xs text-stone-100">
+              <code className="rounded bg-stone-200/40 dark:bg-stone-950/40 px-1.5 py-0.5 text-xs text-stone-800 dark:text-stone-100">
                 titanic_bookings
               </code>{" "}
               내용을 조회합니다.
@@ -174,31 +174,31 @@ export default function LessonTitanicListPage() {
         )}
 
         {!error && (walterId !== null || walterName || walterMemo) && (
-          <section className="mt-6 rounded-xl border border-stone-800/70 bg-stone-950/40 px-4 py-4">
-            <h2 className="text-sm font-semibold text-stone-200">월터 (Walter Roaster)</h2>
+          <section className="mt-6 rounded-xl border border-stone-200/70 dark:border-stone-800/70 bg-stone-100/40 dark:bg-stone-950/40 px-4 py-4">
+            <h2 className="text-sm font-semibold text-stone-700 dark:text-stone-200">월터 (Walter Roaster)</h2>
             <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
               <div>
                 <dt className="text-stone-500">ID</dt>
-                <dd className="font-medium text-stone-100">{walterId ?? "-"}</dd>
+                <dd className="font-medium text-stone-800 dark:text-stone-100">{walterId ?? "-"}</dd>
               </div>
               <div>
                 <dt className="text-stone-500">이름</dt>
-                <dd className="font-medium text-stone-100">{walterName ?? "-"}</dd>
+                <dd className="font-medium text-stone-800 dark:text-stone-100">{walterName ?? "-"}</dd>
               </div>
               <div className="sm:col-span-1">
                 <dt className="text-stone-500">비고</dt>
-                <dd className="font-medium text-stone-100">{walterMemo ?? "-"}</dd>
+                <dd className="font-medium text-stone-800 dark:text-stone-100">{walterMemo ?? "-"}</dd>
               </div>
             </dl>
           </section>
         )}
 
-        <div className="mt-6 overflow-auto rounded-xl border border-stone-800/70 bg-stone-950/30">
+        <div className="mt-6 overflow-auto rounded-xl border border-stone-200/70 dark:border-stone-800/70 bg-stone-50/30 dark:bg-stone-950/30">
           <table className="min-w-[1100px] w-full text-left text-sm">
-            <thead className="sticky top-0 bg-stone-950/80 backdrop-blur">
-              <tr className="border-b border-stone-800/70">
+            <thead className="sticky top-0 bg-stone-100/80 dark:bg-stone-950/80 backdrop-blur">
+              <tr className="border-b border-stone-200/70 dark:border-stone-800/70">
                 {columns.map((c) => (
-                  <th key={c} className="px-3 py-2 font-semibold text-stone-200">
+                  <th key={c} className="px-3 py-2 font-semibold text-stone-700 dark:text-stone-200">
                     {c}
                   </th>
                 ))}
@@ -208,10 +208,10 @@ export default function LessonTitanicListPage() {
               {rows.map((r, idx) => (
                 <tr
                   key={`${r.PassengerId ?? "-"}-${idx}`}
-                  className="border-b border-stone-900/60"
+                  className="border-b border-stone-200/60 dark:border-stone-900/60"
                 >
                   {columns.map((c) => (
-                    <td key={c} className="px-3 py-2 text-stone-200/90">
+                    <td key={c} className="px-3 py-2 text-stone-700 dark:text-stone-200/90">
                       {String((r as any)[c] ?? "-")}
                     </td>
                   ))}
@@ -243,8 +243,8 @@ export default function LessonTitanicListPage() {
                 className={[
                   "inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition-colors",
                   safePage === 1
-                    ? "cursor-not-allowed border-stone-800/60 bg-stone-950/30 text-stone-600"
-                    : "border-stone-200/10 bg-stone-950/20 text-stone-100 hover:bg-stone-800/60",
+                    ? "cursor-not-allowed border-stone-200/60 dark:border-stone-800/60 bg-stone-100/30 dark:bg-stone-950/30 text-stone-400 dark:text-stone-600"
+                    : "border-stone-300/70 dark:border-stone-200/10 bg-stone-50/20 dark:bg-stone-950/20 text-stone-800 dark:text-stone-100 hover:bg-stone-200/60 dark:hover:bg-stone-800/60",
                 ].join(" ")}
                 aria-label="이전 페이지"
               >
@@ -266,8 +266,8 @@ export default function LessonTitanicListPage() {
                       className={[
                         "inline-flex h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-semibold transition-colors",
                         it === safePage
-                          ? "border-stone-800/60 bg-stone-50 text-stone-700 hover:bg-stone-100"
-                          : "border-stone-200/10 bg-stone-950/20 text-stone-100",
+                          ? "border-stone-300/60 dark:border-stone-800/60 bg-stone-200 dark:bg-stone-50 text-stone-900 dark:text-stone-700 hover:bg-stone-300 dark:hover:bg-stone-100"
+                          : "border-stone-300/70 dark:border-stone-200/10 bg-stone-50/20 dark:bg-stone-950/20 text-stone-800 dark:text-stone-100",
                       ].join(" ")}
                     >
                       {it}
@@ -288,8 +288,8 @@ export default function LessonTitanicListPage() {
                 className={[
                   "inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-semibold transition-colors",
                   safePage === totalPages
-                    ? "cursor-not-allowed border-stone-800/60 bg-stone-950/30 text-stone-600"
-                    : "border-stone-200/10 bg-stone-950/20 text-stone-100 hover:bg-stone-800/60",
+                    ? "cursor-not-allowed border-stone-200/60 dark:border-stone-800/60 bg-stone-100/30 dark:bg-stone-950/30 text-stone-400 dark:text-stone-600"
+                    : "border-stone-300/70 dark:border-stone-200/10 bg-stone-50/20 dark:bg-stone-950/20 text-stone-800 dark:text-stone-100 hover:bg-stone-200/60 dark:hover:bg-stone-800/60",
                 ].join(" ")}
                 aria-label="다음 페이지"
               >

@@ -197,11 +197,11 @@ export function KayfabeLogo({
     <>
       <KayfabeMark className={markClassName} />
       <div className="min-w-0">
-        <span className="font-sport block text-2xl font-semibold leading-none tracking-[-0.04em] text-stone-50">
+        <span className="font-sport block text-2xl font-semibold leading-none tracking-[-0.04em] text-stone-900 dark:text-stone-50">
           KayFabe
         </span>
         {showTagline && (
-          <span className="mt-0.5 block text-sm tracking-wide text-stone-400">
+          <span className="mt-0.5 block text-sm tracking-wide text-stone-500 dark:text-stone-400">
             WWE PLE 예측 게임
           </span>
         )}

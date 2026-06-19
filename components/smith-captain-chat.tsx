@@ -192,7 +192,7 @@ export function SmithCaptainChat({ className }: { className?: string }) {
             if (isStreamingDraft) {
               return (
                 <div key={`${msg.ts}-${idx}`} className="flex justify-start">
-                  <div className="rounded-3xl border border-stone-700/60 bg-stone-950/50 px-4 py-3">
+                  <div className="rounded-3xl border border-stone-300/60 dark:border-stone-700/60 bg-stone-100/50 dark:bg-stone-950/50 px-4 py-3">
                     <Loader2 className="size-5 animate-spin text-stone-400" />
                   </div>
                 </div>
@@ -213,8 +213,8 @@ export function SmithCaptainChat({ className }: { className?: string }) {
                   className={cn(
                     "max-w-[88%] rounded-3xl px-4 py-3 text-sm leading-relaxed shadow-sm",
                     msg.role === "user"
-                      ? "bg-stone-100 text-stone-900"
-                      : "border border-stone-700/60 bg-stone-950/50 text-stone-100"
+                      ? "bg-stone-200 dark:bg-stone-100 text-stone-900"
+                      : "border border-stone-300/60 dark:border-stone-700/60 bg-stone-100/50 dark:bg-stone-950/50 text-stone-800 dark:text-stone-100"
                   )}
                 >
                   {msg.role === "assistant" && (
@@ -235,8 +235,8 @@ export function SmithCaptainChat({ className }: { className?: string }) {
       </div>
 
       {state.errorMessage && (
-        <div className="mx-auto mb-3 w-full max-w-3xl rounded-xl border border-red-900/40 bg-red-950/30 px-4 py-3">
-          <p className="text-sm text-red-200">{state.errorMessage}</p>
+        <div className="mx-auto mb-3 w-full max-w-3xl rounded-xl border border-red-400/40 dark:border-red-900/40 bg-red-50/80 dark:bg-red-950/30 px-4 py-3">
+          <p className="text-sm text-red-700 dark:text-red-200">{state.errorMessage}</p>
           {state.lastPayload && (
             <button
               type="button"
@@ -244,7 +244,7 @@ export function SmithCaptainChat({ className }: { className?: string }) {
                 patchState({ errorMessage: null });
                 void sendWithHistory(state.lastPayload!);
               }}
-              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-red-100 hover:underline"
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-red-700 dark:text-red-100 hover:underline"
             >
               <RefreshCw className="size-3.5" />
               재시도
@@ -254,7 +254,7 @@ export function SmithCaptainChat({ className }: { className?: string }) {
       )}
 
       <form onSubmit={handleSubmit} className="mx-auto w-full max-w-3xl shrink-0">
-        <div className="rounded-[1.75rem] border border-stone-600/70 bg-stone-950/70 px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-sm">
+        <div className="rounded-[1.75rem] border border-stone-300/70 dark:border-stone-600/70 bg-stone-100/70 dark:bg-stone-950/70 px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-sm">
           <label htmlFor="smith-chat-input" className="sr-only">
             스미스 선장에게 메시지 보내기
           </label>
@@ -267,14 +267,14 @@ export function SmithCaptainChat({ className }: { className?: string }) {
             disabled={state.isLoading}
             onKeyDown={handleKeyDown}
             placeholder="무엇이든 물어보세요"
-            className="w-full resize-none border-0 bg-transparent px-2 py-2 text-sm text-stone-100 placeholder:text-stone-500 focus:outline-none disabled:opacity-50"
+            className="w-full resize-none border-0 bg-transparent px-2 py-2 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none disabled:opacity-50"
           />
-          <div className="flex items-center justify-between gap-2 border-t border-stone-800/80 pt-2">
+          <div className="flex items-center justify-between gap-2 border-t border-stone-200/80 dark:border-stone-800/80 pt-2">
             <button
               type="button"
               title="준비 중입니다"
               aria-label="첨부"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-stone-400 hover:bg-stone-800/80 hover:text-stone-200"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-stone-500 dark:text-stone-400 hover:bg-stone-200/80 dark:hover:bg-stone-800/80 hover:text-stone-700 dark:hover:text-stone-200"
             >
               <Plus className="size-5" strokeWidth={1.75} />
             </button>

@@ -156,12 +156,12 @@ function MatchResultRow({
       className={cn(
         "rounded-xl border p-4",
         hasResult
-          ? "border-emerald-700/50 bg-emerald-950/25"
-          : "border-stone-600/70 bg-stone-800/50"
+          ? "border-emerald-500/50 bg-emerald-50/60 dark:bg-emerald-950/25"
+          : "border-stone-300/70 dark:border-stone-600/70 bg-stone-100/50 dark:bg-stone-800/50"
       )}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <h3 className="font-semibold text-stone-100">{matchRow.title}</h3>
+        <h3 className="font-semibold text-stone-800 dark:text-stone-100">{matchRow.title}</h3>
         {hasResult && (
           <span className="rounded-full bg-emerald-900/80 px-2.5 py-0.5 text-xs font-medium text-emerald-300">
             결과 등록됨
@@ -170,7 +170,7 @@ function MatchResultRow({
       </div>
 
       {!canEdit && hasResult && readonlyWinner && (
-        <p className="mt-3 text-sm font-medium text-emerald-200/90">
+        <p className="mt-3 text-sm font-medium text-emerald-800 dark:text-emerald-200/90">
           승자: {readonlyWinner}
         </p>
       )}
@@ -200,8 +200,8 @@ function MatchResultRow({
                   className={cn(
                     "rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors",
                     selected
-                      ? "border-amber-500/80 bg-amber-950/50 text-amber-100"
-                      : "border-stone-600 bg-stone-900/60 text-stone-300 hover:border-stone-500 hover:bg-stone-800"
+                      ? "border-amber-500/80 bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-100"
+                      : "border-stone-300 dark:border-stone-600 bg-stone-100/60 dark:bg-stone-900/60 text-stone-700 dark:text-stone-300 hover:border-stone-400 dark:hover:border-stone-500 hover:bg-stone-200 dark:hover:bg-stone-800"
                   )}
                 >
                   {competitor.name}
@@ -222,8 +222,8 @@ function MatchResultRow({
                   className={cn(
                     "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
                     selected
-                      ? "border-amber-500/80 bg-amber-950/50 text-amber-100"
-                      : "border-stone-600 bg-stone-900/60 text-stone-300 hover:border-stone-500 hover:bg-stone-800"
+                      ? "border-amber-500/80 bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-100"
+                      : "border-stone-300 dark:border-stone-600 bg-stone-100/60 dark:bg-stone-900/60 text-stone-700 dark:text-stone-300 hover:border-stone-400 dark:hover:border-stone-500 hover:bg-stone-200 dark:hover:bg-stone-800"
                   )}
                 >
                   {c.name}
@@ -239,7 +239,7 @@ function MatchResultRow({
 
       {canEdit && pick && (
         <p className="mt-2 text-xs text-stone-400">
-          선택: <span className="text-stone-200">{pick.name}</span>
+          선택: <span className="text-stone-800 dark:text-stone-200">{pick.name}</span>
         </p>
       )}
     </li>
@@ -381,7 +381,7 @@ export function PleResultsBoard({ slug }: PleResultsBoardProps) {
 
   if (staticMatches.length === 0) {
     return (
-      <p className="rounded-xl border border-stone-700/60 bg-stone-800/40 px-4 py-8 text-center text-sm text-stone-400">
+      <p className="rounded-xl border border-stone-300/60 dark:border-stone-700/60 bg-stone-100/40 dark:bg-stone-800/40 px-4 py-8 text-center text-sm text-stone-500 dark:text-stone-400">
         이 PLE의 경기 카드가 아직 등록되지 않았습니다.
       </p>
     );
@@ -391,7 +391,7 @@ export function PleResultsBoard({ slug }: PleResultsBoardProps) {
     <div className="space-y-4">
       <PleResultsAdminGate onAdminChange={setCanEdit} />
       {syncError && (
-        <p className="rounded-lg border border-amber-800/60 bg-amber-950/30 px-4 py-3 text-sm text-amber-200">
+        <p className="rounded-lg border border-amber-500/60 bg-amber-100/60 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-800 dark:text-amber-200">
           서버 연결 없음 — 결과를 등록하려면 백엔드가 실행 중이어야 합니다. ({syncError})
         </p>
       )}
@@ -426,11 +426,11 @@ export function PleResultsBoard({ slug }: PleResultsBoardProps) {
             })}
           </ul>
           {canEdit && (
-            <div className="sticky bottom-0 z-20 border-t border-stone-700/80 bg-stone-900/95 py-4 backdrop-blur-md">
+            <div className="sticky bottom-0 z-20 border-t border-stone-200/80 dark:border-stone-700/80 bg-white/95 dark:bg-stone-900/95 py-4 backdrop-blur-md">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-center text-sm text-stone-400 sm:text-left">
                   선택{" "}
-                  <span className="font-semibold tabular-nums text-stone-200">
+                  <span className="font-semibold tabular-nums text-stone-700 dark:text-stone-200">
                     {draftCount}/{matches.length}
                   </span>
                 </p>
@@ -442,7 +442,7 @@ export function PleResultsBoard({ slug }: PleResultsBoardProps) {
                     "rounded-lg px-6 py-2.5 text-sm font-bold transition-colors",
                     canSubmit && !ui.submitting
                       ? "bg-amber-600 text-stone-950 hover:bg-amber-500"
-                      : "cursor-not-allowed bg-stone-700 text-stone-500"
+                      : "cursor-not-allowed bg-stone-200 dark:bg-stone-700 text-stone-500"
                   )}
                 >
                   {ui.submitting ? "등록 중…" : "결과 일괄 등록"}

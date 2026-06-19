@@ -39,14 +39,14 @@ function AiPickBanner({
   return (
     <p
       className={cn(
-        "border-t border-white/8 bg-white/[0.03] px-3 py-1.5 text-center text-[10px] text-stone-400 sm:text-xs",
-        showResults && aiCorrect === true && "bg-emerald-950/40 text-emerald-300",
-        showResults && aiCorrect === false && "bg-red-950/40 text-red-300"
+        "border-t border-stone-200/50 dark:border-white/8 bg-stone-50/50 dark:bg-white/[0.03] px-3 py-1.5 text-center text-[10px] text-stone-400 sm:text-xs",
+        showResults && aiCorrect === true && "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300",
+        showResults && aiCorrect === false && "bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300"
       )}
     >
       <span className="font-semibold text-amber-400/90">AI 예측</span>
       <span className="mx-1 text-stone-600">·</span>
-      <span className="font-medium text-stone-300">{aiPickName}</span>
+      <span className="font-medium text-stone-700 dark:text-stone-300">{aiPickName}</span>
       {showResults && aiCorrect != null && (
         <span className="ml-2 font-bold">{aiCorrect ? "✓ 적중" : "✗ 실패"}</span>
       )}
@@ -141,7 +141,7 @@ function CompetitorPick({
         {competitor.isChampion && <ChampionBelt />}
         <span
           className={cn(
-            "text-center font-semibold text-stone-100",
+            "text-center font-semibold text-stone-800 dark:text-stone-100",
             compact ? "text-xs sm:text-sm" : "text-sm sm:text-base",
             outcome === "win" && "text-emerald-300",
             outcome === "loss" && "text-stone-500"
@@ -192,7 +192,7 @@ function SiteVoteBarTwoWay({
           <span className="font-medium text-stone-500">{BRACKET_LABELS.siteVote}</span>
           <span className="text-stone-600">{BRACKET_LABELS.noVotesYet}</span>
         </div>
-        <div className="h-2 rounded-full bg-white/10" />
+        <div className="h-2 rounded-full bg-stone-200/60 dark:bg-white/10" />
       </div>
     );
   }
@@ -229,7 +229,7 @@ function SiteVoteMulti({
           <span className="font-medium text-stone-500">{BRACKET_LABELS.siteVote}</span>
           <span className="text-stone-600">{BRACKET_LABELS.noVotesYet}</span>
         </div>
-        <div className="h-2 rounded-full bg-white/10" />
+        <div className="h-2 rounded-full bg-stone-200/60 dark:bg-white/10" />
       </div>
     );
   }
@@ -248,7 +248,7 @@ function SiteVoteMulti({
                 <span className="truncate font-medium text-stone-400">{c.name}</span>
                 <span className="shrink-0 tabular-nums font-semibold text-stone-300">{pct}%</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+              <div className="h-1.5 overflow-hidden rounded-full bg-stone-200/60 dark:bg-white/10">
                 <div className={cn("h-full transition-all", barClass)} style={{ width: `${pct}%` }} />
               </div>
             </li>
@@ -282,11 +282,11 @@ function DualStatBar({
         </span>
         <span className="tabular-nums text-stone-400">
           <span className="font-semibold">{leftPercent}%</span>
-          <span className="mx-1 text-stone-300">{BRACKET_LABELS.percentSep}</span>
+          <span className="mx-1 text-stone-500 dark:text-stone-300">{BRACKET_LABELS.percentSep}</span>
           <span className="font-semibold">{rightPercent}%</span>
         </span>
       </div>
-      <div className="flex h-2 overflow-hidden rounded-full bg-white/10">
+      <div className="flex h-2 overflow-hidden rounded-full bg-stone-200/60 dark:bg-white/10">
         <div
           className={cn("h-full transition-all", leftBarClass)}
           style={{ width: `${leftPercent}%` }}
@@ -353,7 +353,7 @@ export function MatchBracketCard({
     return (
       <article className="ple-match-card overflow-hidden rounded-xl">
         <div className="min-w-0 flex-1">
-          <div className="ple-match-card-header px-3 py-2.5 text-center text-xs font-semibold leading-snug text-white sm:text-sm">
+          <div className="ple-match-card-header px-3 py-2.5 text-center text-xs font-semibold leading-snug text-stone-900 dark:text-white sm:text-sm">
             {match.title}
           </div>
           <AiPickBanner
@@ -362,7 +362,7 @@ export function MatchBracketCard({
             showResults={displayResults}
           />
 
-          <div className="border-t border-white/8 bg-black/20 p-2">
+          <div className="border-t border-stone-200/50 dark:border-white/8 bg-stone-50/50 dark:bg-black/20 p-2">
             <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-wide text-stone-500">
               {BRACKET_LABELS.participants}
             </p>
@@ -388,7 +388,7 @@ export function MatchBracketCard({
             </div>
           </div>
 
-          <div className="space-y-2.5 border-t border-white/8 bg-white/[0.03] px-3 py-2.5 sm:px-4">
+          <div className="space-y-2.5 border-t border-stone-200/50 dark:border-white/8 bg-stone-50/50 dark:bg-white/[0.03] px-3 py-2.5 sm:px-4">
             <SiteVoteMulti
               competitors={match.competitors}
               votes={multiVotes}
@@ -425,7 +425,7 @@ export function MatchBracketCard({
           showResults={displayResults}
         />
 
-        <div className="relative flex border-t border-white/8 bg-black/20">
+        <div className="relative flex border-t border-stone-200/50 dark:border-white/8 bg-stone-50/50 dark:bg-black/20">
           <CompetitorPick
             competitor={match.left}
             nameStyle={leftStyle}
