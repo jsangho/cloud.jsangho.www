@@ -74,6 +74,7 @@ export function Navbar() {
     (pathname === "/championship" || pathname.startsWith("/championship/"));
   const isLesson =
     mounted && (pathname === "/lesson" || pathname.startsWith("/lesson/"));
+  const isAdmin = mounted && pathname === "/admin";
   const isLogin = mounted && pathname === "/login";
   const isMyInfo = mounted && pathname === "/my-info";
   const showAuth = mounted && isReady;
@@ -115,6 +116,9 @@ export function Navbar() {
           <WeatherWidget />
           <NavLink href="/lesson" active={isLesson}>
             Lesson
+          </NavLink>
+          <NavLink href="/admin" active={isAdmin}>
+            관리자
           </NavLink>
           {!showAuth ? (
             <div
