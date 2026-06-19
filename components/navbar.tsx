@@ -9,6 +9,7 @@ import { KayfabeLogo } from "@/components/kayfabe-logo";
 import { PlePickerDialog } from "@/components/ple-picker-dialog";
 import { WeatherWidget } from "@/components/weather-widget";
 import { WweTicker } from "@/components/wwe-ticker";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { authDisplayName, useAuth } from "@/context/auth-context";
 import { cn } from "@/lib/utils";
 
@@ -120,6 +121,7 @@ export function Navbar() {
           <NavLink href="/admin" active={isAdmin}>
             관리자
           </NavLink>
+          <ThemeToggle />
           {!showAuth ? (
             <div
               className="h-8 w-[7.5rem] animate-pulse rounded-md border border-stone-700/50 bg-stone-800/60"
