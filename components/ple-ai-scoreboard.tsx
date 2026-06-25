@@ -119,7 +119,7 @@ export function PleAiScoreboard() {
 
   const pleGroups = useMemo(
     () => (stats?.recent.length ? groupRecordsByPle(stats.recent) : []),
-    [stats?.recent]
+    [stats]
   );
 
   useEffect(() => {

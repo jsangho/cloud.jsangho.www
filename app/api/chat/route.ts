@@ -171,6 +171,7 @@ export async function POST(request: NextRequest) {
     const text = await generateReply(prompt, modelName);
     return NextResponse.json({ text, reply: text });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Gemini API Error:", error);
     const { message, status } = toClientError(error);
     return NextResponse.json({ error: message }, { status });

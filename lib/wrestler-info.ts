@@ -1,5 +1,6 @@
 export type WrestlerMember = {
   ringName: string;
+  realName?: string;
 };
 
 export type CompetitorInfo = {

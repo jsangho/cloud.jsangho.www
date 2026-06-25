@@ -45,7 +45,7 @@ www/
 
 - 기본 URL: [`lib/api.ts`](lib/api.ts)의 `apiBaseUrl`  
   `process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000"`
-- 백엔드 경로는 **sangho 라우터 prefix와 일치**해야 한다.
+- 백엔드 경로는 **fastapi 라우터 prefix와 일치**해야 한다.
   - Kayfabe: `/ple/*`, `/records/*`, `/rankings`, `/championship`, `/title-history/*`
   - Auth: `/login`, `/signup`, `/users/{id}`
   - Titanic: `/titanic/*` (`titanicApiBaseUrl` 사용 시 `/api/titanic` 확인)
@@ -88,8 +88,8 @@ docker compose up --build -d frontend
 | 영역 | 규칙 |
 |------|------|
 | 루트 하네스 | [`.cursorrules`](../.cursorrules) |
-| 백엔드 API·라우트 | [`sangho/.cursorrules`](../sangho/.cursorrules) |
-| Titanic 백엔드 | [`sangho/apps/titanic/_docs/.cursorrules`](../sangho/apps/titanic/_docs/.cursorrules) |
+| 백엔드 API·라우트 | [`fastapi/.cursorrules`](../fastapi/.cursorrules) |
+| Titanic 백엔드 | [`fastapi/apps/titanic/_docs/.cursorrules`](../fastapi/apps/titanic/_docs/.cursorrules) |
 
 ## 7. 행동 보조
 

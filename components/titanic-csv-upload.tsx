@@ -30,12 +30,12 @@ export function TitanicCsvUpload() {
       const data = await res.json().catch(() => null);
       if (!res.ok) {
         const detail =
-          (data && typeof data === "object" && "detail" in data && (data as any).detail) ||
+          (data && typeof data === "object" && "detail" in data && (data as Record<string, unknown>).detail) ||
           "업로드에 실패했습니다.";
         throw new Error(String(detail));
       }
       const count =
-        data && typeof data === "object" && "count" in data ? Number((data as any).count) : null;
+        data && typeof data === "object" && "count" in data ? Number((data as Record<string, unknown>).count) : null;
       setUploadedCount(Number.isFinite(count) ? count : null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "업로드 중 오류가 발생했습니다.");

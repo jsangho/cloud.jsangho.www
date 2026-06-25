@@ -88,7 +88,7 @@ export default function LessonTitanicListPage() {
         const data = (await res.json().catch(() => null)) as TitanicPageResponse | null;
         if (!res.ok) {
           const detail =
-            (data && typeof data === "object" && "detail" in data && (data as any).detail) ||
+            (data && typeof data === "object" && "detail" in data && (data as Record<string, unknown>).detail) ||
             "목록을 불러오지 못했습니다.";
           throw new Error(String(detail));
         }
@@ -212,7 +212,7 @@ export default function LessonTitanicListPage() {
                 >
                   {columns.map((c) => (
                     <td key={c} className="px-3 py-2 text-stone-700 dark:text-stone-200/90">
-                      {String((r as any)[c] ?? "-")}
+                      {String(r[c as keyof TitanicRow] ?? "-")}
                     </td>
                   ))}
                 </tr>

@@ -170,7 +170,7 @@ function mergePreservedSelections(
     if (!target || target.selected !== null) continue;
     merged[id] =
       target.kind === entry.kind
-        ? { ...target, selected: entry.selected }
+        ? ({ ...target, selected: entry.selected } as VoteState)
         : target;
   }
   return merged;
@@ -283,11 +283,20 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
     buildInitialState(staticMatches)
   );
 
-  const patchUi = (patch: Partial<BracketUiState>) =>
-    setUi((prev) => ({ ...prev, ...patch }));
+  const patchUi = (
+    patch:
+      | Partial<BracketUiState>
+      | ((prev: BracketUiState) => Partial<BracketUiState>)
+  ) =>
+    setUi((prev) => {
+      const p = typeof patch === "function" ? patch(prev) : patch;
+      return { ...prev, ...p };
+    });
 
   const matches: PleBoardMatch[] =
-    ui.useApi && ui.board ? ui.board.matches : staticMatches;
+    ui.useApi && ui.board
+      ? ui.board.matches
+      : (staticMatches as unknown as PleBoardMatch[]);
   const eventFinished = ui.useApi && ui.board?.status === "finished";
 
   useEffect(() => {
@@ -296,7 +305,9 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
 
     async function bootstrap() {
       try {
-        let data = await fetchPleBoard(slug, boardQuery);
+        const raw = await fetchPleBoard(slug, boardQuery);
+        if (!raw) throw new Error("no board");
+        let data: PleBoard = raw;
         if (needsStaticResync(data, staticCards)) {
           data = await syncPleFromClient(slug, staticCards);
         }
@@ -348,7 +359,9 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
 
     async function retryConnect() {
       try {
-        let data = await fetchPleBoard(slug, boardQuery);
+        const raw = await fetchPleBoard(slug, boardQuery);
+        if (!raw) throw new Error("no board");
+        let data: PleBoard = raw;
         if (needsStaticResync(data, staticCards)) {
           data = await syncPleFromClient(slug, staticCards);
         }
@@ -405,7 +418,7 @@ export function PleMatchBracket({ slug, className }: PleMatchBracketProps) {
     );
   }, [slug, clientId, accountUserId, ui.useApi]);
 
-  const persistLocal = useCallback(
+  const _persistLocal = useCallback(
     (next: StoredBracketState) => {
       if (ui.useApi) return;
       try {

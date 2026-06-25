@@ -98,7 +98,7 @@ function ChampionBelt() {
 
 function CompetitorPick({
   competitor,
-  nameStyle,
+  nameStyle: _nameStyle,
   isSelected,
   isOtherSelected,
   locked,
