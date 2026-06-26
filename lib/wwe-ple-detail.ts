@@ -264,11 +264,11 @@ export const PLE_EVENT_DETAILS: Record<PleSlug, PleEventDetail> = {
       glow: "shadow-[0_0_75px_-18px_rgba(251,191,36,0.35)]",
     },
     highlights: [
-      { title: "챔피언십 중심", detail: "브랜드별 타이틀 매치 집중" },
-      { title: "2026. 6.27", detail: "리야드 개최" },
-      { title: "시즌 중반", detail: "SummerSlam 전 스토리 정리" },
+      { title: "Undisputed 트리플 스렛", detail: "Cody Rhodes (c) vs Gunther vs Sami Zayn" },
+      { title: "킹 & 퀸 결승", detail: "Jey Uso vs Oba Femi / IYO SKY vs Liv Morgan" },
+      { title: "스틸 케이지", detail: "Seth Rollins vs Bron Breakker" },
     ],
-    predictionFocus: ["챔피언 방어", "메인 이벤트", "타이틀 변동"],
+    predictionFocus: ["Undisputed 챔피언 방어", "킹·퀸 우승자", "여자 US 타이틀 변동", "케이지 매치 승자"],
   },
   "bad-blood": {
     slug: "bad-blood",

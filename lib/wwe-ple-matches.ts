@@ -461,37 +461,56 @@ export const PLE_MATCH_CARDS: Record<PleSlug, PleMatchCard[]> = {
   ],
 
   "night-of-champions": [
-    m2(
-      "noc26-sami-kross",
-      "Single Match",
+    mm(
+      "noc26-undisputed",
+      "Undisputed WWE Championship",
       "sideA",
-      { name: "Sami Zayn" },
-      { name: "Karrion Kross" },
-      { left: 1.7, right: 2.15 }
+      [
+        { name: "Cody Rhodes", isChampion: true },
+        { name: "Gunther" },
+        { name: "Sami Zayn" },
+      ],
+      [1.17, 7.0, 4.0]
+    ),
+    m2(
+      "noc26-kotr",
+      "King of the Ring Final",
+      "sideB",
+      { name: "Jey Uso" },
+      { name: "Oba Femi" },
+      { left: 1.77, right: 2.1 }
+    ),
+    m2(
+      "noc26-qotr",
+      "Queen of the Ring Final",
+      "sideA",
+      { name: "IYO SKY" },
+      { name: "Liv Morgan" },
+      { left: 1.17, right: 4.5 }
+    ),
+    m2(
+      "noc26-women-us",
+      "Women's United States Championship",
+      "sideB",
+      { name: "Jade Cargill" },
+      { name: "Tiffany Stratton", isChampion: true },
+      { left: 1.77, right: 2.1 }
     ),
     m2(
       "noc26-us",
       "United States Championship",
-      "sideB",
-      { name: "Solo Sikoa" },
-      { name: "Jacob Fatu", isChampion: true },
-      { left: 2.1, right: 1.72 }
-    ),
-    m2(
-      "noc26-rhea-raquel",
-      "Street Fight",
       "sideA",
-      { name: "Rhea Ripley" },
-      { name: "Raquel Rodriguez" },
-      { left: 1.55, right: 2.45 }
+      { name: "Trick Williams", isChampion: true },
+      { name: "Ricky Saints" },
+      { left: 1.03, right: 9.5 }
     ),
     m2(
-      "noc26-undisputed",
-      "Undisputed WWE Championship",
+      "noc26-cage",
+      "Steel Cage Match",
       "sideB",
-      { name: "John Cena", isChampion: true },
-      { name: "CM Punk" },
-      { left: 1.65, right: 2.25 }
+      { name: "Seth Rollins" },
+      { name: "Bron Breakker" },
+      { left: 1.83, right: 1.83 }
     ),
   ],
 
