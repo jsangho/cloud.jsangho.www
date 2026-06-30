@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -9,8 +10,16 @@ import {
   Users, TrendingUp, TrendingDown, Download, ChevronDown,
   Mail, Phone, ArrowUpRight, LayoutDashboard, Briefcase,
   Package, Code, Coins, MessageSquare, Calendar, Inbox,
-  FolderOpen, User,
+  FolderOpen, User, Send, Loader2, CheckCircle, AlertCircle,
+  BookUser, Plus,
 } from "lucide-react";
+import { ContactsCsvUpload } from "@/components/contacts-csv-upload";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // ── 데이터 ────────────────────────────────────────────────────────────────────
 
@@ -412,10 +421,266 @@ function TeamActivityCard() {
   );
 }
 
+// ── 이메일 작성 ───────────────────────────────────────────────────────────────
+
+type SendState = "idle" | "sending" | "success" | "error";
+type Suggestion = { name: string; email: string };
+
+function EmailComposeCard() {
+  const { data: session, status } = useSession();
+  const isGoogleLinked = status === "authenticated";
+
+  const [to, setTo] = useState("");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [sendState, setSendState] = useState<SendState>("idle");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const handleToChange = (value: string) => {
+    setTo(value);
+    setSuggestions([]);
+    clearTimeout(debounceRef.current);
+    if (!value || !isGoogleLinked) return;
+    debounceRef.current = setTimeout(async () => {
+      const res = await fetch(`/api/contacts?q=${encodeURIComponent(value)}`);
+      if (res.ok) setSuggestions(await res.json());
+    }, 300);
+  };
+
+  const selectSuggestion = (s: Suggestion) => {
+    setTo(s.email);
+    setSuggestions([]);
+  };
+
+  const handleSend = async () => {
+    if (!to || !subject || !body) return;
+    setSendState("sending");
+    try {
+      const res = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to, subject, body }),
+      });
+      setSendState(res.ok ? "success" : "error");
+      if (res.ok) { setTo(""); setSubject(""); setBody(""); }
+    } catch {
+      setSendState("error");
+    }
+    setTimeout(() => setSendState("idle"), 3000);
+  };
+
+  const inputCls =
+    "w-full rounded-lg border border-stone-700/60 bg-stone-900/60 px-3 py-2 text-sm text-stone-100 placeholder-stone-600 outline-none focus:border-stone-500 transition-colors";
+
+  return (
+    <Card className="w-full p-6">
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-stone-400" />
+          <h2 className="text-sm font-semibold text-stone-100">이메일 작성</h2>
+        </div>
+
+        {isGoogleLinked ? (
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-[11px] text-emerald-400">
+              <CheckCircle className="h-3 w-3" /> 주소록 연동됨
+            </span>
+            <button
+              onClick={() => signOut({ redirect: false })}
+              className="text-[11px] text-stone-500 underline hover:text-stone-300"
+            >
+              해제
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => signIn("google")}
+            className="flex items-center gap-1.5 rounded-lg border border-stone-600/70 bg-stone-800/60 px-3 py-1.5 text-[11px] text-stone-300 transition-colors hover:bg-stone-700/60"
+          >
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google 주소록 연동
+          </button>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="mb-1 block text-[11px] text-stone-500">
+            받는 사람
+            {isGoogleLinked && (
+              <span className="ml-1 text-stone-600">— 이름으로 검색 가능</span>
+            )}
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder={isGoogleLinked ? "이름 또는 이메일 입력" : "example@gmail.com"}
+              value={to}
+              onChange={(e) => handleToChange(e.target.value)}
+              onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+              className={inputCls}
+            />
+            {suggestions.length > 0 && (
+              <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-stone-700 bg-stone-900 shadow-xl">
+                {suggestions.map((s) => (
+                  <li
+                    key={s.email}
+                    onMouseDown={() => selectSuggestion(s)}
+                    className="flex cursor-pointer flex-col px-3 py-2.5 hover:bg-stone-800"
+                  >
+                    <span className="text-xs font-medium text-stone-100">{s.name}</span>
+                    <span className="text-[11px] text-stone-400">{s.email}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-[11px] text-stone-500">제목</label>
+          <input
+            type="text"
+            placeholder="제목을 입력하세요"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-[11px] text-stone-500">내용</label>
+          <textarea
+            rows={8}
+            placeholder="내용을 입력하세요"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            className={`${inputCls} resize-none`}
+          />
+        </div>
+
+        <div className="flex items-center justify-between pt-1">
+          {sendState === "success" && (
+            <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+              <CheckCircle className="h-3.5 w-3.5" /> 전송 완료
+            </span>
+          )}
+          {sendState === "error" && (
+            <span className="flex items-center gap-1.5 text-xs text-red-400">
+              <AlertCircle className="h-3.5 w-3.5" /> 전송 실패
+            </span>
+          )}
+          {sendState === "idle" && <span />}
+
+          <button
+            onClick={handleSend}
+            disabled={sendState === "sending" || !to || !subject || !body}
+            className="flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {sendState === "sending" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Send className="h-3.5 w-3.5" />
+            )}
+            {sendState === "sending" ? "전송 중..." : "보내기"}
+          </button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// ── 주소록 패널 ───────────────────────────────────────────────────────────────
+
+type ContactItem = { id: number; name: string; email: string; phone: string; org_name: string };
+
+function AddressBookPanel() {
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [contacts, setContacts] = useState<ContactItem[]>([]);
+
+  const fetchContacts = async () => {
+    try {
+      const res = await fetch("/api/contacts/list");
+      if (res.ok) setContacts(await res.json());
+    } catch {}
+  };
+
+  useEffect(() => { fetchContacts(); }, []);
+
+  const handleUploadClose = (open: boolean) => {
+    setUploadOpen(open);
+    if (!open) fetchContacts();
+  };
+
+  return (
+    <Card className="p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <BookUser className="h-4 w-4 text-stone-400" />
+          <h3 className="text-sm font-semibold text-stone-100">주소록</h3>
+          {contacts.length > 0 && (
+            <span className="rounded-full bg-stone-700 px-1.5 py-0.5 text-[10px] text-stone-300">
+              {contacts.length}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={() => setUploadOpen(true)}
+          className="flex items-center gap-1 rounded-lg border border-stone-600/70 bg-stone-800/45 px-2.5 py-1 text-[11px] font-medium text-stone-200 transition-colors hover:bg-stone-700/65"
+        >
+          <Plus className="h-3 w-3" />
+          등록
+        </button>
+      </div>
+
+      {contacts.length === 0 ? (
+        <div className="py-8 text-center text-[11px] text-stone-600">
+          등록된 연락처가 없습니다.
+          <br />
+          CSV 파일을 업로드해 주세요.
+        </div>
+      ) : (
+        <ul className="max-h-[360px] divide-y divide-stone-800 overflow-y-auto">
+          {contacts.map((c) => (
+            <li key={c.id} className="flex flex-col gap-0.5 py-2.5">
+              <span className="text-[12px] font-medium text-stone-100">{c.name}</span>
+              {c.org_name && (
+                <span className="text-[10px] text-stone-400">{c.org_name}</span>
+              )}
+              {c.email && (
+                <span className="text-[10px] text-stone-500">{c.email}</span>
+              )}
+              {c.phone && (
+                <span className="text-[10px] text-stone-500">{c.phone}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Dialog open={uploadOpen} onOpenChange={handleUploadClose}>
+        <DialogContent className="max-w-2xl border-stone-700/60 bg-stone-950">
+          <DialogHeader>
+            <DialogTitle className="text-stone-100">주소록 CSV 업로드</DialogTitle>
+          </DialogHeader>
+          <ContactsCsvUpload />
+        </DialogContent>
+      </Dialog>
+    </Card>
+  );
+}
+
 // ── 페이지 ────────────────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("대시보드");
+  const [showAddressBook, setShowAddressBook] = useState(false);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0a0a0c] text-stone-900 dark:text-stone-100">
@@ -446,48 +711,69 @@ export default function AdminDashboard() {
       {/* 메인 콘텐츠 */}
       <main className="mx-auto max-w-7xl px-3 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
 
-        {/* 페이지 헤더 */}
-        <div className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-5">
-          <div>
-            <h1 className="text-base font-bold text-stone-50 sm:text-lg">CRM 대시보드</h1>
-            <p className="text-[11px] text-stone-400">팀의 성장 현황을 확인하세요</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 rounded-lg border border-stone-600/70 bg-stone-800/45 px-2.5 py-1.5 text-[11px] text-stone-200 transition-colors hover:bg-stone-700/65">
-              이번 주 <ChevronDown className="h-3 w-3" />
-            </button>
-            <button className="flex items-center gap-1.5 rounded-lg border border-red-700/50 bg-red-900/30 px-2.5 py-1.5 text-[11px] font-medium text-red-300 transition-colors hover:bg-red-900/50">
-              <Download className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">데이터 내보내기</span>
-            </button>
-          </div>
-        </div>
-
-        {/* 2열 레이아웃: 모바일 스택, lg에서 사이드바 */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[260px_1fr] lg:gap-5">
-
-          {/* 캘린더 — 모바일: 하단(order-2), lg: 좌측 사이드바(lg:order-1) */}
-          <div className="order-2 lg:order-1">
-            <CalendarCard />
-          </div>
-
-          {/* 우측: 통계 + 매출 */}
-          <div className="order-1 lg:order-2 space-y-4">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <TotalMembersCard />
-              <AvgTimeCard />
-              <LeadsSalesCard />
+        {activeTab === "이메일" ? (
+          <>
+            <div className="mb-4 flex justify-end">
+              <button
+                onClick={() => setShowAddressBook((v) => !v)}
+                className={[
+                  "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-colors",
+                  showAddressBook
+                    ? "border-stone-400 bg-stone-600 text-stone-50"
+                    : "border-stone-600/70 bg-stone-800/45 text-stone-300 hover:bg-stone-700/65",
+                ].join(" ")}
+              >
+                <BookUser className="h-3.5 w-3.5" />
+                주소록
+              </button>
             </div>
-            <RevenueCard />
-          </div>
-        </div>
+            <div className={showAddressBook ? "grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_300px]" : ""}>
+              <EmailComposeCard />
+              {showAddressBook && <AddressBookPanel />}
+            </div>
+          </>
+        ) : (
+          <>
+            {/* 페이지 헤더 */}
+            <div className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-5">
+              <div>
+                <h1 className="text-base font-bold text-stone-50 sm:text-lg">CRM 대시보드</h1>
+                <p className="text-[11px] text-stone-400">팀의 성장 현황을 확인하세요</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button className="flex items-center gap-1.5 rounded-lg border border-stone-600/70 bg-stone-800/45 px-2.5 py-1.5 text-[11px] text-stone-200 transition-colors hover:bg-stone-700/65">
+                  이번 주 <ChevronDown className="h-3 w-3" />
+                </button>
+                <button className="flex items-center gap-1.5 rounded-lg border border-red-700/50 bg-red-900/30 px-2.5 py-1.5 text-[11px] font-medium text-red-300 transition-colors hover:bg-red-900/50">
+                  <Download className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">데이터 내보내기</span>
+                </button>
+              </div>
+            </div>
 
-        {/* 하단 3열 */}
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-5 lg:grid-cols-3">
-          <LeadsManagementCard />
-          <RetentionRateCard />
-          <TeamActivityCard />
-        </div>
+            {/* 2열 레이아웃: 모바일 스택, lg에서 사이드바 */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-[260px_1fr] lg:gap-5">
+              <div className="order-2 lg:order-1">
+                <CalendarCard />
+              </div>
+              <div className="order-1 lg:order-2 space-y-4">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <TotalMembersCard />
+                  <AvgTimeCard />
+                  <LeadsSalesCard />
+                </div>
+                <RevenueCard />
+              </div>
+            </div>
+
+            {/* 하단 3열 */}
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-5 lg:grid-cols-3">
+              <LeadsManagementCard />
+              <RetentionRateCard />
+              <TeamActivityCard />
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

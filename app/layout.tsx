@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes'
 import { Analytics } from '@vercel/analytics/next'
 import { Navbar } from '@/components/navbar'
 import { AuthProvider } from '@/context/auth-context'
+import { GoogleSessionProvider } from '@/components/google-session-provider'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
@@ -36,17 +37,19 @@ export default function RootLayout({
       <body
         className={`${geist.variable} ${geistMono.variable} ${oswald.variable} min-h-full w-full overflow-x-hidden font-sans antialiased bg-white text-stone-900 dark:bg-[#0a0a0c] dark:text-stone-100`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <Navbar />
-            {children}
-          </AuthProvider>
-        </ThemeProvider>
+        <GoogleSessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthProvider>
+              <Navbar />
+              {children}
+            </AuthProvider>
+          </ThemeProvider>
+        </GoogleSessionProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
