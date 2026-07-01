@@ -533,118 +533,30 @@ export const PLE_MATCH_CARDS: Record<PleSlug, PleMatchCard[]> = {
     ),
   ],
 
+  /** WWE SummerSlam 2026.8.1-2 미니애폴리스 U.S. Bank Stadium — 2026-07-01 기준 공식 확정 카드만 반영 (나머지는 미확정) */
   summerslam: [
     m2(
-      "ss26-n1-sami",
-      "Single Match",
-      "sideA",
-      { name: "Sami Zayn" },
-      { name: "Karrion Kross" },
-      { left: 1.75, right: 2.05 }
-    ),
-    m2(
-      "ss26-n1-women-tag",
-      "WWE Women's Tag Team Championship",
-      "sideB",
-      { name: "Alexa Bliss & Charlotte Flair" },
-      { name: "Raquel Rodriguez & Roxanne Perez", isChampion: true },
-      { left: 1.9, right: 1.92 }
-    ),
-    m2(
-      "ss26-n1-bloodline",
-      "Tag Team Match",
-      "sideA",
-      { name: "Roman Reigns & Jey Uso" },
-      { name: "Bron Breakker & Bronson Reed" },
-      { left: 1.85, right: 1.95 }
-    ),
-    m2(
-      "ss26-n1-orton-jelly",
-      "Tag Team Match",
-      "sideB",
-      { name: "Drew McIntyre & Logan Paul" },
-      { name: "Randy Orton & Jelly Roll" },
-      { left: 1.95, right: 1.85 }
-    ),
-    m2(
-      "ss26-n1-women",
-      "WWE Women's Championship",
-      "sideA",
-      { name: "Tiffany Stratton", isChampion: true },
-      { name: "Jade Cargill" },
-      { left: 1.8, right: 2.0 }
-    ),
-    m2(
-      "ss26-n1-whc",
-      "World Heavyweight Championship",
-      "sideB",
-      { name: "CM Punk" },
-      { name: "Gunther", isChampion: true },
-      { left: 2.3, right: 1.6 }
-    ),
-    m2(
-      "ss26-n1-mitb-cash",
+      "ss26-whc",
       "World Heavyweight Championship",
       "sideA",
+      { name: "Roman Reigns", isChampion: true },
       { name: "Seth Rollins" },
-      { name: "CM Punk", isChampion: true },
-      { left: 2.5, right: 1.55 }
+      { left: 1.9, right: 1.9 }
     ),
-    mm(
-      "ss26-n2-women-world",
+    m2(
+      "ss26-women-world",
       "Women's World Championship",
       "sideB",
-      [
-        { name: "Naomi", isChampion: true },
-        { name: "Rhea Ripley" },
-        { name: "IYO SKY" },
-      ],
-      [2.4, 2.5, 3.2]
+      { name: "Liv Morgan", isChampion: true },
+      { name: "IYO SKY" },
+      { left: 1.9, right: 1.9 }
     ),
     m2(
-      "ss26-n2-women-ic",
-      "Women's Intercontinental Championship",
+      "ss26-hiac",
+      "Hell in a Cell Match",
       "sideA",
-      { name: "Becky Lynch", isChampion: true },
-      { name: "Lyra Valkyria" },
-      { left: 1.72, right: 2.1 }
-    ),
-    mm(
-      "ss26-n2-tag-tlc",
-      "WWE Tag Team Championship",
-      "sideB",
-      [
-        { name: "The Wyatt Sicks", isChampion: true },
-        { name: "Motor City Machine Guns" },
-        { name: "#DIY" },
-        { name: "Fraxiom" },
-        { name: "The Street Profits" },
-        { name: "Andrade & Rey Fénix" },
-      ],
-      [3.0, 4.5, 5.0, 6.0, 6.5, 7.5]
-    ),
-    m2(
-      "ss26-n2-us-cage",
-      "United States Championship",
-      "sideA",
-      { name: "Solo Sikoa", isChampion: true },
-      { name: "Jacob Fatu" },
-      { left: 1.75, right: 2.1 }
-    ),
-    m2(
-      "ss26-n2-ic",
-      "Intercontinental Championship",
-      "sideB",
-      { name: "Dominik Mysterio", isChampion: true },
-      { name: "AJ Styles" },
-      { left: 1.65, right: 2.25 }
-    ),
-    m2(
-      "ss26-n2-undisputed",
-      "Undisputed WWE Championship",
-      "sideA",
-      { name: "Cody Rhodes" },
-      { name: "John Cena", isChampion: true },
+      { name: "Brock Lesnar" },
+      { name: "Oba Femi" },
       { left: 1.9, right: 1.9 }
     ),
   ],

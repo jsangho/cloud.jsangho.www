@@ -1,39 +1,26 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/next-auth-options";
 import { NextRequest, NextResponse } from "next/server";
 
-type PeopleResult = {
-  person: {
-    names?: { displayName: string }[];
-    emailAddresses?: { value: string }[];
-  };
-};
+type ContactItem = { id: number; name: string; email: string; phone: string; org_name: string };
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  const accessToken = (session as Record<string, unknown> | null)?.accessToken as string | undefined;
-
-  if (!accessToken) {
-    return NextResponse.json([], { status: 401 });
-  }
-
-  const q = req.nextUrl.searchParams.get("q") ?? "";
+  const q = (req.nextUrl.searchParams.get("q") ?? "").toLowerCase().trim();
   if (!q) return NextResponse.json([]);
 
   const res = await fetch(
-    `https://people.googleapis.com/v1/people:searchContacts?query=${encodeURIComponent(q)}&readMask=names,emailAddresses&pageSize=5`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+    `${process.env.INTERNAL_API_BASE_URL}/api/manager/juso/contacts`,
+    { cache: "no-store" },
   );
-
   if (!res.ok) return NextResponse.json([]);
 
-  const data = await res.json();
-  const results = ((data.results ?? []) as PeopleResult[])
-    .map((r) => ({
-      name: r.person.names?.[0]?.displayName ?? "",
-      email: r.person.emailAddresses?.[0]?.value ?? "",
-    }))
-    .filter((r) => r.email);
+  const all: ContactItem[] = await res.json();
+  const matched = all
+    .filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q),
+    )
+    .slice(0, 5)
+    .map((c) => ({ name: c.name, email: c.email }));
 
-  return NextResponse.json(results);
+  return NextResponse.json(matched);
 }

@@ -11,7 +11,7 @@ import {
   Mail, Phone, ArrowUpRight, LayoutDashboard, Briefcase,
   Package, Code, Coins, MessageSquare, Calendar, Inbox,
   FolderOpen, User, Send, Loader2, CheckCircle, AlertCircle,
-  BookUser, Plus,
+  BookUser, Plus, SendHorizonal, MailOpen,
 } from "lucide-react";
 import { ContactsCsvUpload } from "@/components/contacts-csv-upload";
 import {
@@ -427,7 +427,7 @@ type SendState = "idle" | "sending" | "success" | "error";
 type Suggestion = { name: string; email: string };
 
 function EmailComposeCard() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const isGoogleLinked = status === "authenticated";
 
   const [to, setTo] = useState("");
@@ -441,7 +441,7 @@ function EmailComposeCard() {
     setTo(value);
     setSuggestions([]);
     clearTimeout(debounceRef.current);
-    if (!value || !isGoogleLinked) return;
+    if (!value) return;
     debounceRef.current = setTimeout(async () => {
       const res = await fetch(`/api/contacts?q=${encodeURIComponent(value)}`);
       if (res.ok) setSuggestions(await res.json());
@@ -513,9 +513,7 @@ function EmailComposeCard() {
         <div>
           <label className="mb-1 block text-[11px] text-stone-500">
             받는 사람
-            {isGoogleLinked && (
-              <span className="ml-1 text-stone-600">— 이름으로 검색 가능</span>
-            )}
+            <span className="ml-1 text-stone-600">— 이름으로 검색 가능</span>
           </label>
           <div className="relative">
             <input
@@ -596,6 +594,229 @@ function EmailComposeCard() {
   );
 }
 
+// ── 텔레그램 작성 ─────────────────────────────────────────────────────────────
+
+function TelegramComposeCard() {
+  const [chatId, setChatId] = useState("");
+  const [message, setMessage] = useState("");
+  const [sendState, setSendState] = useState<SendState>("idle");
+
+  const inputCls =
+    "w-full rounded-lg border border-stone-700/60 bg-stone-900/60 px-3 py-2 text-sm text-stone-100 placeholder-stone-600 outline-none focus:border-stone-500 transition-colors";
+
+  const handleSend = async () => {
+    if (!chatId || !message) return;
+    setSendState("sending");
+    try {
+      const res = await fetch("/api/telegram", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chatId, message }),
+      });
+      setSendState(res.ok ? "success" : "error");
+      if (res.ok) { setChatId(""); setMessage(""); }
+    } catch {
+      setSendState("error");
+    }
+    setTimeout(() => setSendState("idle"), 3000);
+  };
+
+  return (
+    <Card className="w-full p-6">
+      <div className="mb-5 flex items-center gap-2">
+        <SendHorizonal className="h-4 w-4 text-stone-400" />
+        <h2 className="text-sm font-semibold text-stone-100">텔레그램 메시지</h2>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="mb-1 block text-[11px] text-stone-500">Chat ID</label>
+          <input
+            type="text"
+            placeholder="@username 또는 숫자 Chat ID"
+            value={chatId}
+            onChange={(e) => setChatId(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-[11px] text-stone-500">메시지</label>
+          <textarea
+            rows={8}
+            placeholder="전송할 메시지를 입력하세요 (HTML 태그 지원)"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className={`${inputCls} resize-none`}
+          />
+        </div>
+
+        <div className="flex items-center justify-between pt-1">
+          {sendState === "success" && (
+            <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+              <CheckCircle className="h-3.5 w-3.5" /> 전송 완료
+            </span>
+          )}
+          {sendState === "error" && (
+            <span className="flex items-center gap-1.5 text-xs text-red-400">
+              <AlertCircle className="h-3.5 w-3.5" /> 전송 실패
+            </span>
+          )}
+          {sendState === "idle" && <span />}
+
+          <button
+            onClick={handleSend}
+            disabled={sendState === "sending" || !chatId || !message}
+            className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {sendState === "sending" ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Send className="h-3.5 w-3.5" />
+            )}
+            {sendState === "sending" ? "전송 중..." : "보내기"}
+          </button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// ── 받은편지함 ────────────────────────────────────────────────────────────────
+
+type InboxEmail = {
+  id: number;
+  from_email: string;
+  from_name: string;
+  subject: string;
+  body: string;
+  received_at: string;
+  is_read: boolean;
+};
+
+function InboxPanel() {
+  const [emails, setEmails] = useState<InboxEmail[]>([]);
+  const [selected, setSelected] = useState<InboxEmail | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchEmails = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/inbox");
+      if (res.ok) setEmails(await res.json());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchEmails(); }, []);
+
+  const openEmail = async (email: InboxEmail) => {
+    setSelected(email);
+    if (!email.is_read) {
+      await fetch(`/api/inbox/${email.id}/read`, { method: "PATCH" });
+      setEmails((prev) =>
+        prev.map((e) => (e.id === email.id ? { ...e, is_read: true } : e))
+      );
+    }
+  };
+
+  const unreadCount = emails.filter((e) => !e.is_read).length;
+
+  return (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[320px_1fr]">
+      {/* 메일 목록 */}
+      <Card className="overflow-hidden">
+        <div className="flex items-center justify-between border-b border-stone-700/50 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Inbox className="h-4 w-4 text-stone-400" />
+            <span className="text-sm font-semibold text-stone-100">받은편지함</span>
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                {unreadCount}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={fetchEmails}
+            className="text-[11px] text-stone-500 hover:text-stone-300 transition-colors"
+          >
+            새로고침
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-5 w-5 animate-spin text-stone-500" />
+          </div>
+        ) : emails.length === 0 ? (
+          <div className="py-12 text-center text-[11px] text-stone-600">
+            받은 메일이 없습니다.
+          </div>
+        ) : (
+          <ul className="divide-y divide-stone-800 overflow-y-auto max-h-[600px]">
+            {emails.map((email) => (
+              <li
+                key={email.id}
+                onClick={() => openEmail(email)}
+                className={`cursor-pointer px-4 py-3 transition-colors hover:bg-stone-800/50 ${
+                  selected?.id === email.id ? "bg-stone-800/70" : ""
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      {!email.is_read && (
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+                      )}
+                      <span className={`truncate text-xs ${email.is_read ? "text-stone-400" : "font-semibold text-stone-100"}`}>
+                        {email.from_name || email.from_email}
+                      </span>
+                    </div>
+                    <p className={`mt-0.5 truncate text-[11px] ${email.is_read ? "text-stone-600" : "text-stone-300"}`}>
+                      {email.subject || "(제목 없음)"}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-[10px] text-stone-600">
+                    {new Date(email.received_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      {/* 메일 본문 */}
+      <Card className="p-5">
+        {selected ? (
+          <>
+            <div className="mb-4 border-b border-stone-700/50 pb-4">
+              <h3 className="mb-2 text-sm font-semibold text-stone-100">
+                {selected.subject || "(제목 없음)"}
+              </h3>
+              <div className="flex items-center gap-2 text-[11px] text-stone-500">
+                <MailOpen className="h-3.5 w-3.5" />
+                <span>{selected.from_name ? `${selected.from_name} <${selected.from_email}>` : selected.from_email}</span>
+                <span>·</span>
+                <span>{new Date(selected.received_at).toLocaleString("ko-KR")}</span>
+              </div>
+            </div>
+            <div
+              className="prose prose-sm prose-invert max-w-none text-stone-300"
+              dangerouslySetInnerHTML={{ __html: selected.body || "" }}
+            />
+          </>
+        ) : (
+          <div className="flex h-full min-h-[200px] items-center justify-center text-[11px] text-stone-600">
+            메일을 선택하면 내용이 표시됩니다.
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
 // ── 주소록 패널 ───────────────────────────────────────────────────────────────
 
 type ContactItem = { id: number; name: string; email: string; phone: string; org_name: string };
@@ -603,6 +824,7 @@ type ContactItem = { id: number; name: string; email: string; phone: string; org
 function AddressBookPanel() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [contacts, setContacts] = useState<ContactItem[]>([]);
+  const [resetting, setResetting] = useState(false);
 
   const fetchContacts = async () => {
     try {
@@ -618,6 +840,17 @@ function AddressBookPanel() {
     if (!open) fetchContacts();
   };
 
+  const handleReset = async () => {
+    if (!window.confirm("연락처를 모두 삭제하시겠습니까?")) return;
+    setResetting(true);
+    try {
+      await fetch("/api/contacts/list", { method: "DELETE" });
+      setContacts([]);
+    } finally {
+      setResetting(false);
+    }
+  };
+
   return (
     <Card className="p-4">
       <div className="mb-4 flex items-center justify-between">
@@ -630,13 +863,24 @@ function AddressBookPanel() {
             </span>
           )}
         </div>
-        <button
-          onClick={() => setUploadOpen(true)}
-          className="flex items-center gap-1 rounded-lg border border-stone-600/70 bg-stone-800/45 px-2.5 py-1 text-[11px] font-medium text-stone-200 transition-colors hover:bg-stone-700/65"
-        >
-          <Plus className="h-3 w-3" />
-          등록
-        </button>
+        <div className="flex items-center gap-1.5">
+          {contacts.length > 0 && (
+            <button
+              onClick={handleReset}
+              disabled={resetting}
+              className="flex items-center gap-1 rounded-lg border border-red-800/60 bg-red-900/30 px-2.5 py-1 text-[11px] font-medium text-red-400 transition-colors hover:bg-red-900/50 disabled:opacity-50"
+            >
+              {resetting ? "삭제 중..." : "리셋"}
+            </button>
+          )}
+          <button
+            onClick={() => setUploadOpen(true)}
+            className="flex items-center gap-1 rounded-lg border border-stone-600/70 bg-stone-800/45 px-2.5 py-1 text-[11px] font-medium text-stone-200 transition-colors hover:bg-stone-700/65"
+          >
+            <Plus className="h-3 w-3" />
+            등록
+          </button>
+        </div>
       </div>
 
       {contacts.length === 0 ? (
@@ -680,6 +924,7 @@ function AddressBookPanel() {
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("대시보드");
+  const [emailSubTab, setEmailSubTab] = useState<"이메일" | "텔레그램" | "받은편지함">("이메일");
   const [showAddressBook, setShowAddressBook] = useState(false);
 
   return (
@@ -713,24 +958,48 @@ export default function AdminDashboard() {
 
         {activeTab === "이메일" ? (
           <>
-            <div className="mb-4 flex justify-end">
-              <button
-                onClick={() => setShowAddressBook((v) => !v)}
-                className={[
-                  "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-colors",
-                  showAddressBook
-                    ? "border-stone-400 bg-stone-600 text-stone-50"
-                    : "border-stone-600/70 bg-stone-800/45 text-stone-300 hover:bg-stone-700/65",
-                ].join(" ")}
-              >
-                <BookUser className="h-3.5 w-3.5" />
-                주소록
-              </button>
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex gap-1">
+                {(["이메일", "텔레그램", "받은편지함"] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setEmailSubTab(t)}
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                      emailSubTab === t
+                        ? "border border-stone-400 bg-stone-600 text-stone-50"
+                        : "border border-transparent text-stone-400 hover:bg-stone-800/60 hover:text-stone-200"
+                    }`}
+                  >
+                    {t === "이메일" ? <Mail className="h-3.5 w-3.5" /> : t === "텔레그램" ? <SendHorizonal className="h-3.5 w-3.5" /> : <Inbox className="h-3.5 w-3.5" />}
+                    {t}
+                  </button>
+                ))}
+              </div>
+              {emailSubTab === "이메일" && (
+                <button
+                  onClick={() => setShowAddressBook((v) => !v)}
+                  className={[
+                    "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-colors",
+                    showAddressBook
+                      ? "border-stone-400 bg-stone-600 text-stone-50"
+                      : "border-stone-600/70 bg-stone-800/45 text-stone-300 hover:bg-stone-700/65",
+                  ].join(" ")}
+                >
+                  <BookUser className="h-3.5 w-3.5" />
+                  주소록
+                </button>
+              )}
             </div>
-            <div className={showAddressBook ? "grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_300px]" : ""}>
-              <EmailComposeCard />
-              {showAddressBook && <AddressBookPanel />}
-            </div>
+            {emailSubTab === "이메일" ? (
+              <div className={showAddressBook ? "grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_300px]" : ""}>
+                <EmailComposeCard />
+                {showAddressBook && <AddressBookPanel />}
+              </div>
+            ) : emailSubTab === "텔레그램" ? (
+              <TelegramComposeCard />
+            ) : (
+              <InboxPanel />
+            )}
           </>
         ) : (
           <>

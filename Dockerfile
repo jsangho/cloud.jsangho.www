@@ -13,8 +13,5 @@ RUN pnpm install --frozen-lockfile
 # 3. 소스 코드 전체 복사
 COPY . .
 
-# 4. Next.js 빌드 진행 (CI=true는 빌드 단계에서만 적용)
-RUN CI=true pnpm build
-
-# 5. Next.js 실행 명령 (기본 3000번 포트)
-CMD ["pnpm", "start"]
+# 4. Next.js 개발 서버 실행 (볼륨 마운트로 핫 리로드)
+CMD ["pnpm", "dev"]

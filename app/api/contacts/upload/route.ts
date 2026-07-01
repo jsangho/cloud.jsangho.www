@@ -8,9 +8,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ detail: "파일이 없습니다." }, { status: 400 });
   }
 
-  const text = await file.text();
-  const lines = text.trim().split(/\r?\n/).filter(Boolean);
-  const count = Math.max(0, lines.length - 1);
+  const upstream = new FormData();
+  upstream.append("file", file);
 
-  return NextResponse.json({ count });
+  const res = await fetch(
+    `${process.env.INTERNAL_API_BASE_URL}/api/manager/juso/fileupload`,
+    { method: "POST", body: upstream },
+  );
+  const data = await res.json().catch(() => null);
+  return NextResponse.json(data, { status: res.status });
 }
